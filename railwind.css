@@ -1,0 +1,4 @@
+.space-y-3 > *:not(:first-child) {
+  margin-top: 0.75rem;
+}
+

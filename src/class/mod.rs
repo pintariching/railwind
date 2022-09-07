@@ -1,4 +1,4 @@
-use self::spacing::{Margin, Padding};
+use self::spacing::{Margin, Padding, SpaceBetween};
 
 pub mod spacing;
 
@@ -6,6 +6,7 @@ pub mod spacing;
 pub enum Class {
     Padding(Padding),
     Margin(Margin),
+    SpaceBetween(SpaceBetween),
 }
 
 impl Class {
@@ -13,6 +14,7 @@ impl Class {
         match self {
             Class::Padding(c) => c.to_css(),
             Class::Margin(c) => c.to_css(),
+            Class::SpaceBetween(c) => c.to_css(),
         }
     }
 }
