@@ -61,3 +61,15 @@ pub fn convert_size(size: &str) -> String {
     }
     .to_string()
 }
+
+pub fn convert_breakpoint(breakpoint: &str) -> String {
+    match breakpoint {
+        "sm" => "640px",
+        "md" => "786px",
+        "lg" => "1024px",
+        "xl" => "1280px",
+        "2xl" => "1536px",
+        _ => "1024px",
+    }
+    .to_string()
+}
