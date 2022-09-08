@@ -1,4 +1,4 @@
-use class::spacing::{Margin, Padding, SpaceBetween};
+use class::spacing::{margin::Margin, padding::Padding, space_between::SpaceBetween};
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::{
@@ -31,7 +31,8 @@ pub fn parse_html(input: &Path, output: &Path) -> Result<(), String> {
         }
     }
 
-    let mut compiled_css = String::new();
+    let mut compiled_css = fs::read_to_string("preflight.css").unwrap();
+
     for class in classes {
         // padding, margin, spacing...
         if class.contains('-') {
