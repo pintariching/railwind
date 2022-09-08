@@ -407,3 +407,7 @@ video {
   margin-top: 0.75rem;
 }
 
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+

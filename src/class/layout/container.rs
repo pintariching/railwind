@@ -10,7 +10,7 @@ impl Container {
         }
     }
 
-    pub fn to_css(&self) -> String {
-        format!(".{} {{\n  width: 100%;\n}}\n\n", self.class)
+    pub fn to_css(&self) -> Option<String> {
+        Some(format!(".{} {{\n  width: 100%;\n}}\n\n", self.class))
     }
 }

@@ -1,18 +1,25 @@
-use self::spacing::{margin::Margin, padding::Padding, space_between::SpaceBetween};
+use self::{
+    layout::{aspect_ratio::AspectRatio, container::Container},
+    spacing::{margin::Margin, padding::Padding, space_between::SpaceBetween},
+};
 
 pub mod layout;
 pub mod spacing;
 
 #[derive(Debug)]
 pub enum Class {
+    AspectRatio(AspectRatio),
+    Container(Container),
     Padding(Padding),
     Margin(Margin),
     SpaceBetween(SpaceBetween),
 }
 
 impl Class {
-    pub fn to_css(&self) -> String {
+    pub fn to_css(&self) -> Option<String> {
         match self {
+            Class::AspectRatio(c) => c.to_css(),
+            Class::Container(c) => c.to_css(),
             Class::Padding(c) => c.to_css(),
             Class::Margin(c) => c.to_css(),
             Class::SpaceBetween(c) => c.to_css(),

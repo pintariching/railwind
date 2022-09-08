@@ -24,28 +24,33 @@ impl Margin {
         }
     }
 
-    pub fn to_css(&self) -> String {
+    pub fn to_css(&self) -> Option<String> {
         if self.direction.is_given() {
-            format!(
-                ".{} {{\n  margin-{}: {};\n}}\n\n",
-                self.class,
-                self.direction.to_string(),
-                self.size
+            Some(
+                format!(
+                    ".{} {{\n  margin-{}: {};\n}}\n\n",
+                    self.class,
+                    self.direction.to_string(),
+                    self.size
+                )
+                .to_string(),
             )
-            .to_string()
         } else {
             if self.direction.is_horizontal() {
-                format!(
+                Some(format!(
                     ".{} {{\n  margin-left: {};\n  margin-right: {};\n}}\n\n",
                     self.class, self.size, self.size
-                )
+                ))
             } else if self.direction.is_vertical() {
-                format!(
+                Some(format!(
                     ".{} {{\n  margin-top: {};\n  margin-bottom: {};\n}}\n\n",
                     self.class, self.size, self.size
-                )
+                ))
             } else {
-                format!(".{} {{\n  margin: {};\n}}\n\n", self.class, self.size)
+                Some(format!(
+                    ".{} {{\n  margin: {};\n}}\n\n",
+                    self.class, self.size
+                ))
             }
         }
     }

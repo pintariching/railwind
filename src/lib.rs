@@ -1,4 +1,7 @@
-use class::spacing::{margin::Margin, padding::Padding, space_between::SpaceBetween};
+use class::{
+    layout::{aspect_ratio::AspectRatio, container::Container},
+    spacing::{margin::Margin, padding::Padding, space_between::SpaceBetween},
+};
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::{
@@ -34,16 +37,15 @@ pub fn parse_html(input: &Path, output: &Path) -> Result<(), String> {
     let mut compiled_css = fs::read_to_string("preflight.css").unwrap();
 
     for class in classes {
-        // padding, margin, spacing...
         if class.contains('-') {
-            // if class contains one dash `-`
             match class.chars().filter(|c| *c == '-').count() {
+                // if class contains one dash `-`
                 1 => {
                     let mut split = class.split("-");
                     let before_dash = split.nth(0).unwrap();
                     let after_dash = split.nth(0).unwrap();
 
-                    let class = match before_dash.len() {
+                    let c = match before_dash.len() {
                         1 => match before_dash {
                             "m" => Class::Margin(Margin::new(before_dash, after_dash)),
                             "p" => Class::Padding(Padding::new(before_dash, after_dash)),
@@ -54,25 +56,45 @@ pub fn parse_html(input: &Path, output: &Path) -> Result<(), String> {
                             'p' => Class::Padding(Padding::new(before_dash, after_dash)),
                             _ => continue,
                         },
+                        6 => match before_dash {
+                            "aspect" => {
+                                Class::AspectRatio(AspectRatio::new(before_dash, after_dash))
+                            }
+                            _ => continue,
+                        },
                         _ => continue,
                     };
 
-                    compiled_css.push_str(&class.to_css());
+                    if let Some(c) = c.to_css() {
+                        compiled_css.push_str(&c);
+                    }
                 }
+                // if class contains two dashes `-`
                 2 => {
                     let mut split = class.split("-");
                     let before_dash = split.nth(0).unwrap();
                     let mid_dash = split.nth(0).unwrap();
                     let after_dash = split.nth(0).unwrap();
 
-                    let class = match before_dash {
+                    let c = match before_dash {
                         "space" => Class::SpaceBetween(SpaceBetween::new(mid_dash, after_dash)),
                         _ => continue,
                     };
 
-                    compiled_css.push_str(&class.to_css());
+                    if let Some(c) = c.to_css() {
+                        compiled_css.push_str(&c);
+                    }
                 }
-                _ => (),
+                _ => continue,
+            }
+        } else {
+            let c = match class {
+                "container" => Class::Container(Container::new()),
+                _ => continue,
+            };
+
+            if let Some(c) = c.to_css() {
+                compiled_css.push_str(&c);
             }
         }
     }

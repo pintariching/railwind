@@ -37,17 +37,17 @@ impl SpaceBetween {
         }
     }
 
-    pub fn to_css(&self) -> String {
+    pub fn to_css(&self) -> Option<String> {
         if self.direction.is_horizontal() {
-            format!(
+            Some(format!(
                 ".{} > *:not(:first-child) {{\n  margin-left: {};\n}}\n\n",
                 self.class, self.size
-            )
+            ))
         } else {
-            format!(
+            Some(format!(
                 ".{} > *:not(:first-child) {{\n  margin-top: {};\n}}\n\n",
                 self.class, self.size
-            )
+            ))
         }
     }
 }
