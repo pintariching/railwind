@@ -1,16 +1,15 @@
+use swc_css::ast::QualifiedRule;
+
+use crate::class::BaseClass;
+
 #[derive(Debug)]
-pub struct Container {
-    class: String,
-}
+pub struct Container(pub Option<BaseClass>);
 
 impl Container {
-    pub fn new() -> Self {
-        Container {
-            class: "container".to_string(),
-        }
+    pub fn default() -> Self {
+        Self(None)
     }
-
-    pub fn to_css(&self) -> Option<String> {
-        Some(format!(".{} {{\n  width: 100%;\n}}\n\n", self.class))
+    pub fn generate_rule(&self) -> QualifiedRule {
+        todo!()
     }
 }
