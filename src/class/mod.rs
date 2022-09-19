@@ -1,4 +1,6 @@
-use crate::modifiers::{Group, MediaQuery, Modifier, Peer, PseudoClass, PseudoElement};
+use swc_css::ast::Rule;
+
+use crate::modifiers::Modifier;
 
 use self::layout::container::Container;
 
@@ -14,7 +16,27 @@ pub enum Class {
     // SpaceBetween(SpaceBetween),
 }
 
-#[derive(Debug)]
+impl Class {
+    pub fn to_css(&self) -> Option<String> {
+        todo!()
+    }
+
+    pub fn parse_from_str(str: &str) -> Option<Self> {
+        if str.ends_with("container") {
+            return Some(Class::Container(Container(BaseClass::parse_from_str(&str))));
+        }
+
+        None
+    }
+
+    pub fn to_qualified_rule(self) -> Rule {
+        match self {
+            Class::Container(c) => c.generate_rule(),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
 pub struct BaseClass(pub Vec<Modifier>);
 
 impl BaseClass {
@@ -29,24 +51,29 @@ impl BaseClass {
                 .filter_map(|m| Modifier::parse_from_str(m))
                 .collect();
 
-            Some(BaseClass(modifiers));
+            return Some(BaseClass(modifiers));
         }
 
         None
     }
 }
 
-impl Class {
-    pub fn to_css(&self) -> Option<String> {
-        todo!()
-    }
+#[cfg(test)]
+mod tests {
+    use crate::modifiers::{MediaQuery, Modifier, PseudoClass, PseudoElement};
 
-    pub fn parse_from_str(str: &str) -> Option<Self> {
-        if str.contains("container") {
-            return Some(Class::Container(Container(BaseClass::parse_from_str(&str))));
-        }
+    use super::BaseClass;
 
-        None
+    #[test]
+    fn test_base_class_parse_from_str() {
+        assert_eq!(
+            BaseClass::parse_from_str("first-line:hover:sm"),
+            Some(BaseClass(vec![
+                Modifier::PseudoElement(PseudoElement::FirstLine),
+                Modifier::PseudoClass(PseudoClass::Hover),
+                Modifier::MediaQuery(MediaQuery::Sm)
+            ]))
+        )
     }
 }
 
