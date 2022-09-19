@@ -1,4 +1,4 @@
-use railwindcss::parse_html;
+use railwind::parse_html;
 use std::path::Path;
 
 fn main() {
