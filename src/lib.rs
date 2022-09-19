@@ -15,7 +15,6 @@ use crate::class::Class;
 
 pub mod class;
 pub mod modifiers;
-mod stylesheet;
 
 lazy_static! {
     pub static ref STYLE_REGEX: Regex =
@@ -27,8 +26,6 @@ pub fn parse_html(input: &Path, output: &Path) {
 
     let mut rules: Vec<Rule> = Vec::new();
 
-    // get all the classes from "class" and "className"
-    // attributes and puts them in a list
     for capture in STYLE_REGEX.captures_iter(&html) {
         if let Some(group) = capture.get(1) {
             for cap in group.as_str().split(" ") {

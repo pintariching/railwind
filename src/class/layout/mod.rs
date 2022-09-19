@@ -1,2 +1,5 @@
-pub mod aspect_ratio;
-pub mod container;
+mod aspect_ratio;
+mod container;
+
+pub use aspect_ratio::AspectRatio;
+pub use container::Container;

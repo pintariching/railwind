@@ -2,14 +2,15 @@ use swc_css::ast::Rule;
 
 use crate::modifiers::Modifier;
 
-use self::layout::container::Container;
+use self::layout::{AspectRatio, Container};
 
+mod helpers;
 pub mod layout;
 pub mod spacing;
 
 #[derive(Debug)]
 pub enum Class {
-    // AspectRatio(AspectRatio),
+    AspectRatio(AspectRatio),
     Container(Container),
     // Padding(Padding),
     // Margin(Margin),
@@ -26,12 +27,19 @@ impl Class {
             return Some(Class::Container(Container(BaseClass::parse_from_str(&str))));
         }
 
+        if str.contains("aspect-") {
+            if let Some(aspect_ratio) = AspectRatio::new(str) {
+                return Some(Class::AspectRatio(aspect_ratio));
+            }
+        }
+
         None
     }
 
     pub fn to_qualified_rule(self) -> Rule {
         match self {
             Class::Container(c) => c.generate_rule(),
+            Class::AspectRatio(c) => c.generate_rule(),
         }
     }
 }
@@ -55,6 +63,10 @@ impl BaseClass {
         }
 
         None
+    }
+
+    pub fn to_string_vec(&self) -> Vec<String> {
+        self.0.iter().map(|m| m.to_string()).collect()
     }
 }
 

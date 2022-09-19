@@ -31,6 +31,14 @@ impl Modifier {
 
         None
     }
+
+    pub fn to_string(&self) -> String {
+        match self {
+            Modifier::PseudoClass(m) => m.as_str().to_string(),
+            Modifier::PseudoElement(m) => m.as_str().to_string(),
+            Modifier::MediaQuery(m) => m.as_str().to_string(),
+        }
+    }
 }
 
 #[cfg(test)]
