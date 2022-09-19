@@ -6,7 +6,7 @@ use crate::class::{
     BaseClass,
 };
 use swc_common::Span;
-use swc_css::ast::{ComponentValue, QualifiedRule, Rule, SimpleBlock, StyleBlock};
+use swc_css::ast::{QualifiedRule, Rule};
 
 #[derive(Debug)]
 pub struct Container(pub Option<BaseClass>);

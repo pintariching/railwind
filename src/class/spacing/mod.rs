@@ -1,8 +1,12 @@
+use super::{convert_size, BaseClass};
+
 // pub mod margin;
-// pub mod padding;
+mod padding;
 // pub mod space_between;
 
-#[derive(Debug)]
+pub use padding::Padding;
+
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Top,
     Bottom,
@@ -14,7 +18,7 @@ pub enum Direction {
 }
 
 impl Direction {
-    pub fn new(dir: char) -> Option<Self> {
+    pub fn from_char(dir: char) -> Option<Self> {
         match dir {
             't' => Some(Direction::Top),
             'b' => Some(Direction::Bottom),
@@ -49,13 +53,13 @@ impl Direction {
         }
     }
 
-    pub fn to_string(&self) -> String {
+    pub fn to_string(&self) -> &'static str {
         match self {
-            Direction::Top => "top".to_string(),
-            Direction::Bottom => "bottom".to_string(),
-            Direction::Left => "left".to_string(),
-            Direction::Right => "right".to_string(),
-            _ => "".to_string(),
+            Direction::Top => "top",
+            Direction::Bottom => "bottom",
+            Direction::Left => "left",
+            Direction::Right => "right",
+            _ => "",
         }
     }
 }

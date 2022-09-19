@@ -1,12 +1,31 @@
 use swc_common::Span;
 use swc_css::ast::{
     ClassSelector, ComplexSelector, ComplexSelectorChildren, ComponentValue, CompoundSelector,
-    Declaration, DeclarationName, Delimiter, DelimiterValue, Ident, Integer, Number, Percentage,
-    PseudoClassSelector, QualifiedRulePrelude, Ratio, SelectorList, SimpleBlock, Str, StyleBlock,
-    SubclassSelector,
+    Declaration, DeclarationName, Delimiter, DelimiterValue, Dimension, Ident, Integer, Length,
+    Number, Percentage, PseudoClassSelector, QualifiedRule, QualifiedRulePrelude, Ratio, Rule,
+    SelectorList, SimpleBlock, Str, StyleBlock, SubclassSelector,
 };
 
-use crate::modifiers::PseudoClass;
+use super::BaseClass;
+
+pub fn new_rule(modifiers: Option<BaseClass>, class_selector: &str, block: SimpleBlock) -> Rule {
+    if let Some(base_class) = modifiers {
+        return Rule::QualifiedRule(Box::new(QualifiedRule {
+            span: Span::default(),
+            prelude: new_qualified_rule_with_pseudoclass_prelude(
+                class_selector,
+                base_class.to_string_vec(),
+            ),
+            block,
+        }));
+    } else {
+        return Rule::QualifiedRule(Box::new(QualifiedRule {
+            span: Span::default(),
+            prelude: new_qualified_rule_prelude(class_selector),
+            block,
+        }));
+    }
+}
 
 pub fn new_qualified_rule_prelude(class_selector: &str) -> QualifiedRulePrelude {
     QualifiedRulePrelude::SelectorList(SelectorList {
@@ -90,6 +109,17 @@ pub fn new_simple_block(declaration: Box<Declaration>) -> SimpleBlock {
     }
 }
 
+pub fn new_simple_block_many(declarations: Vec<Box<Declaration>>) -> SimpleBlock {
+    SimpleBlock {
+        span: Span::default(),
+        name: '{',
+        value: declarations
+            .into_iter()
+            .map(|d| ComponentValue::StyleBlock(StyleBlock::Declaration(d)))
+            .collect(),
+    }
+}
+
 pub fn new_declaration(
     declaration_name_value: &str,
     value: Vec<ComponentValue>,
@@ -106,7 +136,7 @@ pub fn new_declaration(
     })
 }
 
-pub fn new_number(value: i32) -> Number {
+pub fn new_number(value: f32) -> Number {
     Number {
         span: Span::default(),
         value: value.into(),
@@ -137,12 +167,20 @@ pub fn new_component_value_delimiter(value: DelimiterValue) -> ComponentValue {
     })
 }
 
+pub fn new_component_value_length(value: f32, unit: &str) -> ComponentValue {
+    ComponentValue::Dimension(Dimension::Length(Length {
+        span: Span::default(),
+        value: new_number(value),
+        unit: new_ident(unit),
+    }))
+}
+
 pub fn new_component_value_ratio(left: i32, right: Option<i32>) -> ComponentValue {
     ComponentValue::Ratio(Ratio {
         span: Span::default(),
-        left: new_number(left),
+        left: new_number(left as f32),
         right: match right {
-            Some(r) => Some(new_number(r)),
+            Some(r) => Some(new_number(r as f32)),
             None => None,
         },
     })
@@ -151,10 +189,14 @@ pub fn new_component_value_ratio(left: i32, right: Option<i32>) -> ComponentValu
 pub fn new_component_value_percentage(value: i32) -> ComponentValue {
     ComponentValue::Percentage(Percentage {
         span: Span::default(),
-        value: Number {
-            span: Span::default(),
-            value: value.into(),
-            raw: None,
-        },
+        value: new_number(value as f32),
     })
+}
+
+pub fn new_ident(value: &str) -> Ident {
+    Ident {
+        span: Span::default(),
+        value: value.into(),
+        raw: None,
+    }
 }

@@ -4,6 +4,14 @@
 .aspect-video {
   aspect-ratio: 16/9;
 }
-.container {
+.container:sm {
   width: 100%;
+}
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+.py-12:hover {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }

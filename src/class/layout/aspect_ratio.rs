@@ -1,13 +1,12 @@
 use crate::class::{
     helpers::{
-        new_component_value_percentage, new_component_value_ratio, new_component_value_str,
-        new_declaration, new_qualified_rule_prelude, new_qualified_rule_with_pseudoclass_prelude,
-        new_simple_block,
+        new_component_value_ratio, new_component_value_str, new_declaration,
+        new_qualified_rule_prelude, new_qualified_rule_with_pseudoclass_prelude, new_simple_block,
     },
     BaseClass,
 };
 use swc_common::Span;
-use swc_css::ast::{ComponentValue, QualifiedRule, Rule, SimpleBlock, StyleBlock};
+use swc_css::ast::{ComponentValue, QualifiedRule, Rule};
 
 #[derive(Debug)]
 pub struct AspectRatio {
@@ -34,10 +33,10 @@ impl Ratio {
 }
 
 impl AspectRatio {
-    pub fn new(str: &str) -> Option<Self> {
-        if let Some(ratio) = Ratio::from_str(str) {
+    pub fn parse_from_str(class: &str, modifiers: &Option<String>) -> Option<Self> {
+        if let Some(ratio) = Ratio::from_str(class) {
             return Some(Self {
-                base: BaseClass::parse_from_str(str),
+                base: BaseClass::parse_from_str(modifiers),
                 ratio,
             });
         }
