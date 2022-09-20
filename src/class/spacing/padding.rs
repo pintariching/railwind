@@ -1,16 +1,18 @@
 use swc_css::ast::Rule;
 
-use crate::class::{
-    convert_size,
-    helpers::{new_component_value_length, new_declaration, new_rule, new_simple_block_many},
-    BaseClass,
+use crate::{
+    class::{
+        convert_size,
+        helpers::{new_component_value_length, new_declaration, new_rule, new_simple_block_many},
+    },
+    modifiers::Modifier,
 };
 
 use super::Direction;
 
 #[derive(Debug, PartialEq)]
 pub struct Padding {
-    base: Option<BaseClass>,
+    modifiers: Option<Vec<Modifier>>,
     direction: Direction,
     size: f32,
     unit: String,
@@ -35,7 +37,7 @@ impl Padding {
             let size_and_unit = convert_size(aft);
 
             return Some(Self {
-                base: BaseClass::parse_from_str(modifiers),
+                modifiers: Modifier::parse_many_from_str(modifiers),
                 direction,
                 size: size_and_unit.0,
                 unit: size_and_unit.1.to_string(),
@@ -81,14 +83,14 @@ impl Padding {
 
         let block = new_simple_block_many(declarations);
 
-        new_rule(self.base, &self.class_selector, block)
+        new_rule(self.modifiers, &self.class_selector, block)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::{
-        class::{spacing::Direction, BaseClass},
+        class::spacing::Direction,
         modifiers::{Modifier, PseudoClass},
     };
 
@@ -98,7 +100,7 @@ mod tests {
     fn test_padding_all() {
         assert_eq!(
             Padding {
-                base: None,
+                modifiers: None,
                 direction: Direction::Around,
                 size: 10.,
                 unit: "rem".to_string(),
@@ -112,7 +114,7 @@ mod tests {
     fn test_padding_directions() {
         assert_eq!(
             Padding {
-                base: None,
+                modifiers: None,
                 direction: Direction::Horizontal,
                 size: 10.,
                 unit: "rem".to_string(),
@@ -123,7 +125,7 @@ mod tests {
 
         assert_eq!(
             Padding {
-                base: None,
+                modifiers: None,
                 direction: Direction::Vertical,
                 size: 10.,
                 unit: "rem".to_string(),
@@ -134,7 +136,7 @@ mod tests {
 
         assert_eq!(
             Padding {
-                base: None,
+                modifiers: None,
                 direction: Direction::Top,
                 size: 10.,
                 unit: "rem".to_string(),
@@ -148,11 +150,11 @@ mod tests {
     fn test_padding_with_pseudo_class() {
         assert_eq!(
             Padding {
-                base: Some(BaseClass(vec![Modifier::PseudoClass(PseudoClass::Hover)])),
+                modifiers: Some(vec![Modifier::PseudoClass(PseudoClass::Hover)]),
                 direction: Direction::Top,
                 size: 10.,
                 unit: "rem".to_string(),
-                class_selector: "hover:pt-40".to_string()
+                class_selector: "pt-40".to_string()
             },
             Padding::parse_from_str("pt-40", &Some("hover".to_string())).unwrap()
         );

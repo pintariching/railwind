@@ -1,15 +1,15 @@
-use crate::class::{
-    helpers::{
+use crate::{
+    class::helpers::{
         new_component_value_percentage, new_declaration, new_qualified_rule_prelude,
         new_qualified_rule_with_pseudoclass_prelude, new_simple_block,
     },
-    BaseClass,
+    modifiers::Modifier,
 };
 use swc_common::Span;
 use swc_css::ast::{QualifiedRule, Rule};
 
 #[derive(Debug)]
-pub struct Container(pub Option<BaseClass>);
+pub struct Container(pub Option<Vec<Modifier>>);
 
 impl Container {
     pub fn default() -> Self {
@@ -21,12 +21,12 @@ impl Container {
             vec![new_component_value_percentage(100)],
         ));
 
-        if let Some(base_class) = self.0 {
+        if let Some(modifiers) = self.0 {
             return Rule::QualifiedRule(Box::new(QualifiedRule {
                 span: Span::default(),
                 prelude: new_qualified_rule_with_pseudoclass_prelude(
                     "container",
-                    base_class.to_string_vec(),
+                    modifiers.iter().map(|m| m.to_string()).collect(),
                 ),
                 block,
             }));

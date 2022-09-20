@@ -1,16 +1,16 @@
-use crate::class::{
-    helpers::{
+use crate::{
+    class::helpers::{
         new_component_value_ratio, new_component_value_str, new_declaration,
         new_qualified_rule_prelude, new_qualified_rule_with_pseudoclass_prelude, new_simple_block,
     },
-    BaseClass,
+    modifiers::Modifier,
 };
 use swc_common::Span;
 use swc_css::ast::{ComponentValue, QualifiedRule, Rule};
 
 #[derive(Debug)]
 pub struct AspectRatio {
-    pub base: Option<BaseClass>,
+    pub modifiers: Option<Vec<Modifier>>,
     pub ratio: Ratio,
 }
 
@@ -36,7 +36,7 @@ impl AspectRatio {
     pub fn parse_from_str(class: &str, modifiers: &Option<String>) -> Option<Self> {
         if let Some(ratio) = Ratio::from_str(class) {
             return Some(Self {
-                base: BaseClass::parse_from_str(modifiers),
+                modifiers: Modifier::parse_many_from_str(modifiers),
                 ratio,
             });
         }
@@ -61,12 +61,12 @@ impl AspectRatio {
 
         let block = new_simple_block(new_declaration("aspect-ratio", values));
 
-        if let Some(base_class) = self.base {
+        if let Some(modifier) = self.modifiers {
             return Rule::QualifiedRule(Box::new(QualifiedRule {
                 span: Span::default(),
                 prelude: new_qualified_rule_with_pseudoclass_prelude(
                     "container",
-                    base_class.to_string_vec(),
+                    modifier.iter().map(|m| m.to_string()).collect(),
                 ),
                 block,
             }));

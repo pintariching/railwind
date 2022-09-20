@@ -28,18 +28,18 @@ impl Class {
     pub fn parse_from_str(str: &str) -> Option<Self> {
         let mut modifiers: Option<String> = None;
 
-        // removes pseudo classes and elements
-        let class = if str.contains(':') {
-            let mut split = str.split(':').rev();
-            let c = split.next().unwrap();
-            modifiers = Some(split.collect());
-            c
+        // splits modifiers and class
+        let class = if let Some(split) = str.rsplit_once(':') {
+            // split.0 is everything before the last ':'
+            // split.1 is everything after the last ':'
+            modifiers = Some(split.0.to_string());
+            split.1
         } else {
             str
         };
 
         if class.starts_with("container") {
-            return Some(Class::Container(Container(BaseClass::parse_from_str(
+            return Some(Class::Container(Container(Modifier::parse_many_from_str(
                 &modifiers,
             ))));
         }
@@ -65,38 +65,6 @@ impl Class {
             Class::AspectRatio(c) => c.generate_rule(),
             Class::Padding(c) => c.generate_rule(),
         }
-    }
-}
-
-#[derive(Debug, PartialEq)]
-pub struct BaseClass(pub Vec<Modifier>);
-
-impl BaseClass {
-    pub fn default() -> Self {
-        Self(Vec::new())
-    }
-
-    pub fn parse_from_str(modifiers: &Option<String>) -> Option<Self> {
-        if let Some(ms) = modifiers {
-            if ms.contains(':') {
-                let modifiers: Vec<Modifier> = ms
-                    .split(':')
-                    .filter_map(|m| Modifier::parse_from_str(m))
-                    .collect();
-
-                return Some(BaseClass(modifiers));
-            }
-
-            if let Some(modif) = Modifier::parse_from_str(&ms) {
-                return Some(BaseClass(vec![modif]));
-            }
-        }
-
-        None
-    }
-
-    pub fn to_string_vec(&self) -> Vec<String> {
-        self.0.iter().map(|m| m.to_string()).collect()
     }
 }
 
@@ -151,31 +119,4 @@ pub fn convert_breakpoint(breakpoint: &str) -> String {
         _ => "1024px",
     }
     .to_string()
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::modifiers::{MediaQuery, Modifier, PseudoClass, PseudoElement};
-
-    use super::BaseClass;
-
-    #[test]
-    fn test_base_class_parse_from_str() {
-        assert_eq!(
-            BaseClass::parse_from_str(&Some("first-line:hover:sm".to_string())),
-            Some(BaseClass(vec![
-                Modifier::PseudoElement(PseudoElement::FirstLine),
-                Modifier::PseudoClass(PseudoClass::Hover),
-                Modifier::MediaQuery(MediaQuery::Sm)
-            ]))
-        )
-    }
-
-    #[test]
-    fn test_base_class_parse_from_single_str() {
-        assert_eq!(
-            BaseClass::parse_from_str(&Some("hover".to_string())),
-            Some(BaseClass(vec![Modifier::PseudoClass(PseudoClass::Hover)]))
-        )
-    }
 }

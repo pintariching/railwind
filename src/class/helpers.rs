@@ -6,15 +6,19 @@ use swc_css::ast::{
     SelectorList, SimpleBlock, Str, StyleBlock, SubclassSelector,
 };
 
-use super::BaseClass;
+use crate::modifiers::Modifier;
 
-pub fn new_rule(modifiers: Option<BaseClass>, class_selector: &str, block: SimpleBlock) -> Rule {
-    if let Some(base_class) = modifiers {
+pub fn new_rule(
+    modifiers: Option<Vec<Modifier>>,
+    class_selector: &str,
+    block: SimpleBlock,
+) -> Rule {
+    if let Some(modifiers) = modifiers {
         return Rule::QualifiedRule(Box::new(QualifiedRule {
             span: Span::default(),
             prelude: new_qualified_rule_with_pseudoclass_prelude(
                 class_selector,
-                base_class.to_string_vec(),
+                modifiers.iter().map(|m| m.to_string()).collect(),
             ),
             block,
         }));
