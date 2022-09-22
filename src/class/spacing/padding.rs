@@ -3,7 +3,7 @@ use swc_css::ast::Rule;
 use crate::{
     class::{
         convert_size,
-        helpers::{new_component_value_length, new_declaration, new_rule, new_simple_block_many},
+        helpers::{new_component_value_length, new_declaration, new_rule, new_simple_block},
     },
     modifiers::Modifier,
 };

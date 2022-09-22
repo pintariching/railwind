@@ -16,7 +16,7 @@ pub enum Modifier {
 }
 
 impl Modifier {
-    pub fn parse_from_str(str: &str) -> Option<Self> {
+    fn parse_from_str(str: &str) -> Option<Self> {
         if let Some(modifier) = PseudoClass::parse_from_str(str) {
             return Some(Modifier::PseudoClass(modifier));
         }
@@ -40,20 +40,18 @@ impl Modifier {
         }
     }
 
-    pub fn parse_many_from_str(modifiers: &Option<String>) -> Option<Vec<Self>> {
-        if let Some(ms) = modifiers {
-            if ms.contains(':') {
-                let modifiers: Vec<Modifier> = ms
-                    .split(':')
-                    .filter_map(|m| Modifier::parse_from_str(m))
-                    .collect();
+    pub fn parse_many_from_str(modifiers: &str) -> Option<Vec<Self>> {
+        if modifiers.contains("\\:") {
+            let modifiers: Vec<Modifier> = modifiers
+                .split("\\:")
+                .filter_map(|m| Modifier::parse_from_str(m))
+                .collect();
 
-                return Some(modifiers);
-            }
+            return Some(modifiers);
+        }
 
-            if let Some(modif) = Modifier::parse_from_str(&ms) {
-                return Some(vec![modif]);
-            }
+        if let Some(modif) = Modifier::parse_from_str(&modifiers) {
+            return Some(vec![modif]);
         }
 
         None

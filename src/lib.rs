@@ -30,7 +30,7 @@ pub fn parse_html(input: &Path, output: &Path) {
         if let Some(group) = capture.get(1) {
             for cap in group.as_str().split(" ") {
                 if let Some(parsed_class) = Class::parse_from_str(cap) {
-                    rules.push(parsed_class.to_qualified_rule());
+                    rules.push(parsed_class.to_rule());
                 }
             }
         }
