@@ -20,21 +20,21 @@ pub enum MediaQuery {
 impl MediaQuery {
     pub fn as_str(&self) -> &'static str {
         match self {
-            MediaQuery::Sm => "sm",
-            MediaQuery::Md => "md",
-            MediaQuery::Lg => "lg",
-            MediaQuery::Xl => "xl",
-            MediaQuery::Xxl => "2xl",
-            MediaQuery::Dark => "dark",
-            MediaQuery::MotionReduce => "motion-reduce",
-            MediaQuery::MotionSafe => "motion-safe",
-            MediaQuery::ContrastMore => "contrast-more",
-            MediaQuery::ContrastLess => "contrast-less",
-            MediaQuery::Portrait => "portrait",
-            MediaQuery::Landscape => "landscape",
+            MediaQuery::Sm => "min-width: 640px",
+            MediaQuery::Md => "min-width: 768px",
+            MediaQuery::Lg => "min-width: 1024px",
+            MediaQuery::Xl => "min-width: 1280px",
+            MediaQuery::Xxl => "min-width: 1536px",
+            MediaQuery::Dark => "prefers-color-scheme: dark",
+            MediaQuery::MotionReduce => "prefers-reduced-motion: reduce",
+            MediaQuery::MotionSafe => "prefers-reduced-motion: no-preference",
+            MediaQuery::ContrastMore => "prefers-contrast: more",
+            MediaQuery::ContrastLess => "prefers-contrast: less",
+            MediaQuery::Portrait => "orientation: portrait",
+            MediaQuery::Landscape => "orientation: landscape",
             MediaQuery::Print => "print",
-            MediaQuery::Ltr => "ltr",
-            MediaQuery::Rtl => "rtl",
+            MediaQuery::Ltr => r#"[dir="ltr"]"#,
+            MediaQuery::Rtl => r#"[dir="rtl"]"#,
         }
     }
 
