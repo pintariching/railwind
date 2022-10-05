@@ -8,6 +8,8 @@ pub use parent_sibling::{Group, Peer};
 pub use pseudo_class::PseudoClass;
 pub use pseudo_element::PseudoElement;
 
+use crate::utils::indent_string;
+
 #[derive(Debug, PartialEq)]
 pub enum Modifier {
     PseudoClass(PseudoClass),
@@ -130,7 +132,7 @@ pub fn wrap_with_media_query(mut class: String, modifiers: &Vec<Modifier>) -> St
 {}
 }}"#,
                         query.as_str(),
-                        class
+                        indent_string(&class)
                     );
                 }
                 _ => (),
@@ -145,7 +147,7 @@ pub fn wrap_with_media_query(mut class: String, modifiers: &Vec<Modifier>) -> St
 mod tests {
     use super::pseudo_class::PseudoClass;
     use super::pseudo_element::PseudoElement;
-    use super::{modifiers_to_string, Modifier};
+    use super::{modifiers_to_class_selector, Modifier};
 
     #[test]
     fn test_modifier_parse_from_str() {
@@ -166,6 +168,9 @@ mod tests {
     fn test_modifiers_to_string() {
         let modifiers = Modifier::parse_many_from_str("hover\\:before\\:target").unwrap();
 
-        assert_eq!(modifiers_to_string(&modifiers), ":hover:target::before")
+        assert_eq!(
+            modifiers_to_class_selector(&modifiers),
+            "hover:target::before"
+        )
     }
 }

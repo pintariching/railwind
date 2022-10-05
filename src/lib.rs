@@ -9,6 +9,7 @@ use std::{
 
 pub mod class;
 pub mod modifiers;
+pub mod utils;
 
 lazy_static! {
     pub static ref STYLE_REGEX: Regex =

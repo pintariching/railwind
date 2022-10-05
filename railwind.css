@@ -1,39 +1,35 @@
 @media (prefers-color-scheme: dark) {
-	@media (min-width: 1024px) {
-		@media (min-width: 640px) {
-			.hover\:sm\:lg\:dark\:container:hover {
-				width: 100%;
-			}
+  @media (min-width: 1024px) {
+    @media (min-width: 640px) {
+      .hover\:sm\:lg\:dark\:container:hover {
+        width: 100%;
+      }
+      @media (min-width: 640px) {
+        .hover\:sm\:lg\:dark\:container:hover {
+          max-width: 640px;
+        }
+      }
+      @media (min-width: 768px) {
+        .hover\:sm\:lg\:dark\:container:hover {
+          max-width: 768px;
+        }
+      }
+      @media (min-width: 1024px) {
+        .hover\:sm\:lg\:dark\:container:hover {
+          max-width: 1024px;
+        }
+      }
+      @media (min-width: 1280px) {
+        .hover\:sm\:lg\:dark\:container:hover {
+          max-width: 1280px;
+        }
+      }
+      @media (min-width: 1536px) {
+        .hover\:sm\:lg\:dark\:container:hover {
+          max-width: 1536px;
+        }
+      }
+    }
+  }
 
-			@media (min-width: 640px) {
-				.hover\:sm\:lg\:dark\:container:hover {
-					max-width: 640px;
-				}
-			}
-
-			@media (min-width: 768px) {
-				.hover\:sm\:lg\:dark\:container:hover {
-					max-width: 768px;
-				}
-			}
-
-			@media (min-width: 1024px) {
-				.hover\:sm\:lg\:dark\:container:hover {
-					max-width: 1024px;
-				}
-			}
-
-			@media (min-width: 1280px) {
-				.hover\:sm\:lg\:dark\:container:hover {
-					max-width: 1280px;
-				}
-			}
-
-			@media (min-width: 1536px) {
-				.hover\:sm\:lg\:dark\:container:hover {
-					max-width: 1536px;
-				}
-			}
-		}
-	}
 }
