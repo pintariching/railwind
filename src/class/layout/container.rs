@@ -7,51 +7,53 @@ pub struct Container {
 }
 
 impl Container {
-    pub fn parse_from_str(class: &str) -> String {
-        let container = Self {
+    fn new(class: &str) -> Self {
+        Self {
             modifiers: Modifier::parse_many_from_str(class),
             class_selector: class.into(),
-        };
+        }
+    }
 
-        container.generate_class()
+    pub fn parse_from_str(class: &str) -> String {
+        Self::generate_class(&Self::new(class))
     }
 
     fn generate_class(&self) -> String {
-        let mut class = format!(
-            r#".container {{
+        let mut class = r#".[class-selector] {{
   width: 100%;
 }}
 
 @media (min-width: 640px) {{
-  .container {{
+  .[class-selector] {{
     max-width: 640px;
   }}
 }}
 
 @media (min-width: 768px) {{
-  .container {{
+  .[class-selector] {{
     max-width: 768px;
   }}
 }}
 
 @media (min-width: 1024px) {{
-  .container {{
+  .[class-selector] {{
     max-width: 1024px;
   }}
 }}
 
 @media (min-width: 1280px) {{
-  .container {{
+  .[class-selector] {{
     max-width: 1280px;
   }}
 }}
 
 @media (min-width: 1536px) {{
-  .container {{
+  .[class-selector] {{
     max-width: 1536px;
   }}
-}}"#
-        );
+}}
+"#
+        .to_string();
 
         let mut class_selector = self.class_selector.clone();
 
@@ -65,6 +67,6 @@ impl Container {
             class = wrap_with_media_query(class, modifiers);
         }
 
-        class.replace("container", &class_selector)
+        class.replace("[class-selector]", &class_selector)
     }
 }

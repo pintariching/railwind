@@ -1,17 +1,10 @@
-use crate::{
-    class::helpers::{
-        new_component_value_ratio, new_component_value_str, new_declaration,
-        new_qualified_rule_prelude, new_qualified_rule_with_pseudoclass_prelude, new_simple_block,
-    },
-    modifiers::Modifier,
-};
-use swc_common::Span;
-use swc_css::ast::{ComponentValue, QualifiedRule, Rule};
+use crate::modifiers::{modifiers_to_class_selector, wrap_with_media_query, Modifier};
 
 #[derive(Debug)]
 pub struct AspectRatio {
-    pub modifiers: Option<Vec<Modifier>>,
-    pub ratio: Ratio,
+    modifiers: Option<Vec<Modifier>>,
+    class_selector: String,
+    ratio: Ratio,
 }
 
 #[derive(Debug)]
@@ -22,60 +15,58 @@ pub enum Ratio {
 }
 
 impl Ratio {
-    fn from_str(str: &str) -> Option<Ratio> {
+    fn from_str(str: &str) -> Ratio {
         match str {
-            "aspect-auto" => Some(Ratio::Auto),
-            "aspect-square" => Some(Ratio::Square),
-            "aspect-video" => Some(Ratio::Video),
-            _ => None,
+            "aspect-auto" => Ratio::Auto,
+            "aspect-square" => Ratio::Square,
+            "aspect-video" => Ratio::Video,
+            _ => unreachable!(),
+        }
+    }
+
+    fn to_str(&self) -> &'static str {
+        match self {
+            Ratio::Auto => "auto",
+            Ratio::Square => "1 / 1",
+            Ratio::Video => "16 / 9",
         }
     }
 }
 
 impl AspectRatio {
-    pub fn parse_from_str(class: &str, modifiers: &Option<String>) -> Option<Self> {
-        if let Some(ratio) = Ratio::from_str(class) {
-            return Some(Self {
-                modifiers: Modifier::parse_many_from_str(modifiers),
-                ratio,
-            });
-        }
-
-        None
-    }
-
-    fn get_class_selector(&self) -> String {
-        match self.ratio {
-            Ratio::Auto => "aspect-auto".into(),
-            Ratio::Square => "aspect-square".into(),
-            Ratio::Video => "aspect-video".into(),
+    fn new(class: &str, selector: &str) -> Self {
+        Self {
+            modifiers: Modifier::parse_many_from_str(class),
+            class_selector: class.into(),
+            ratio: Ratio::from_str(selector),
         }
     }
 
-    // pub fn generate_rule(self) -> Rule {
-    //     let values: Vec<ComponentValue> = match self.ratio {
-    //         Ratio::Auto => vec![new_component_value_str("auto")],
-    //         Ratio::Square => vec![new_component_value_ratio(1, Some(1))],
-    //         Ratio::Video => vec![new_component_value_ratio(16, Some(9))],
-    //     };
+    pub fn parse_from_str(class: &str, selector: &str) -> String {
+        Self::generate_class(&Self::new(class, selector))
+    }
 
-    //     let block = new_simple_block(new_declaration("aspect-ratio", values));
+    fn generate_class(&self) -> String {
+        let mut class = format!(
+            r#".[class-selector] {{
+  aspect-ratio: {};
+}}
+"#,
+            self.ratio.to_str()
+        );
 
-    //     if let Some(modifier) = self.modifiers {
-    //         return Rule::QualifiedRule(Box::new(QualifiedRule {
-    //             span: Span::default(),
-    //             prelude: new_qualified_rule_with_pseudoclass_prelude(
-    //                 "container",
-    //                 modifier.iter().map(|m| m.to_string()).collect(),
-    //             ),
-    //             block,
-    //         }));
-    //     } else {
-    //         return Rule::QualifiedRule(Box::new(QualifiedRule {
-    //             span: Span::default(),
-    //             prelude: new_qualified_rule_prelude(self.get_class_selector().as_str()),
-    //             block,
-    //         }));
-    //     }
-    // }
+        let mut class_selector = self.class_selector.clone();
+
+        if let Some(modifiers) = &self.modifiers {
+            class_selector = format!(
+                "{}:{}",
+                class_selector,
+                modifiers_to_class_selector(modifiers)
+            );
+
+            class = wrap_with_media_query(class, modifiers);
+        }
+
+        class.replace("[class-selector]", &class_selector)
+    }
 }

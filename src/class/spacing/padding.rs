@@ -1,12 +1,5 @@
-use swc_css::ast::Rule;
-
-use crate::{
-    class::{
-        convert_size,
-        helpers::{new_component_value_length, new_declaration, new_rule, new_simple_block},
-    },
-    modifiers::Modifier,
-};
+use crate::class::convert_size;
+use crate::modifiers::{modifiers_to_class_selector, wrap_with_media_query, Modifier};
 
 use super::Direction;
 
@@ -20,8 +13,8 @@ pub struct Padding {
 }
 
 impl Padding {
-    pub fn parse_from_str(class: &str, modifiers: &Option<String>) -> Option<Self> {
-        let mut split = class.split('-');
+    fn new(class: &str, selector: &str) -> Self {
+        let mut split = selector.split('-');
         let before_dash = split.next();
         let after_dash = split.next();
 
@@ -36,127 +29,60 @@ impl Padding {
 
             let size_and_unit = convert_size(aft);
 
-            return Some(Self {
-                modifiers: Modifier::parse_many_from_str(modifiers),
+            return Self {
+                modifiers: Modifier::parse_many_from_str(class),
                 direction,
                 size: size_and_unit.0,
                 unit: size_and_unit.1.to_string(),
-                class_selector: class.to_string(),
-            });
+                class_selector: class.into(),
+            };
         }
-        None
+
+        unreachable!()
     }
 
-    pub fn generate_rule(self) -> Rule {
-        let declarations = match self.direction {
-            Direction::Top | Direction::Bottom | Direction::Left | Direction::Right => {
-                vec![new_declaration(
-                    format!("padding-{}", self.direction.to_string()).as_str(),
-                    vec![new_component_value_length(self.size, self.unit.as_str())],
-                )]
+    pub fn parse_from_str(class: &str, selector: &str) -> String {
+        Self::generate_class(&Self::new(class, selector))
+    }
+
+    fn generate_class(&self) -> String {
+        let mut class = format!(
+            r#".[class-selector] {{
+  {}
+}}
+"#,
+            match self.direction {
+                Direction::Around => format!("padding: {}{};", self.size, self.unit),
+                Direction::Vertical => format!(
+                    "padding-top: {}{};\n  padding-bottom: {}{};",
+                    self.size, self.unit, self.size, self.unit
+                ),
+
+                Direction::Horizontal => format!(
+                    "padding-left: {}{};\n  padding-right: {}{};",
+                    self.size, self.unit, self.size, self.unit
+                ),
+                _ => format!(
+                    "padding-{}: {}{};",
+                    self.direction.to_string(),
+                    self.size,
+                    self.unit
+                ),
             }
-            Direction::Horizontal => vec![
-                new_declaration(
-                    "padding-left",
-                    vec![new_component_value_length(self.size, self.unit.as_str())],
-                ),
-                new_declaration(
-                    "padding-right",
-                    vec![new_component_value_length(self.size, self.unit.as_str())],
-                ),
-            ],
-            Direction::Vertical => vec![
-                new_declaration(
-                    "padding-top",
-                    vec![new_component_value_length(self.size, self.unit.as_str())],
-                ),
-                new_declaration(
-                    "padding-bottom",
-                    vec![new_component_value_length(self.size, self.unit.as_str())],
-                ),
-            ],
-            Direction::Around => vec![new_declaration(
-                "padding",
-                vec![new_component_value_length(self.size, self.unit.as_str())],
-            )],
-        };
-
-        let block = new_simple_block_many(declarations);
-
-        new_rule(self.modifiers, &self.class_selector, block)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{
-        class::spacing::Direction,
-        modifiers::{Modifier, PseudoClass},
-    };
-
-    use super::Padding;
-
-    #[test]
-    fn test_padding_all() {
-        assert_eq!(
-            Padding {
-                modifiers: None,
-                direction: Direction::Around,
-                size: 10.,
-                unit: "rem".to_string(),
-                class_selector: "p-40".to_string()
-            },
-            Padding::parse_from_str("p-40", &None).unwrap()
-        );
-    }
-
-    #[test]
-    fn test_padding_directions() {
-        assert_eq!(
-            Padding {
-                modifiers: None,
-                direction: Direction::Horizontal,
-                size: 10.,
-                unit: "rem".to_string(),
-                class_selector: "px-40".to_string()
-            },
-            Padding::parse_from_str("px-40", &None).unwrap()
         );
 
-        assert_eq!(
-            Padding {
-                modifiers: None,
-                direction: Direction::Vertical,
-                size: 10.,
-                unit: "rem".to_string(),
-                class_selector: "py-40".to_string()
-            },
-            Padding::parse_from_str("py-40", &None).unwrap()
-        );
+        let mut class_selector = self.class_selector.clone();
 
-        assert_eq!(
-            Padding {
-                modifiers: None,
-                direction: Direction::Top,
-                size: 10.,
-                unit: "rem".to_string(),
-                class_selector: "pt-40".to_string()
-            },
-            Padding::parse_from_str("pt-40", &None).unwrap()
-        );
-    }
+        if let Some(modifiers) = &self.modifiers {
+            class_selector = format!(
+                "{}:{}",
+                class_selector,
+                modifiers_to_class_selector(modifiers)
+            );
 
-    #[test]
-    fn test_padding_with_pseudo_class() {
-        assert_eq!(
-            Padding {
-                modifiers: Some(vec![Modifier::PseudoClass(PseudoClass::Hover)]),
-                direction: Direction::Top,
-                size: 10.,
-                unit: "rem".to_string(),
-                class_selector: "pt-40".to_string()
-            },
-            Padding::parse_from_str("pt-40", &Some("hover".to_string())).unwrap()
-        );
+            class = wrap_with_media_query(class, modifiers);
+        }
+
+        class.replace("[class-selector]", &class_selector)
     }
 }

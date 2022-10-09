@@ -3,6 +3,8 @@ mod parent_sibling;
 mod pseudo_class;
 mod pseudo_element;
 
+use std::ops::Index;
+
 pub use media_query::MediaQuery;
 pub use parent_sibling::{Group, Peer};
 pub use pseudo_class::PseudoClass;
@@ -128,9 +130,7 @@ pub fn wrap_with_media_query(mut class: String, modifiers: &Vec<Modifier>) -> St
                 | MediaQuery::Portrait
                 | MediaQuery::Landscape => {
                     class = format!(
-                        r#"@media ({}) {{
-{}
-}}"#,
+                        "@media ({}) {{ \n{} }}",
                         query.as_str(),
                         indent_string(&class)
                     );

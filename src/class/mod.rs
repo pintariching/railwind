@@ -1,4 +1,7 @@
-use self::layout::Container;
+use self::{
+    layout::{AspectRatio, Container},
+    spacing::{Margin, Padding},
+};
 
 pub mod layout;
 pub mod spacing;
@@ -11,11 +14,21 @@ pub fn parse_class_from_str(str: &str) -> Option<String> {
         return Some(Container::parse_from_str(&class_selector));
     }
 
-    // if class.starts_with("container") {
-    //     return Some(Class::Container(Container(Modifier::parse_many_from_str(
-    //         &modifiers,
-    //     ))));
-    // }
+    if let Some(last_selector) = class_selector.split("\\:").last() {
+        if last_selector.starts_with("aspect") {
+            return Some(AspectRatio::parse_from_str(&class_selector, last_selector));
+        }
+
+        if last_selector.contains("-") {
+            if last_selector.starts_with("p") {
+                return Some(Padding::parse_from_str(&class_selector, last_selector));
+            }
+
+            if last_selector.starts_with("m") {
+                return Some(Margin::parse_from_str(&class_selector, last_selector));
+            }
+        }
+    }
 
     // if class.starts_with("aspect-") {
     //     if let Some(aspect_ratio) = AspectRatio::parse_from_str(str) {

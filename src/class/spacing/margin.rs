@@ -1,57 +1,90 @@
-use crate::class::convert_size;
+use crate::{
+    class::convert_size,
+    modifiers::{modifiers_to_class_selector, wrap_with_media_query, Modifier},
+};
 
 use super::Direction;
 
 #[derive(Debug)]
 pub struct Margin {
+    modifiers: Option<Vec<Modifier>>,
     direction: Direction,
-    class: String,
-    size: String,
+    size: f32,
+    unit: String,
+    class_selector: String,
 }
 
 impl Margin {
-    pub fn new(before_dash: &str, after_dash: &str) -> Self {
-        let mut direction = Direction::Around;
+    fn new(class: &str, selector: &str) -> Self {
+        let mut split = selector.split('-');
+        let before_dash = split.next();
+        let after_dash = split.next();
 
-        if before_dash.len() > 1 {
-            direction = Direction::new(before_dash.chars().nth(1).unwrap()).unwrap();
+        if let (Some(bef), Some(aft)) = (before_dash, after_dash) {
+            let mut direction = Direction::Around;
+
+            if let Some(dir) = bef.chars().nth(1) {
+                if let Some(d) = Direction::from_char(dir) {
+                    direction = d;
+                }
+            }
+
+            let size_and_unit = convert_size(aft);
+
+            return Self {
+                modifiers: Modifier::parse_many_from_str(class),
+                direction,
+                size: size_and_unit.0,
+                unit: size_and_unit.1.to_string(),
+                class_selector: class.into(),
+            };
         }
 
-        Margin {
-            direction,
-            class: format!("{}-{}", before_dash, after_dash),
-            size: convert_size(after_dash),
-        }
+        unreachable!()
     }
 
-    pub fn to_css(&self) -> Option<String> {
-        if self.direction.is_given() {
-            Some(
-                format!(
-                    ".{} {{\n  margin-{}: {};\n}}\n\n",
-                    self.class,
+    pub fn parse_from_str(class: &str, selector: &str) -> String {
+        Self::generate_class(&Self::new(class, selector))
+    }
+
+    fn generate_class(&self) -> String {
+        let mut class = format!(
+            r#".[class-selector] {{
+  {}
+}}
+"#,
+            match self.direction {
+                Direction::Around => format!("margin: {}{};", self.size, self.unit),
+                Direction::Vertical => format!(
+                    "margin-top: {}{};\n  margin-bottom: {}{};",
+                    self.size, self.unit, self.size, self.unit
+                ),
+
+                Direction::Horizontal => format!(
+                    "margin-left: {}{};\n  margin-right: {}{};",
+                    self.size, self.unit, self.size, self.unit
+                ),
+                _ => format!(
+                    "margin-{}: {}{};",
                     self.direction.to_string(),
-                    self.size
-                )
-                .to_string(),
-            )
-        } else {
-            if self.direction.is_horizontal() {
-                Some(format!(
-                    ".{} {{\n  margin-left: {};\n  margin-right: {};\n}}\n\n",
-                    self.class, self.size, self.size
-                ))
-            } else if self.direction.is_vertical() {
-                Some(format!(
-                    ".{} {{\n  margin-top: {};\n  margin-bottom: {};\n}}\n\n",
-                    self.class, self.size, self.size
-                ))
-            } else {
-                Some(format!(
-                    ".{} {{\n  margin: {};\n}}\n\n",
-                    self.class, self.size
-                ))
+                    self.size,
+                    self.unit
+                ),
             }
+        );
+
+        let mut class_selector = self.class_selector.clone();
+
+        if let Some(modifiers) = &self.modifiers {
+            class_selector = format!(
+                "{}:{}",
+                class_selector,
+                modifiers_to_class_selector(modifiers)
+            );
+
+            class = wrap_with_media_query(class, modifiers);
         }
+
+        class.replace("[class-selector]", &class_selector)
     }
 }
