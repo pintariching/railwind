@@ -3,8 +3,6 @@ mod parent_sibling;
 mod pseudo_class;
 mod pseudo_element;
 
-use std::ops::Index;
-
 pub use media_query::MediaQuery;
 pub use parent_sibling::{Group, Peer};
 pub use pseudo_class::PseudoClass;
@@ -83,7 +81,7 @@ impl Modifier {
     }
 }
 
-pub fn modifiers_to_class_selector(modifiers: &Vec<Modifier>) -> String {
+fn modifiers_to_class_selector(modifiers: &Vec<Modifier>) -> String {
     let pseudo_classes: Vec<&str> = modifiers
         .iter()
         .filter_map(|m| m.pseudo_class())
@@ -110,44 +108,57 @@ pub fn modifiers_to_class_selector(modifiers: &Vec<Modifier>) -> String {
     class_selector
 }
 
-pub fn wrap_with_media_query(mut class: String, modifiers: &Vec<Modifier>) -> String {
-    let media_queries: Vec<&MediaQuery> =
-        modifiers.iter().filter_map(|m| m.media_query()).collect();
+pub fn generate_class_selector(class: &str, modifiers: &Option<Vec<Modifier>>) -> String {
+    if let Some(m) = modifiers {
+        let modifier_string = modifiers_to_class_selector(&m);
 
-    if !media_queries.is_empty() {
-        for query in media_queries {
-            match query {
-                MediaQuery::Sm
-                | MediaQuery::Md
-                | MediaQuery::Lg
-                | MediaQuery::Xl
-                | MediaQuery::Xxl
-                | MediaQuery::Dark
-                | MediaQuery::MotionReduce
-                | MediaQuery::MotionSafe
-                | MediaQuery::ContrastMore
-                | MediaQuery::ContrastLess
-                | MediaQuery::Portrait
-                | MediaQuery::Landscape => {
-                    class = format!(
-                        "@media ({}) {{ \n{} }}",
-                        query.as_str(),
-                        indent_string(&class)
-                    );
+        if modifier_string.is_empty() {
+            return class.to_string();
+        }
+
+        return format!("{}:{}", class, modifiers_to_class_selector(&m));
+    }
+
+    class.to_string()
+}
+
+pub fn wrap_with_media_query(class: &str, modifiers: &Option<Vec<Modifier>>) -> String {
+    let mut c = class.to_string();
+
+    if let Some(m) = modifiers {
+        let media_queries: Vec<&MediaQuery> = m.iter().filter_map(|m| m.media_query()).collect();
+
+        if !media_queries.is_empty() {
+            for query in media_queries {
+                match query {
+                    MediaQuery::Sm
+                    | MediaQuery::Md
+                    | MediaQuery::Lg
+                    | MediaQuery::Xl
+                    | MediaQuery::Xxl
+                    | MediaQuery::Dark
+                    | MediaQuery::MotionReduce
+                    | MediaQuery::MotionSafe
+                    | MediaQuery::ContrastMore
+                    | MediaQuery::ContrastLess
+                    | MediaQuery::Portrait
+                    | MediaQuery::Landscape => {
+                        c = format!("@media ({}) {{\n{}}}\n", query.as_str(), indent_string(&c));
+                    }
+                    _ => (),
                 }
-                _ => (),
             }
         }
     }
 
-    class
+    c
 }
 
 #[cfg(test)]
 mod tests {
     use super::pseudo_class::PseudoClass;
     use super::pseudo_element::PseudoElement;
-    use super::{modifiers_to_class_selector, Modifier};
+    use super::{modifiers_to_class_selector, MediaQuery, Modifier};
 
     #[test]
     fn test_modifier_parse_from_str() {
@@ -165,8 +176,29 @@ mod tests {
     }
 
     #[test]
+    fn test_modifier_parse_many_from_str() {
+        let result = vec![
+            Modifier::MediaQuery(MediaQuery::Sm),
+            Modifier::MediaQuery(MediaQuery::Md),
+            Modifier::MediaQuery(MediaQuery::Lg),
+        ];
+
+        assert_eq!(Modifier::parse_many_from_str("sm\\:md\\:lg"), Some(result));
+    }
+
+    #[test]
+    fn test_modifiers_to_class_selector() {}
+
+    #[test]
     fn test_modifiers_to_string() {
         let modifiers = Modifier::parse_many_from_str("hover\\:before\\:target").unwrap();
+        let result = vec![
+            Modifier::PseudoClass(PseudoClass::Hover),
+            Modifier::PseudoElement(PseudoElement::Before),
+            Modifier::PseudoClass(PseudoClass::Target),
+        ];
+
+        assert_eq!(modifiers, result);
 
         assert_eq!(
             modifiers_to_class_selector(&modifiers),

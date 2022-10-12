@@ -1,4 +1,5 @@
-use crate::modifiers::{modifiers_to_class_selector, wrap_with_media_query, Modifier};
+use crate::class::wrap_with_everything;
+use crate::modifiers::Modifier;
 
 #[derive(Debug)]
 pub struct AspectRatio {
@@ -47,7 +48,7 @@ impl AspectRatio {
     }
 
     fn generate_class(&self) -> String {
-        let mut class = format!(
+        let class = format!(
             r#".[class-selector] {{
   aspect-ratio: {};
 }}
@@ -55,18 +56,6 @@ impl AspectRatio {
             self.ratio.to_str()
         );
 
-        let mut class_selector = self.class_selector.clone();
-
-        if let Some(modifiers) = &self.modifiers {
-            class_selector = format!(
-                "{}:{}",
-                class_selector,
-                modifiers_to_class_selector(modifiers)
-            );
-
-            class = wrap_with_media_query(class, modifiers);
-        }
-
-        class.replace("[class-selector]", &class_selector)
+        wrap_with_everything(&class, &self.class_selector, &self.modifiers)
     }
 }

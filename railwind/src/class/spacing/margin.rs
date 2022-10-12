@@ -1,10 +1,10 @@
-use crate::class::convert_size;
-use crate::modifiers::{modifiers_to_class_selector, wrap_with_media_query, Modifier};
+use crate::class::{convert_size, wrap_with_everything};
+use crate::modifiers::Modifier;
 
 use super::Direction;
 
-#[derive(Debug, PartialEq)]
-pub struct Padding {
+#[derive(Debug)]
+pub struct Margin {
     modifiers: Option<Vec<Modifier>>,
     direction: Direction,
     size: f32,
@@ -12,7 +12,7 @@ pub struct Padding {
     class_selector: String,
 }
 
-impl Padding {
+impl Margin {
     fn new(class: &str, selector: &str) -> Self {
         let mut split = selector.split('-');
         let before_dash = split.next();
@@ -46,24 +46,24 @@ impl Padding {
     }
 
     fn generate_class(&self) -> String {
-        let mut class = format!(
+        let class = format!(
             r#".[class-selector] {{
   {}
 }}
 "#,
             match self.direction {
-                Direction::Around => format!("padding: {}{};", self.size, self.unit),
+                Direction::Around => format!("margin: {}{};", self.size, self.unit),
                 Direction::Vertical => format!(
-                    "padding-top: {}{};\n  padding-bottom: {}{};",
+                    "margin-top: {}{};\n  margin-bottom: {}{};",
                     self.size, self.unit, self.size, self.unit
                 ),
 
                 Direction::Horizontal => format!(
-                    "padding-left: {}{};\n  padding-right: {}{};",
+                    "margin-left: {}{};\n  margin-right: {}{};",
                     self.size, self.unit, self.size, self.unit
                 ),
                 _ => format!(
-                    "padding-{}: {}{};",
+                    "margin-{}: {}{};",
                     self.direction.to_string(),
                     self.size,
                     self.unit
@@ -71,18 +71,6 @@ impl Padding {
             }
         );
 
-        let mut class_selector = self.class_selector.clone();
-
-        if let Some(modifiers) = &self.modifiers {
-            class_selector = format!(
-                "{}:{}",
-                class_selector,
-                modifiers_to_class_selector(modifiers)
-            );
-
-            class = wrap_with_media_query(class, modifiers);
-        }
-
-        class.replace("[class-selector]", &class_selector)
+        wrap_with_everything(&class, &self.class_selector, &self.modifiers)
     }
 }
