@@ -1,6 +1,13 @@
 [package]
 name = "railwind_cli"
-version = "0.1.0"
+version = "0.0.1"
+authors = ["pintariching"]
+license = "MIT"
+description = "CLI for railwind"
+readme = "README.md"
+homepage = "https://github.com/pintariching/railwind"
+repository = "https://github.com/pintariching/railwind"
+keywords = ["tailwind", "css", "compiler", "cli"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
