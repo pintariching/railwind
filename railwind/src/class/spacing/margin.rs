@@ -1,76 +1,46 @@
-use crate::class::{convert_size, wrap_with_everything};
-use crate::modifiers::Modifier;
-
-use super::Direction;
+use crate::class::{generate_class, split_by_dash};
 
 #[derive(Debug)]
-pub struct Margin {
-    modifiers: Option<Vec<Modifier>>,
-    direction: Direction,
-    size: f32,
-    unit: String,
-    class_selector: String,
-}
+pub struct Margin;
 
 impl Margin {
-    fn new(class: &str, selector: &str) -> Self {
-        let mut split = selector.split('-');
-        let before_dash = split.next();
-        let after_dash = split.next();
-
-        if let (Some(bef), Some(aft)) = (before_dash, after_dash) {
-            let mut direction = Direction::Around;
-
-            if let Some(dir) = bef.chars().nth(1) {
-                if let Some(d) = Direction::from_char(dir) {
-                    direction = d;
-                }
-            }
-
-            let size_and_unit = convert_size(aft);
-
-            return Self {
-                modifiers: Modifier::parse_many_from_str(class),
-                direction,
-                size: size_and_unit.0,
-                unit: size_and_unit.1.to_string(),
-                class_selector: class.into(),
+    pub fn parse_from_str(class: &str, margin: &str) -> Option<String> {
+        if let Some((before, value)) = split_by_dash(margin) {
+            let declaration = match before.as_str() {
+                "p" => format!("margin: {};", value),
+                "pt" => format!("margin-top: {};", value),
+                "pb" => format!("margin-bottom: {};", value),
+                "pl" => format!("margin-left: {};", value),
+                "pr" => format!("margin-right: {};", value),
+                "px" => format!("margin-left: {};\n  margin-right: {};", value, value),
+                "py" => format!("margin-top: {};\n  margin-bottom: {};", value, value),
+                _ => return None,
             };
+
+            let template = format!(".[class-selector] {{\n  {}\n}}\n", declaration);
+
+            return Some(generate_class(class, &template));
         }
 
-        unreachable!()
+        None
     }
+}
 
-    pub fn parse_from_str(class: &str, selector: &str) -> String {
-        Self::generate_class(&Self::new(class, selector))
-    }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    fn generate_class(&self) -> String {
-        let class = format!(
-            r#".[class-selector] {{
-  {}
-}}
-"#,
-            match self.direction {
-                Direction::Around => format!("margin: {}{};", self.size, self.unit),
-                Direction::Vertical => format!(
-                    "margin-top: {}{};\n  margin-bottom: {}{};",
-                    self.size, self.unit, self.size, self.unit
-                ),
+    #[test]
+    fn test_parse_from_string() {
+        let result = Margin::parse_from_str("p-5", "p-5");
+        assert!(result.is_some());
+        assert_eq!(result.unwrap(), ".p-5 {\n  margin: 1.25rem;\n}\n");
 
-                Direction::Horizontal => format!(
-                    "margin-left: {}{};\n  margin-right: {}{};",
-                    self.size, self.unit, self.size, self.unit
-                ),
-                _ => format!(
-                    "margin-{}: {}{};",
-                    self.direction.to_string(),
-                    self.size,
-                    self.unit
-                ),
-            }
+        let result = Margin::parse_from_str("py-5", "py-5");
+        assert!(result.is_some());
+        assert_eq!(
+            result.unwrap(),
+            ".py-5 {\n  margin-top: 1.25rem;\n  margin-bottom: 1.25rem;\n}\n"
         );
-
-        wrap_with_everything(&class, &self.class_selector, &self.modifiers)
     }
 }

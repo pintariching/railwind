@@ -1,12 +1,22 @@
 use crate::modifiers::{generate_class_selector, wrap_with_media_query, Modifier};
 
 use self::{
+    flex::flex::Flex,
     layout::{AspectRatio, Container},
     spacing::{Margin, Padding},
 };
 
+pub mod flex;
+pub mod grid;
 pub mod layout;
 pub mod spacing;
+
+fn generate_class(selector: &str, template: &str) -> String {
+    let modifiers = Modifier::parse_many_from_str(selector);
+    let selector = generate_class_selector(selector, &modifiers);
+    let class_body = wrap_with_media_query(template, &modifiers);
+    class_body.replace("[class-selector]", &selector)
+}
 
 pub fn parse_class_from_str(str: &str) -> Option<String> {
     // css needs to escape ":" with "\:"
@@ -18,16 +28,20 @@ pub fn parse_class_from_str(str: &str) -> Option<String> {
 
     if let Some(last_selector) = class_selector.split("\\:").last() {
         if last_selector.starts_with("aspect") {
-            return Some(AspectRatio::parse_from_str(&class_selector, last_selector));
+            return AspectRatio::parse_from_str(&class_selector, last_selector);
+        }
+
+        if last_selector.starts_with("flex") {
+            return Flex::parse_from_str(&class_selector, last_selector);
         }
 
         if last_selector.contains("-") {
             if last_selector.starts_with("p") {
-                return Some(Padding::parse_from_str(&class_selector, last_selector));
+                return Padding::parse_from_str(&class_selector, last_selector);
             }
 
             if last_selector.starts_with("m") {
-                return Some(Margin::parse_from_str(&class_selector, last_selector));
+                return Margin::parse_from_str(&class_selector, last_selector);
             }
         }
     }
@@ -35,8 +49,33 @@ pub fn parse_class_from_str(str: &str) -> Option<String> {
     None
 }
 
-pub fn convert_size(size: &str) -> (f32, &'static str) {
-    match size {
+/// Splits a class selector by dash and returns the string
+/// before the dash and converts the string after the dash into a CSS unit
+///
+/// For example `split_by_dash("py-5")` returns a tuple ("py", "1.25rem")
+pub fn split_by_dash(str: &str) -> Option<(String, String)> {
+    let mut split = str.split('-');
+    let before_dash = split.next();
+    let after_dash = split.next();
+
+    if let (Some(before), Some(after)) = (before_dash, after_dash) {
+        if before.is_empty() || after.is_empty() {
+            return None;
+        }
+
+        if let Some((size, unit)) = convert_size(after) {
+            let value = format!("{}{}", size, unit);
+            return Some((before.into(), value));
+        }
+
+        return None;
+    }
+
+    None
+}
+
+pub fn convert_size(size: &str) -> Option<(f32, &'static str)> {
+    let result = match size {
         "0" => (0., "px"),
         "px" => (1., "px"),
         "0.5" => (0.125, "rem"),
@@ -72,20 +111,10 @@ pub fn convert_size(size: &str) -> (f32, &'static str) {
         "72" => (18., "rem"),
         "80" => (20., "rem"),
         "96" => (24., "rem"),
-        _ => (0., "px"),
-    }
-}
+        _ => return None,
+    };
 
-pub fn convert_breakpoint(breakpoint: &str) -> String {
-    match breakpoint {
-        "sm" => "640px",
-        "md" => "786px",
-        "lg" => "1024px",
-        "xl" => "1280px",
-        "2xl" => "1536px",
-        _ => "1024px",
-    }
-    .to_string()
+    Some(result)
 }
 
 pub fn wrap_with_everything(
@@ -98,4 +127,22 @@ pub fn wrap_with_everything(
     let class_body = wrap_with_media_query(class_body, modifiers);
 
     class_body.replace("[class-selector]", &selector)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_split_by_dash() {
+        assert!(split_by_dash("py-5").is_some());
+        assert_eq!(
+            split_by_dash("py-5").unwrap(),
+            ("py".into(), "1.25rem".into())
+        );
+
+        assert!(split_by_dash("-5").is_none());
+        assert!(split_by_dash("py-").is_none());
+        assert!(split_by_dash("py-f").is_none());
+    }
 }

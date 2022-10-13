@@ -1,26 +1,13 @@
-use crate::class::wrap_with_everything;
-use crate::modifiers::Modifier;
+use crate::class::generate_class;
 
 #[derive(Debug)]
-pub struct Container {
-    modifiers: Option<Vec<Modifier>>,
-    class_selector: String,
-}
+pub struct Container;
 
 impl Container {
-    fn new(class: &str) -> Self {
-        Self {
-            modifiers: Modifier::parse_many_from_str(class),
-            class_selector: class.into(),
-        }
-    }
-
     pub fn parse_from_str(class: &str) -> String {
-        Self::generate_class(&Self::new(class))
-    }
-
-    fn generate_class(&self) -> String {
-        let class = r#".[class-selector] {
+        generate_class(
+            class,
+            r#".[class-selector] {
   width: 100%;
 }
 
@@ -53,9 +40,7 @@ impl Container {
     max-width: 1536px;
   }
 }
-"#
-        .to_string();
-
-        wrap_with_everything(&class, &self.class_selector, &self.modifiers)
+"#,
+        )
     }
 }

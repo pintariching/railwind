@@ -1,61 +1,60 @@
-use crate::class::wrap_with_everything;
-use crate::modifiers::Modifier;
+use crate::class::generate_class;
 
 #[derive(Debug)]
-pub struct AspectRatio {
-    modifiers: Option<Vec<Modifier>>,
-    class_selector: String,
-    ratio: Ratio,
-}
-
-#[derive(Debug)]
-pub enum Ratio {
-    Auto,
-    Square,
-    Video,
-}
-
-impl Ratio {
-    fn from_str(str: &str) -> Ratio {
-        match str {
-            "aspect-auto" => Ratio::Auto,
-            "aspect-square" => Ratio::Square,
-            "aspect-video" => Ratio::Video,
-            _ => unreachable!(),
-        }
-    }
-
-    fn to_str(&self) -> &'static str {
-        match self {
-            Ratio::Auto => "auto",
-            Ratio::Square => "1 / 1",
-            Ratio::Video => "16 / 9",
-        }
-    }
-}
+pub struct AspectRatio;
 
 impl AspectRatio {
-    fn new(class: &str, selector: &str) -> Self {
-        Self {
-            modifiers: Modifier::parse_many_from_str(class),
-            class_selector: class.into(),
-            ratio: Ratio::from_str(selector),
+    pub fn parse_from_str(class: &str, ratio: &str) -> Option<String> {
+        if let Some(ratio) = match ratio {
+            "aspect-auto" => Some("auto"),
+            "aspect-square" => Some("1 / 1"),
+            "aspect-video" => Some("16 / 9"),
+            _ => return None,
+        } {
+            let template = format!(".[class-selector] {{\n  aspect-ratio: {};\n}}\n", ratio);
+            return Some(generate_class(class, &template));
         }
+        None
     }
+}
 
-    pub fn parse_from_str(class: &str, selector: &str) -> String {
-        Self::generate_class(&Self::new(class, selector))
-    }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    fn generate_class(&self) -> String {
-        let class = format!(
-            r#".[class-selector] {{
-  aspect-ratio: {};
-}}
-"#,
-            self.ratio.to_str()
+    #[test]
+    fn test_parse_from_str_auto() {
+        let result = AspectRatio::parse_from_str("aspect-auto", "aspect-auto");
+        assert!(result.is_some());
+        assert_eq!(
+            result.unwrap(),
+            ".aspect-auto {\n  aspect-ratio: auto;\n}\n"
         );
+    }
 
-        wrap_with_everything(&class, &self.class_selector, &self.modifiers)
+    #[test]
+    fn test_parse_from_str_square() {
+        let result = AspectRatio::parse_from_str("aspect-square", "aspect-square");
+        assert!(result.is_some());
+        assert_eq!(
+            result.unwrap(),
+            ".aspect-square {\n  aspect-ratio: 1 / 1;\n}\n"
+        );
+    }
+
+    #[test]
+    fn test_parse_from_str_video() {
+        let result = AspectRatio::parse_from_str("aspect-video", "aspect-video");
+        assert!(result.is_some());
+        assert_eq!(
+            result.unwrap(),
+            ".aspect-video {\n  aspect-ratio: 16 / 9;\n}\n"
+        );
+    }
+
+    #[test]
+    fn test_parse_from_str_none() {
+        let result = AspectRatio::parse_from_str("aspect-vidjeo", "aspect-vidjeo");
+        assert!(result.is_none());
     }
 }

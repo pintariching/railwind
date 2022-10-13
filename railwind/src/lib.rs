@@ -7,9 +7,9 @@ use std::{
     path::Path,
 };
 
-pub mod class;
-pub mod modifiers;
-pub mod utils;
+mod class;
+mod modifiers;
+mod utils;
 
 lazy_static! {
     pub static ref STYLE_REGEX: Regex =
@@ -34,4 +34,19 @@ pub fn parse_html(input: &Path, output: &Path) {
 
     let mut css_file = File::create(output).unwrap();
     css_file.write_all(classes.as_bytes()).unwrap();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_html() {
+        let input = Path::new("../index.html");
+        let output = Path::new("../railwind.css");
+
+        parse_html(input, output);
+
+        assert!(true)
+    }
 }
