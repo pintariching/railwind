@@ -1,54 +1,43 @@
-<a name="readme-top"></a>
+# Railwind
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
+Tailwind compiler rewritten in Rust
 
+## Description
 
-<h1 align="center">Railwind</h1>
+The main goal, is to decouple the original Tailwind project from Node and NPM with the side goal of possibly making it even faster and smaller (Tailwind already has a [standalone version](https://tailwindcss.com/blog/standalone-cli), but the binary size is a *whooping 35 mb*).
 
-  <p align="center">
-    Tailwind reimplemented in Rust
-    <br />
-  </p>
-</div>
+# Features
 
+Currently, not all Tailwind features are supported. At the moment, the following features are working:
 
+### Layout
+- [x] Container
+- [x] Aspect ratio
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-    </li>
-    <li>
-		<a href="#contributing">Contributing</a>
-	</li>
-  </ol>
-</details>
+### Spacing
+- [x] Padding
+- [x] Margin
+
+### Flexbox & Grid
+- [x] Flex
+
+### Other
+- [x] Pseudo-classes
+- [x] Pseudo-elements
+- [x] Media queries
 
 
+## Authors
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+Contributors names and contact info
 
-A Tailwind parser implemented in Rust. The main goal, is to decouple the original Tailwind project from Node and NPM with the side goal of possibly making it even faster and smaller (Tailwind already has a [standalone version](https://tailwindcss.com/blog/standalone-cli), but the binary size is a *whooping 35 mb*). 
+[@pintariching](https://github.com/pintariching)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+## License
 
-<!-- CONTRIBUTING -->
-## Contributing
+This project is licensed under the MIT License - see the LICENSE.md file for details
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+## Acknowledgments
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+Inspiration, code snippets, etc.
+* [awesome-readme](https://github.com/matiassingers/awesome-readme)
