@@ -35,6 +35,7 @@ pub fn parse_html(input: &Path, output: &Path) {
     let mut css_file = File::create(output).unwrap();
     let preflight = fs::read_to_string("preflight.css").unwrap();
     css_file.write_all(preflight.as_bytes()).unwrap();
+    css_file.write_all("\n\n".as_bytes()).unwrap();
     css_file.write_all(classes.as_bytes()).unwrap();
 }
 

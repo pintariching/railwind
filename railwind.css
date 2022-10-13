@@ -399,7 +399,9 @@ video {
 /* Make elements with the HTML hidden attribute stay hidden by default */
 [hidden] {
 	display: none;
-}@media (min-width: 1024px) {
+}
+
+@media (min-width: 1024px) {
   @media (min-width: 640px) {
     .sm\:lg\:flex {
       display: flex;
