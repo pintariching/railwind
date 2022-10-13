@@ -23,7 +23,7 @@ pub fn parse_html(input: &Path, output: &Path) {
 
     for capture in STYLE_REGEX.captures_iter(&html) {
         if let Some(group) = capture.get(1) {
-            for cap in group.as_str().split(" ") {
+            for cap in group.as_str().split(' ') {
                 if let Some(parsed_class) = parse_class_from_str(cap) {
                     classes.push_str(&parsed_class);
                     classes.push('\n');

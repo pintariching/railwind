@@ -1,7 +1,7 @@
 use crate::modifiers::{generate_class_selector, wrap_with_media_query, Modifier};
 
 use self::{
-    flex::flex::Flex,
+    flex::Flex,
     layout::{AspectRatio, Container},
     spacing::{Margin, Padding},
 };
@@ -35,12 +35,12 @@ pub fn parse_class_from_str(str: &str) -> Option<String> {
             return Flex::parse_from_str(&class_selector, last_selector);
         }
 
-        if last_selector.contains("-") {
-            if last_selector.starts_with("p") {
+        if last_selector.contains('-') {
+            if last_selector.starts_with('p') {
                 return Padding::parse_from_str(&class_selector, last_selector);
             }
 
-            if last_selector.starts_with("m") {
+            if last_selector.starts_with('m') {
                 return Margin::parse_from_str(&class_selector, last_selector);
             }
         }
@@ -115,18 +115,6 @@ pub fn convert_size(size: &str) -> Option<(f32, &'static str)> {
     };
 
     Some(result)
-}
-
-pub fn wrap_with_everything(
-    class_body: &str,
-    selector: &str,
-    modifiers: &Option<Vec<Modifier>>,
-) -> String {
-    let selector = generate_class_selector(selector, modifiers);
-
-    let class_body = wrap_with_media_query(class_body, modifiers);
-
-    class_body.replace("[class-selector]", &selector)
 }
 
 #[cfg(test)]

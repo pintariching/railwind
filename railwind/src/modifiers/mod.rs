@@ -1,16 +1,16 @@
 mod media_query;
-mod parent_sibling;
+//mod parent_sibling;
 mod pseudo_class;
 mod pseudo_element;
 
 pub use media_query::MediaQuery;
-pub use parent_sibling::{Group, Peer};
+//pub use parent_sibling::{Group, Peer};
 pub use pseudo_class::PseudoClass;
 pub use pseudo_element::PseudoElement;
 
 use crate::utils::indent_string;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Modifier {
     PseudoClass(PseudoClass),
     PseudoElement(PseudoElement),
@@ -34,25 +34,17 @@ impl Modifier {
         None
     }
 
-    pub fn to_string(&self) -> String {
-        match self {
-            Modifier::PseudoClass(m) => m.as_str().to_string(),
-            Modifier::PseudoElement(m) => m.as_str().to_string(),
-            Modifier::MediaQuery(m) => m.as_str().to_string(),
-        }
-    }
-
     pub fn parse_many_from_str(modifiers: &str) -> Option<Vec<Self>> {
         if modifiers.contains("\\:") {
             let modifiers: Vec<Modifier> = modifiers
                 .split("\\:")
-                .filter_map(|m| Modifier::parse_from_str(m))
+                .filter_map(Modifier::parse_from_str)
                 .collect();
 
             return Some(modifiers);
         }
 
-        if let Some(modif) = Modifier::parse_from_str(&modifiers) {
+        if let Some(modif) = Modifier::parse_from_str(modifiers) {
             return Some(vec![modif]);
         }
 
@@ -81,7 +73,7 @@ impl Modifier {
     }
 }
 
-fn modifiers_to_class_selector(modifiers: &Vec<Modifier>) -> String {
+fn modifiers_to_class_selector(modifiers: &[Modifier]) -> String {
     let pseudo_classes: Vec<&str> = modifiers
         .iter()
         .filter_map(|m| m.pseudo_class())
@@ -110,13 +102,13 @@ fn modifiers_to_class_selector(modifiers: &Vec<Modifier>) -> String {
 
 pub fn generate_class_selector(class: &str, modifiers: &Option<Vec<Modifier>>) -> String {
     if let Some(m) = modifiers {
-        let modifier_string = modifiers_to_class_selector(&m);
+        let modifier_string = modifiers_to_class_selector(m);
 
         if modifier_string.is_empty() {
             return class.to_string();
         }
 
-        return format!("{}:{}", class, modifiers_to_class_selector(&m));
+        return format!("{}:{}", class, modifiers_to_class_selector(m));
     }
 
     class.to_string()
