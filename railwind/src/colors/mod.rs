@@ -7,11 +7,7 @@ lazy_static! {
 }
 
 // Accepts a color value like `slate-500` and returns a rgb value, seperated by spaces `100 116 139`
-pub fn convert_color(color: &str) -> Option<String> {
-    let mut split = color.split('-');
-    let color_name = split.next()?;
-    let color_value = split.next()?;
-
+pub fn convert_color(color_name: &str, color_value: &str) -> Option<String> {
     let color = COLORS.get(color_name)?;
     let hex_str = color.get(color_value)?;
 
@@ -27,7 +23,7 @@ mod tests {
 
     #[test]
     fn test_convert_color() {
-        let result = convert_color("slate-500");
+        let result = convert_color("slate", "500");
         assert!(result.is_some());
         assert_eq!(result.unwrap(), "100 116 139");
     }

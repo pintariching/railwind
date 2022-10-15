@@ -1,11 +1,13 @@
 use crate::modifiers::{generate_class_selector, wrap_with_media_query, Modifier};
 
 use self::{
+    background::Background,
     flex::Flex,
     layout::{AspectRatio, Container},
     spacing::{Margin, Padding},
 };
 
+pub mod background;
 pub mod flex;
 pub mod grid;
 pub mod layout;
@@ -42,6 +44,10 @@ pub fn parse_class_from_str(str: &str) -> Option<String> {
 
             if last_selector.starts_with('m') {
                 return Margin::parse_from_str(&class_selector, last_selector);
+            }
+
+            if last_selector.starts_with("bg") {
+                return Background::parse_from_str(&class_selector, last_selector);
             }
         }
     }

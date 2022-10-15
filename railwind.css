@@ -401,11 +401,29 @@ video {
 	display: none;
 }
 
-@media (min-width: 1024px) {
-  @media (min-width: 640px) {
-    .sm\:lg\:flex {
-      display: flex;
-    }
+@media (min-width: 640px) {
+  .sm\:bg-red-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(254 202 202 / var(--tw-bg-opacity));
   }
+}
+
+@media (min-width: 768px) {
+  .md\:bg-red-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:bg-red-800 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(153 27 27 / var(--tw-bg-opacity));
+  }
+}
+
+.bg-slate-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 
