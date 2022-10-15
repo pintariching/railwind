@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use serde::de::IntoDeserializer;
 use std::collections::HashMap;
 
 lazy_static! {
@@ -8,6 +9,12 @@ lazy_static! {
 
 // Accepts a color value like `slate-500` and returns a rgb value, seperated by spaces `100 116 139`
 pub fn convert_color(color_name: &str, color_value: &str) -> Option<String> {
+    match color_name {
+        "black" => return Some("0 0 0".into()),
+        "white" => return Some("255 255 255".into()),
+        _ => (),
+    }
+
     let color = COLORS.get(color_name)?;
     let hex_str = color.get(color_value)?;
 
