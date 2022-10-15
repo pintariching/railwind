@@ -31,6 +31,9 @@ Currently, not all Tailwind features are supported. At the moment, the following
 ### Flexbox & Grid
 - [x] Flex
 
+### Background
+- [x] Color
+
 ### Other
 - [x] Pseudo-classes
 - [x] Pseudo-elements
