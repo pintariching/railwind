@@ -8,6 +8,7 @@ use std::{
 };
 
 mod class;
+mod colors;
 mod modifiers;
 mod utils;
 
