@@ -1,5 +1,4 @@
 use lazy_static::lazy_static;
-use serde::de::IntoDeserializer;
 use std::collections::HashMap;
 
 lazy_static! {

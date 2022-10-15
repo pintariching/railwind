@@ -14,4 +14,4 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0.13", features = ["derive"] }
-railwind = { version = "0.0.2", path = "../railwind" }
+railwind = "0.0.2" 

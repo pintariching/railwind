@@ -22,7 +22,7 @@ Currently, not all Tailwind features are supported. At the moment, the following
 
 ### Layout
 - [x] Container
-- [x] Aspect ratio
+- [x] Aspect Ratio
 
 ### Spacing
 - [x] Padding
@@ -32,12 +32,20 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Flex
 
 ### Background
+- [x] Attachment
+- [x] Clip
 - [x] Color
+- [x] Origin
+- [x] Position
+- [x] Repeat
+- [x] Size
+- [ ] Image
+- [ ] Gradient Color Stops
 
 ### Other
-- [x] Pseudo-classes
-- [x] Pseudo-elements
-- [x] Media queries
+- [x] Pseudo-Classes
+- [x] Pseudo-Elements
+- [x] Media Queries
 
 
 ## Authors

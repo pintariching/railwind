@@ -167,6 +167,16 @@ dependencies = [
 [[package]]
 name = "railwind"
 version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f69b276b3be9f25bc991a65003416e206e404b4aa5ceadc272f81b39ef907a6"
+dependencies = [
+ "lazy_static",
+ "regex",
+]
+
+[[package]]
+name = "railwind"
+version = "0.0.3"
 dependencies = [
  "hex",
  "lazy_static",
@@ -180,7 +190,7 @@ name = "railwind_cli"
 version = "0.0.2"
 dependencies = [
  "clap",
- "railwind",
+ "railwind 0.0.2",
 ]
 
 [[package]]
