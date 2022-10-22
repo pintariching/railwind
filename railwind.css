@@ -401,29 +401,30 @@ video {
 	display: none;
 }
 
-@media (min-width: 640px) {
-  .sm\:bg-red-200 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(254 202 202 / var(--tw-bg-opacity));
-  }
-}
-
-@media (min-width: 768px) {
-  .md\:bg-red-500 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(239 68 68 / var(--tw-bg-opacity));
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:bg-red-800 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(153 27 27 / var(--tw-bg-opacity));
-  }
-}
-
-.bg-slate-200 {
+.bg-red-800 {
   --tw-bg-opacity: 1;
-  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+  background-color: rgb(153 27 27 / var(--tw-bg-opacity));
+}
+
+.border-8 {
+  border-width: 8px;
+}
+
+.border-sky-500 {
+  --tw-bg-opacity: 1;
+  border-color: rgb(14 165 233 / var(--tw-bg-opacity));
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.border-dashed {
+  border-style: dashed;
+}
+
+.bg-green-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(34 197 94 / var(--tw-bg-opacity));
 }
 

@@ -42,6 +42,23 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [ ] Image
 - [ ] Gradient Color Stops
 
+### Border
+- [x] Border Radius
+- [x] Border Width
+- [x] Border Color
+- [x] Border Style
+- [ ] Divide Width
+- [ ] Divide Color
+- [ ] Divide Style
+- [ ] Outline Width
+- [ ] Outline Color
+- [ ] Outline Style
+- [ ] Outline Offset
+- [ ] Ring Width
+- [ ] Ring Color
+- [ ] Ring Offset Width
+- [ ] Ring Offset Color
+
 ### Other
 - [x] Pseudo-Classes
 - [x] Pseudo-Elements

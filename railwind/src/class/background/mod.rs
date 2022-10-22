@@ -10,12 +10,8 @@ impl Background {
     pub fn parse_from_str(class: &str, background: &str) -> Option<String> {
         let mut split = background.split('-');
         split.next();
-        let utility = split.next()?;
-        let value = split.next()?;
-
-        if let Some(bg) = BackgroundColor::parse_from_str(class, utility, value) {
-            return Some(bg);
-        }
+        let utility = split.next().unwrap_or("");
+        let value = split.next().unwrap_or("");
 
         let declaration = match utility {
             "fixed" | "local" | "scroll" if value.is_empty() => {
@@ -59,15 +55,15 @@ impl Background {
                     _ => return None,
                 }
             ),
-            "no" if value == "repeat" => format!("background-repeat: no-repeat;"),
+            "no" if value == "repeat" => "background-repeat: no-repeat;".into(),
             "auto" | "cover" | "contain" if value.is_empty() => {
                 format!("background-size: {};", utility)
             }
-            _ => return None,
+            _ => return BackgroundColor::parse_from_str(class, utility, value),
         };
 
         let template = format!(".[class-selector] {{\n  {}\n}}\n", declaration);
-        return Some(generate_class(class, &template));
+        Some(generate_class(class, &template))
     }
 }
 

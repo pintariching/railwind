@@ -2,12 +2,14 @@ use crate::modifiers::{generate_class_selector, wrap_with_media_query, Modifier}
 
 use self::{
     background::Background,
+    border::Border,
     flex::Flex,
     layout::{AspectRatio, Container},
     spacing::{Margin, Padding},
 };
 
 pub mod background;
+pub mod border;
 pub mod flex;
 pub mod grid;
 pub mod layout;
@@ -35,6 +37,10 @@ pub fn parse_class_from_str(str: &str) -> Option<String> {
 
         if last_selector.starts_with("flex") {
             return Flex::parse_from_str(&class_selector, last_selector);
+        }
+
+        if last_selector.starts_with("border") || last_selector.starts_with("rounded") {
+            return Border::parse_from_str(&class_selector, last_selector);
         }
 
         if last_selector.contains('-') {
