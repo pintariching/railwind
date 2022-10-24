@@ -1,60 +1,43 @@
-use crate::class::generate_class;
+use crate::class::OneArgSingleDeclaration;
 
 #[derive(Debug)]
 pub struct AspectRatio;
 
-impl AspectRatio {
-    pub fn parse_from_str(class: &str, ratio: &str) -> Option<String> {
-        if let Some(ratio) = match ratio {
-            "aspect-auto" => Some("auto"),
-            "aspect-square" => Some("1 / 1"),
-            "aspect-video" => Some("16 / 9"),
-            _ => return None,
-        } {
-            let template = format!(".[class-selector] {{\n  aspect-ratio: {};\n}}\n", ratio);
-            return Some(generate_class(class, &template));
-        }
-        None
+impl OneArgSingleDeclaration for AspectRatio {
+    fn generate_declaration(arg: &str) -> Result<Vec<String>, String> {
+        let decl = format!(
+                "aspect-ratio: {}",
+                match arg {
+                    "auto" => "auto",
+                    "square" => "1 / 1",
+                    "video" => "16 / 9",
+                    _ => return Err("class doesn't contain a valid ratio, should be either 'auto', 'square' or 'video'".into()),
+                }
+            );
+
+        return Ok(vec![decl]);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::class::SeperatedClass;
 
     #[test]
-    fn test_parse_from_str_auto() {
-        let result = AspectRatio::parse_from_str("aspect-auto", "aspect-auto");
-        assert!(result.is_some());
-        assert_eq!(
-            result.unwrap(),
-            ".aspect-auto {\n  aspect-ratio: auto;\n}\n"
-        );
-    }
+    fn test_generate_declaration() {
+        let class = SeperatedClass {
+            class: "aspect",
+            raw_class: "aspect-square",
+            args: Some(vec!["square"]),
+            pseudo_classes: None,
+            pseudo_elements: None,
+            media_queries: None,
+        };
 
-    #[test]
-    fn test_parse_from_str_square() {
-        let result = AspectRatio::parse_from_str("aspect-square", "aspect-square");
-        assert!(result.is_some());
-        assert_eq!(
-            result.unwrap(),
-            ".aspect-square {\n  aspect-ratio: 1 / 1;\n}\n"
-        );
-    }
+        let result = AspectRatio::generate(&class);
 
-    #[test]
-    fn test_parse_from_str_video() {
-        let result = AspectRatio::parse_from_str("aspect-video", "aspect-video");
-        assert!(result.is_some());
-        assert_eq!(
-            result.unwrap(),
-            ".aspect-video {\n  aspect-ratio: 16 / 9;\n}\n"
-        );
-    }
-
-    #[test]
-    fn test_parse_from_str_none() {
-        let result = AspectRatio::parse_from_str("aspect-vidjeo", "aspect-vidjeo");
-        assert!(result.is_none());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), vec!["aspect-ratio: 1 / 1"]);
     }
 }

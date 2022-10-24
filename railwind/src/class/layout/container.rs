@@ -1,13 +1,11 @@
-use crate::class::generate_class;
+use crate::class::NoArgsMultiDefinition;
 
 #[derive(Debug)]
 pub struct Container;
 
-impl Container {
-    pub fn parse_from_str(class: &str) -> String {
-        generate_class(
-            class,
-            r#".[class-selector] {
+impl NoArgsMultiDefinition for Container {
+    fn generate_definitions() -> String {
+        r#".[class-selector] {
   width: 100%;
 }
 
@@ -40,7 +38,7 @@ impl Container {
     max-width: 1536px;
   }
 }
-"#,
-        )
+"#
+        .into()
     }
 }

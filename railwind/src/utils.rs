@@ -1,7 +1,7 @@
 // Indents every line in a string with two spaces
 // and removes empty lines
 pub fn indent_string(str: &str) -> String {
-    str.lines().map(|line| format!("  {}\n", line)).collect()
+    str.lines().map(|line| format!("    {}\n", line)).collect()
 }
 
 #[cfg(test)]
