@@ -10,15 +10,15 @@ mod tests {
 
     #[test]
     fn test_indent_string() {
-        assert_eq!(indent_string("test"), "  test\n");
+        assert_eq!(indent_string("test"), "    test\n");
         assert_eq!(
             indent_string(
                 r#"test
-  123
+    123
 "#
             ),
-            r#"  test
-    123
+            r#"    test
+        123
 "#
         );
     }

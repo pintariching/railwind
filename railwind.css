@@ -2,3 +2,20 @@
     aspect-ratio: auto;
 }
 
+.p-5 {
+    padding: 1.25rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.bg-green-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(34 197 94 / var(--tw-bg-opacity));
+}
+
+.bg-fixed {
+    background-attachment: fixed;
+}
+

@@ -4,7 +4,7 @@ use std::{io::Write, path::Path};
 use warning::Warning;
 
 mod class;
-mod colors;
+mod config;
 mod modifiers;
 mod utils;
 mod warning;

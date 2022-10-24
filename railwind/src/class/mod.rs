@@ -1,16 +1,17 @@
 use crate::{
-    modifiers::{MediaQuery, Modifier, PseudoClass, PseudoElement},
+    class::{background::Background, spacing::MarginAndPadding},
+    modifiers::{MediaQuery, PseudoClass, PseudoElement},
     utils::indent_string,
 };
 
 use self::layout::{AspectRatio, Container};
 
-// pub mod background;
+mod background;
 // pub mod border;
 // pub mod flex;
 // pub mod grid;
-// pub mod spacing;
-pub mod layout;
+mod layout;
+mod spacing;
 
 #[derive(Debug, PartialEq)]
 pub struct SeperatedClass<'a> {
@@ -23,8 +24,13 @@ pub struct SeperatedClass<'a> {
 }
 
 impl<'a> SeperatedClass<'a> {
-    pub fn from_str(raw_class: &'a str) -> Self {
+    pub fn from_str(raw_class: &'a str) -> Result<Self, String> {
         let (class, args) = Self::extract_class_and_args(raw_class);
+
+        if class.is_empty() {
+            return Err(format!("class shouldn't be empty: {}", raw_class));
+        }
+
         let states = Self::extract_states(raw_class);
 
         let mut seperated_class = Self {
@@ -64,7 +70,7 @@ impl<'a> SeperatedClass<'a> {
             }
         }
 
-        seperated_class
+        Ok(seperated_class)
     }
 
     fn extract_states(raw_class: &'a str) -> Option<Vec<&'a str>> {
@@ -108,38 +114,48 @@ impl<'a> SeperatedClass<'a> {
     }
 }
 
-// fn generate_class(selector: &str, template: &str) -> String {
-//     let modifiers = Modifier::parse_many_from_vec(selector);
-//     let selector = generate_class_selector(selector, &modifiers);
-//     let class_body = wrap_with_media_query(template, &modifiers);
-//     class_body.replace("[class-selector]", &selector)
-// }
-
 pub fn parse_class_from_str(str: &str) -> Result<String, String> {
-    let class = SeperatedClass::from_str(str);
+    let class = SeperatedClass::from_str(str)?;
 
     let declarations = match class.class {
-        "aspect" => Some(AspectRatio::generate(&class)),
-        _ => None,
+        "aspect" => AspectRatio::generate(&class)?,
+        "bg" => Background::generate(&class)?,
+        c => {
+            let mut class_chars = c.chars();
+
+            if let Some(first_char) = class_chars.next() {
+                match first_char {
+                    'p' | 'm' => MarginAndPadding::generate(&class)?,
+                    first_char => {
+                        if let Some(second_char) = class_chars.next() {
+                            match second_char {
+                                _ => return Err(format!("failed to parse class name: {}", str)),
+                            }
+                        } else {
+                            return Err(format!("failed to parse class name: {}", str));
+                        }
+                    }
+                }
+            } else {
+                return Err(format!("failed to parse class name: {}", str));
+            }
+        }
     };
 
-    let mut generated_class = if let Some(decls) = declarations {
-        match decls {
-            Ok(d) => {
-                let selector = generate_class_selector(&class);
-                let class = format!(".{} {{\n    {};\n}}\n", selector, d.join(";\n    "));
-                class
-            }
-            Err(err) => return Err(err),
-        }
+    let mut generated_class = if !declarations.is_empty() {
+        let selector = generate_class_selector(&class);
+        let class = format!(
+            ".{} {{\n    {};\n}}\n",
+            selector,
+            declarations.join(";\n    ")
+        );
+        class
     } else {
         match class.class {
             "container" => Container::generate_definitions(),
             _ => return Err(format!("unsupported class: {}", str)),
         }
     };
-
-    println!("{}", generated_class);
 
     if let Some(media_queries) = class.media_queries {
         for query in media_queries {
@@ -167,6 +183,7 @@ pub fn parse_class_from_str(str: &str) -> Result<String, String> {
         }
     }
 
+    println!("{}", generated_class);
     Ok(generated_class)
 
     // let declarations: Vec<String> = match *class.first()? {
@@ -209,7 +226,38 @@ pub fn parse_class_from_str(str: &str) -> Result<String, String> {
     // }
 }
 
-pub trait OneArgSingleDeclaration {
+pub trait MultiArgsDeclaration {
+    fn generate_declaration(class: &str, args: &Vec<&str>) -> Result<Vec<String>, String>;
+    fn generate(seperated_class: &SeperatedClass) -> Result<Vec<String>, String> {
+        if let Some(args) = &seperated_class.args {
+            return Self::generate_declaration(seperated_class.class, args);
+        }
+
+        return Err("class isn't formatted correctly, requires arguments after dash '-'".into());
+    }
+}
+
+pub trait OneArgDeclarationWithDirection {
+    fn generate_declaration(class: &str, arg: &str) -> Result<Vec<String>, String>;
+    fn generate(seperated_class: &SeperatedClass) -> Result<Vec<String>, String> {
+        if let Some(args) = &seperated_class.args {
+            if args.len() != 1 {
+                return Err(format!(
+                    "invalid argument count, should be 1 but is {}",
+                    args.len()
+                ));
+            }
+
+            let arg = args.first().unwrap();
+
+            return Self::generate_declaration(seperated_class.class, arg);
+        }
+
+        return Err("class isn't formatted correctly, requires arguments after dash '-'".into());
+    }
+}
+
+pub trait OneArgDeclaration {
     fn generate_declaration(arg: &str) -> Result<Vec<String>, String>;
 
     fn generate(seperated_class: &SeperatedClass) -> Result<Vec<String>, String> {
@@ -262,74 +310,6 @@ fn generate_class_selector(seperated_class: &SeperatedClass) -> String {
     result
 }
 
-/// Splits a class selector by dash and returns the string
-/// before the dash and converts the string after the dash into a CSS unit
-///
-/// For example `split_by_dash("py-5")` returns a tuple ("py", "1.25rem")
-pub fn split_by_dash(str: &str) -> Option<(String, String)> {
-    let mut split = str.split('-');
-    let before_dash = split.next();
-    let after_dash = split.next();
-
-    if let (Some(before), Some(after)) = (before_dash, after_dash) {
-        if before.is_empty() || after.is_empty() {
-            return None;
-        }
-
-        if let Some((size, unit)) = convert_size(after) {
-            let value = format!("{}{}", size, unit);
-            return Some((before.into(), value));
-        }
-
-        return None;
-    }
-
-    None
-}
-
-pub fn convert_size(size: &str) -> Option<(f32, &'static str)> {
-    let result = match size {
-        "0" => (0., "px"),
-        "px" => (1., "px"),
-        "0.5" => (0.125, "rem"),
-        "1" => (0.25, "rem"),
-        "1.5" => (0.375, "rem"),
-        "2" => (0.5, "rem"),
-        "2.5" => (0.625, "rem"),
-        "3" => (0.75, "rem"),
-        "3.5" => (0.875, "rem"),
-        "4" => (1., "rem"),
-        "5" => (1.25, "rem"),
-        "6" => (1.5, "rem"),
-        "7" => (1.75, "rem"),
-        "8" => (2., "rem"),
-        "9" => (2.25, "rem"),
-        "10" => (2.5, "rem"),
-        "11" => (2.75, "rem"),
-        "12" => (3., "rem"),
-        "14" => (3.5, "rem"),
-        "16" => (4., "rem"),
-        "20" => (5., "rem"),
-        "24" => (6., "rem"),
-        "28" => (7., "rem"),
-        "32" => (8., "rem"),
-        "36" => (9., "rem"),
-        "40" => (10., "rem"),
-        "44" => (11., "rem"),
-        "48" => (12., "rem"),
-        "52" => (13., "rem"),
-        "56" => (14., "rem"),
-        "60" => (15., "rem"),
-        "64" => (16., "rem"),
-        "72" => (18., "rem"),
-        "80" => (20., "rem"),
-        "96" => (24., "rem"),
-        _ => return None,
-    };
-
-    Some(result)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -370,7 +350,7 @@ mod tests {
     #[test]
     fn test_seperated_class_from_str() {
         assert_eq!(
-            SeperatedClass::from_str("container"),
+            SeperatedClass::from_str("container").unwrap(),
             SeperatedClass {
                 class: "container",
                 raw_class: "container",
@@ -382,7 +362,7 @@ mod tests {
         );
 
         assert_eq!(
-            SeperatedClass::from_str("p-5"),
+            SeperatedClass::from_str("p-5").unwrap(),
             SeperatedClass {
                 class: "p",
                 raw_class: "p-5",
@@ -394,7 +374,7 @@ mod tests {
         );
 
         assert_eq!(
-            SeperatedClass::from_str("overflow-x-hidden"),
+            SeperatedClass::from_str("overflow-x-hidden").unwrap(),
             SeperatedClass {
                 class: "overflow",
                 raw_class: "overflow-x-hidden",
@@ -406,7 +386,7 @@ mod tests {
         );
 
         assert_eq!(
-            SeperatedClass::from_str("sm:hover:bg-green-200"),
+            SeperatedClass::from_str("sm:hover:bg-green-200").unwrap(),
             SeperatedClass {
                 class: "bg",
                 raw_class: "sm:hover:bg-green-200",
@@ -418,7 +398,7 @@ mod tests {
         );
 
         assert_eq!(
-            SeperatedClass::from_str("sm::bg--200"),
+            SeperatedClass::from_str("sm::bg--200").unwrap(),
             SeperatedClass {
                 class: "bg",
                 raw_class: "sm::bg--200",

@@ -1,9 +1,9 @@
-use crate::class::OneArgSingleDeclaration;
+use crate::class::OneArgDeclaration;
 
 #[derive(Debug)]
 pub struct AspectRatio;
 
-impl OneArgSingleDeclaration for AspectRatio {
+impl OneArgDeclaration for AspectRatio {
     fn generate_declaration(arg: &str) -> Result<Vec<String>, String> {
         let decl = format!(
                 "aspect-ratio: {}",

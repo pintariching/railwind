@@ -1,46 +1,75 @@
-use crate::class::{generate_class, split_by_dash};
+use crate::class::OneArgDeclarationWithDirection;
+use crate::config::convert_spacing;
 
 #[derive(Debug)]
 pub struct Margin;
 
-impl Margin {
-    pub fn parse_from_str(class: &str, margin: &str) -> Option<String> {
-        if let Some((before, value)) = split_by_dash(margin) {
-            let declaration = match before.as_str() {
-                "p" => format!("margin: {};", value),
-                "pt" => format!("margin-top: {};", value),
-                "pb" => format!("margin-bottom: {};", value),
-                "pl" => format!("margin-left: {};", value),
-                "pr" => format!("margin-right: {};", value),
-                "px" => format!("margin-left: {};\n  margin-right: {};", value, value),
-                "py" => format!("margin-top: {};\n  margin-bottom: {};", value, value),
-                _ => return None,
-            };
+impl OneArgDeclarationWithDirection for Margin {
+    fn generate_declaration(class: &str, arg: &str) -> Result<Vec<String>, String> {
+        let mut res = Vec::new();
 
-            let template = format!(".[class-selector] {{\n  {}\n}}\n", declaration);
+        let value = convert_spacing(arg)?;
 
-            return Some(generate_class(class, &template));
+        match class {
+            "m" => res.push(format!("margin: {}", value)),
+            "mt" => res.push(format!("margin-top: {}", value)),
+            "mb" => res.push(format!("margin-bottom: {}", value)),
+            "ml" => res.push(format!("margin-left: {}", value)),
+            "mr" => res.push(format!("margin-right: {}", value)),
+            "mx" => {
+                res.push(format!("margin-left: {}", value));
+                res.push(format!("margin-right: {}", value));
+            }
+            "my" => {
+                res.push(format!("margin-top: {}", value));
+                res.push(format!("margin-bottom: {}", value));
+            }
+            _ => return Err(format!("failed to match margin class: {}-{}", class, arg)),
         }
 
-        None
+        Ok(res)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::class::SeperatedClass;
 
     #[test]
-    fn test_parse_from_string() {
-        let result = Margin::parse_from_str("p-5", "p-5");
-        assert!(result.is_some());
-        assert_eq!(result.unwrap(), ".p-5 {\n  margin: 1.25rem;\n}\n");
+    fn test_generate_declaration() {
+        let class = SeperatedClass {
+            class: "m",
+            raw_class: "m-5",
+            args: Some(vec!["5"]),
+            pseudo_classes: None,
+            pseudo_elements: None,
+            media_queries: None,
+        };
 
-        let result = Margin::parse_from_str("py-5", "py-5");
-        assert!(result.is_some());
+        let result = Margin::generate(&class);
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), vec!["margin: 1.25rem"]);
+    }
+
+    #[test]
+    fn test_generate_declaration_multi_line() {
+        let class = SeperatedClass {
+            class: "mx",
+            raw_class: "mx-5",
+            args: Some(vec!["5"]),
+            pseudo_classes: None,
+            pseudo_elements: None,
+            media_queries: None,
+        };
+
+        let result = Margin::generate(&class);
+
+        assert!(result.is_ok());
         assert_eq!(
             result.unwrap(),
-            ".py-5 {\n  margin-top: 1.25rem;\n  margin-bottom: 1.25rem;\n}\n"
+            vec!["margin-left: 1.25rem", "margin-right: 1.25rem"]
         );
     }
 }
