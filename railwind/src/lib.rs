@@ -9,7 +9,7 @@ mod modifiers;
 mod utils;
 mod warning;
 
-pub fn parse_html(input: &Path, output: &Path) -> Vec<Warning> {
+pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<Warning> {
     let html = fs::read_to_string(input).unwrap();
 
     let mut generated_classes = String::new();
@@ -31,6 +31,7 @@ pub fn parse_html(input: &Path, output: &Path) -> Vec<Warning> {
                         Ok(class) => {
                             generated_classes.push_str(&class);
                             generated_classes.push('\n');
+                            generated_classes.push('\n');
                         }
                         Err(err) => warnings.push(Warning::new(&err, line_index, column_index)),
                     }
@@ -41,10 +42,20 @@ pub fn parse_html(input: &Path, output: &Path) -> Vec<Warning> {
         }
     }
 
+    // replaces a double newline with a single newline
+    if generated_classes.ends_with("\n\n") {
+        generated_classes = generated_classes.trim_end().to_string();
+        generated_classes.push('\n');
+    }
+
     let mut css_file = File::create(output).unwrap();
-    //let preflight = fs::read_to_string("preflight.css").unwrap();
-    //css_file.write_all(preflight.as_bytes()).unwrap();
-    //css_file.write_all("\n\n".as_bytes()).unwrap();
+
+    if include_preflight {
+        let preflight = fs::read_to_string("preflight.css").unwrap();
+        css_file.write_all(preflight.as_bytes()).unwrap();
+        css_file.write_all("\n\n".as_bytes()).unwrap();
+    }
+
     css_file.write_all(generated_classes.as_bytes()).unwrap();
 
     warnings
@@ -59,7 +70,7 @@ mod tests {
         let input = Path::new("../index.html");
         let output = Path::new("../railwind.css");
 
-        let warnings = parse_html(input, output);
+        let warnings = parse_html(input, output, false);
 
         for warning in warnings {
             println!("{}", warning);

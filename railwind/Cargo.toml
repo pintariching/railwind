@@ -18,3 +18,6 @@ regex = "1.6.0"
 ron = "0.8.0"
 serde = { version = "1.0.145", features = ["derive"] }
 hex = "0.4.3"
+
+[dev-dependencies]
+walkdir = "2.3.2"

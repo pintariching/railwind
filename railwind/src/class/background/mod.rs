@@ -120,18 +120,3 @@ impl MultiArgsDeclaration for Background {
         ))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_background_parse_from_str() {
-        // let result = Background::parse_from_str("bg-clip-border", "bg-clip-border");
-        // assert!(result.is_some());
-        // assert_eq!(
-        //     result.unwrap(),
-        //     ".bg-clip-border {\n  background-clip: border-box;\n}\n"
-        // );
-    }
-}

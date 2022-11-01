@@ -18,26 +18,3 @@ impl OneArgDeclaration for AspectRatio {
         return Ok(vec![decl]);
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::class::SeperatedClass;
-
-    #[test]
-    fn test_generate_declaration() {
-        let class = SeperatedClass {
-            class: "aspect",
-            raw_class: "aspect-square",
-            args: Some(vec!["square"]),
-            pseudo_classes: None,
-            pseudo_elements: None,
-            media_queries: None,
-        };
-
-        let result = AspectRatio::generate(&class);
-
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), vec!["aspect-ratio: 1 / 1"]);
-    }
-}

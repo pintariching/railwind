@@ -1,5 +1,8 @@
 use crate::{
-    class::{background::Background, spacing::MarginAndPadding},
+    class::{
+        background::Background,
+        spacing::{MarginAndPadding, SpaceBetween},
+    },
     modifiers::{MediaQuery, PseudoClass, PseudoElement},
     utils::indent_string,
 };
@@ -88,6 +91,20 @@ impl<'a> SeperatedClass<'a> {
             // if class contains '-' like py-5 or rounded-sm seperate by it
             // otherwise set class to str (rounded, container...)
             if class_with_values.contains('-') {
+                if class_with_values.starts_with('-') {
+                    let split_count = class_with_values.matches('-').count() - 1;
+
+                    let split = class_with_values.rsplitn(split_count, "-");
+                    let mut vec_split = split.collect::<Vec<&str>>();
+                    vec_split.reverse();
+                    let mut vec_split_iter = vec_split.into_iter();
+
+                    let class = vec_split_iter.next().unwrap_or("");
+                    let args = vec_split_iter.collect::<Vec<&str>>();
+
+                    return (class, Some(args));
+                };
+
                 let mut split = class_with_values.split("-");
                 let class = split.next();
                 let args = split.collect::<Vec<&str>>();
@@ -101,6 +118,21 @@ impl<'a> SeperatedClass<'a> {
         }
 
         if raw_class.contains('-') {
+            if raw_class.starts_with('-') {
+                let split_count = raw_class.matches('-').count();
+
+                let split = raw_class.rsplitn(split_count, "-");
+
+                let mut vec_split = split.collect::<Vec<&str>>();
+                vec_split.reverse();
+                let mut vec_split_iter = vec_split.into_iter();
+
+                let class = vec_split_iter.next().unwrap_or("");
+                let args = vec_split_iter.collect::<Vec<&str>>();
+
+                return (class, Some(args));
+            };
+
             let mut split = raw_class.split("-");
 
             // raw_class should contain a '-' so this should be safe to unwrap I think?
@@ -120,21 +152,24 @@ pub fn parse_class_from_str(str: &str) -> Result<String, String> {
     let declarations = match class.class {
         "aspect" => AspectRatio::generate(&class)?,
         "bg" => Background::generate(&class)?,
+        "space" => SpaceBetween::generate(&class)?,
         c => {
             let mut class_chars = c.chars();
 
             if let Some(first_char) = class_chars.next() {
                 match first_char {
                     'p' | 'm' => MarginAndPadding::generate(&class)?,
-                    first_char => {
+                    '-' => {
                         if let Some(second_char) = class_chars.next() {
                             match second_char {
+                                'm' => MarginAndPadding::generate(&class)?,
                                 _ => return Err(format!("failed to parse class name: {}", str)),
                             }
                         } else {
                             return Err(format!("failed to parse class name: {}", str));
                         }
                     }
+                    _ => return Err(format!("failed to parse class name: {}", str)),
                 }
             } else {
                 return Err(format!("failed to parse class name: {}", str));
@@ -145,8 +180,8 @@ pub fn parse_class_from_str(str: &str) -> Result<String, String> {
     let mut generated_class = if !declarations.is_empty() {
         let selector = generate_class_selector(&class);
         let class = format!(
-            ".{} {{\n    {};\n}}\n",
-            selector,
+            ".{} {{\n    {};\n}}",
+            selector.replace(".", "\\."),
             declarations.join(";\n    ")
         );
         class
@@ -183,47 +218,7 @@ pub fn parse_class_from_str(str: &str) -> Result<String, String> {
         }
     }
 
-    println!("{}", generated_class);
     Ok(generated_class)
-
-    // let declarations: Vec<String> = match *class.first()? {
-    //     "container" => todo!(), //
-    //     _ => return None,
-    // };
-    // css needs to escape ":" with "\:"
-    // let class_selector = str.replace(':', "\\:");
-
-    // if class_selector.ends_with("container") {
-    //     return Some(Container::parse_from_str(&class_selector));
-    // }
-
-    // if let Some(last_selector) = class_selector.split("\\:").last() {
-    //     if last_selector.starts_with("aspect") {
-    //         return AspectRatio::parse_from_str(&class_selector, last_selector);
-    //     }
-
-    //     if last_selector.starts_with("flex") {
-    //         return Flex::parse_from_str(&class_selector, last_selector);
-    //     }
-
-    //     if last_selector.starts_with("border") || last_selector.starts_with("rounded") {
-    //         return Border::parse_from_str(&class_selector, last_selector);
-    //     }
-
-    //     if last_selector.contains('-') {
-    //         if last_selector.starts_with('p') {
-    //             return Padding::parse_from_str(&class_selector, last_selector);
-    //         }
-
-    //         if last_selector.starts_with('m') {
-    //             return Margin::parse_from_str(&class_selector, last_selector);
-    //         }
-
-    //         if last_selector.starts_with("bg") {
-    //             return Background::parse_from_str(&class_selector, last_selector);
-    //         }
-    //     }
-    // }
 }
 
 pub trait MultiArgsDeclaration {
