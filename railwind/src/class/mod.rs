@@ -1,449 +1,48 @@
-use crate::{
-    class::{
-        background::Background,
-        spacing::{MarginAndPadding, SpaceBetween},
-    },
-    modifiers::{MediaQuery, PseudoClass, PseudoElement},
-    utils::indent_string,
-};
+use crate::traits::IntoDeclaration;
+use crate::warning::WarningType;
 
-use self::layout::{AspectRatio, Container};
+use layout::Layout;
 
-mod background;
-// pub mod border;
-// pub mod flex;
-// pub mod grid;
 mod layout;
-mod spacing;
 
 #[derive(Debug, PartialEq)]
-pub struct SeperatedClass<'a> {
-    pub class: &'a str,
-    pub raw_class: &'a str,
-    pub args: Option<Vec<&'a str>>,
-    pub pseudo_classes: Option<Vec<PseudoClass>>,
-    pub pseudo_elements: Option<Vec<PseudoElement>>,
-    pub media_queries: Option<Vec<MediaQuery>>,
+pub enum Class {
+    Layout(Layout),
 }
 
-impl<'a> SeperatedClass<'a> {
-    pub fn from_str(raw_class: &'a str) -> Result<Self, String> {
-        let (class, args) = Self::extract_class_and_args(raw_class);
-
-        if class.is_empty() {
-            return Err(format!("class shouldn't be empty: {}", raw_class));
+impl Class {
+    pub fn new(class_name: &str, args: &[&str; 3]) -> Result<Self, WarningType> {
+        match Layout::new(class_name, args) {
+            Ok(layout) => return Ok(Class::Layout(layout)),
+            Err(e) => match e {
+                WarningType::ClassNotFound => (),
+                _ => return Err(e),
+            },
         }
 
-        let states = Self::extract_states(raw_class);
-
-        let mut seperated_class = Self {
-            class,
-            raw_class,
-            args,
-            pseudo_classes: None,
-            pseudo_elements: None,
-            media_queries: None,
-        };
-
-        if let Some(states) = states {
-            let mut pseudo_classes = Vec::new();
-            let mut pseudo_elements = Vec::new();
-            let mut media_queries = Vec::new();
-
-            for state in states {
-                if let Some(pseudo_class) = PseudoClass::parse_from_str(state) {
-                    pseudo_classes.push(pseudo_class);
-                } else if let Some(pseudo_element) = PseudoElement::parse_from_str(state) {
-                    pseudo_elements.push(pseudo_element);
-                } else if let Some(media_query) = MediaQuery::parse_from_str(state) {
-                    media_queries.push(media_query);
-                }
-            }
-
-            if !pseudo_classes.is_empty() {
-                seperated_class.pseudo_classes = Some(pseudo_classes);
-            }
-
-            if !pseudo_elements.is_empty() {
-                seperated_class.pseudo_elements = Some(pseudo_elements);
-            }
-
-            if !media_queries.is_empty() {
-                seperated_class.media_queries = Some(media_queries);
-            }
-        }
-
-        Ok(seperated_class)
+        Err(WarningType::ClassNotFound)
     }
+}
 
-    fn extract_states(raw_class: &'a str) -> Option<Vec<&'a str>> {
-        // if raw_class contains ':' split at the last one
-        if let Some((pseudo_elements, _)) = raw_class.rsplit_once(':') {
-            // split at every ':' so that pseudo classes with '-' work too
-            return Some(pseudo_elements.split(':').collect::<Vec<&'a str>>());
-        }
-
-        None
-    }
-
-    fn extract_class_and_args(raw_class: &'a str) -> (&'a str, Option<Vec<&'a str>>) {
-        if let Some((_, class_with_values)) = raw_class.rsplit_once(':') {
-            // if class contains '-' like py-5 or rounded-sm seperate by it
-            // otherwise set class to str (rounded, container...)
-            if class_with_values.contains('-') {
-                if class_with_values.starts_with('-') {
-                    let split_count = class_with_values.matches('-').count() - 1;
-
-                    let split = class_with_values.rsplitn(split_count, "-");
-                    let mut vec_split = split.collect::<Vec<&str>>();
-                    vec_split.reverse();
-                    let mut vec_split_iter = vec_split.into_iter();
-
-                    let class = vec_split_iter.next().unwrap_or("");
-                    let args = vec_split_iter.collect::<Vec<&str>>();
-
-                    return (class, Some(args));
-                };
-
-                let mut split = class_with_values.split("-");
-                let class = split.next();
-                let args = split.collect::<Vec<&str>>();
-
-                if let Some(c) = class {
-                    return (c, Some(args));
-                }
-            } else {
-                return (class_with_values, None);
-            }
-        }
-
-        if raw_class.contains('-') {
-            if raw_class.starts_with('-') {
-                let split_count = raw_class.matches('-').count();
-
-                let split = raw_class.rsplitn(split_count, "-");
-
-                let mut vec_split = split.collect::<Vec<&str>>();
-                vec_split.reverse();
-                let mut vec_split_iter = vec_split.into_iter();
-
-                let class = vec_split_iter.next().unwrap_or("");
-                let args = vec_split_iter.collect::<Vec<&str>>();
-
-                return (class, Some(args));
-            };
-
-            let mut split = raw_class.split("-");
-
-            // raw_class should contain a '-' so this should be safe to unwrap I think?
-            let class = split.next().unwrap_or("");
-            let args = split.collect::<Vec<&str>>();
-
-            return (class, Some(args));
-        } else {
-            return (raw_class, None);
+impl IntoDeclaration for Class {
+    fn into_decl(&self) -> Vec<String> {
+        match self {
+            Class::Layout(l) => l.into_decl(),
         }
     }
 }
 
-pub fn parse_class_from_str(str: &str) -> Result<String, String> {
-    let class = SeperatedClass::from_str(str)?;
-
-    let declarations = match class.class {
-        "aspect" => AspectRatio::generate(&class)?,
-        "bg" => Background::generate(&class)?,
-        "space" => SpaceBetween::generate(&class)?,
-        c => {
-            let mut class_chars = c.chars();
-
-            if let Some(first_char) = class_chars.next() {
-                match first_char {
-                    'p' | 'm' => MarginAndPadding::generate(&class)?,
-                    '-' => {
-                        if let Some(second_char) = class_chars.next() {
-                            match second_char {
-                                'm' => MarginAndPadding::generate(&class)?,
-                                _ => return Err(format!("failed to parse class name: {}", str)),
-                            }
-                        } else {
-                            return Err(format!("failed to parse class name: {}", str));
-                        }
-                    }
-                    _ => return Err(format!("failed to parse class name: {}", str)),
-                }
-            } else {
-                return Err(format!("failed to parse class name: {}", str));
-            }
+pub fn check_arg_count(args: &[&str], count: usize) -> Result<(), WarningType> {
+    let mut non_empty_count = 0;
+    for arg in args {
+        if !arg.is_empty() {
+            non_empty_count += 1;
         }
-    };
+    }
 
-    let mut generated_class = if !declarations.is_empty() {
-        let selector = generate_class_selector(&class);
-        let class = format!(
-            ".{} {{\n    {};\n}}",
-            selector.replace(".", "\\."),
-            declarations.join(";\n    ")
-        );
-        class
+    if non_empty_count > count {
+        Err(WarningType::TooManyArgs(non_empty_count, count))
     } else {
-        match class.class {
-            "container" => Container::generate_definitions(),
-            _ => return Err(format!("unsupported class: {}", str)),
-        }
-    };
-
-    if let Some(media_queries) = class.media_queries {
-        for query in media_queries {
-            match query {
-                MediaQuery::Sm
-                | MediaQuery::Md
-                | MediaQuery::Lg
-                | MediaQuery::Xl
-                | MediaQuery::Xxl
-                | MediaQuery::Dark
-                | MediaQuery::MotionReduce
-                | MediaQuery::MotionSafe
-                | MediaQuery::ContrastMore
-                | MediaQuery::ContrastLess
-                | MediaQuery::Portrait
-                | MediaQuery::Landscape => {
-                    generated_class = format!(
-                        "@media ({}) {{\n{}}}\n",
-                        query.as_str(),
-                        indent_string(&generated_class)
-                    );
-                }
-                _ => (),
-            }
-        }
-    }
-
-    Ok(generated_class)
-}
-
-pub trait MultiArgsDeclaration {
-    fn generate_declaration(class: &str, args: &Vec<&str>) -> Result<Vec<String>, String>;
-    fn generate(seperated_class: &SeperatedClass) -> Result<Vec<String>, String> {
-        if let Some(args) = &seperated_class.args {
-            return Self::generate_declaration(seperated_class.class, args);
-        }
-
-        return Err("class isn't formatted correctly, requires arguments after dash '-'".into());
-    }
-}
-
-pub trait OneArgDeclarationWithDirection {
-    fn generate_declaration(class: &str, arg: &str) -> Result<Vec<String>, String>;
-    fn generate(seperated_class: &SeperatedClass) -> Result<Vec<String>, String> {
-        if let Some(args) = &seperated_class.args {
-            if args.len() != 1 {
-                return Err(format!(
-                    "invalid argument count, should be 1 but is {}",
-                    args.len()
-                ));
-            }
-
-            let arg = args.first().unwrap();
-
-            return Self::generate_declaration(seperated_class.class, arg);
-        }
-
-        return Err("class isn't formatted correctly, requires arguments after dash '-'".into());
-    }
-}
-
-pub trait OneArgDeclaration {
-    fn generate_declaration(arg: &str) -> Result<Vec<String>, String>;
-
-    fn generate(seperated_class: &SeperatedClass) -> Result<Vec<String>, String> {
-        if let Some(args) = &seperated_class.args {
-            if args.len() != 1 {
-                return Err(format!(
-                    "invalid argument count, should be 1 but is {}",
-                    args.len()
-                ));
-            }
-
-            let arg = args.first().unwrap();
-
-            return Self::generate_declaration(arg);
-        }
-
-        return Err("class isn't formatted correctly, requires arguments after dash '-'".into());
-    }
-}
-
-pub trait NoArgsMultiDefinition {
-    fn generate_definitions() -> String;
-}
-
-fn generate_class_selector(seperated_class: &SeperatedClass) -> String {
-    let mut result = seperated_class.raw_class.replace(':', "\\:");
-
-    if let Some(pseudo_classes) = &seperated_class.pseudo_classes {
-        let p = pseudo_classes
-            .iter()
-            .map(|p| p.as_str())
-            .collect::<Vec<&str>>()
-            .join(":");
-
-        result.push(':');
-        result.push_str(&p);
-    };
-
-    if let Some(pseudo_elements) = &seperated_class.pseudo_elements {
-        let p = pseudo_elements
-            .iter()
-            .map(|p| p.as_str())
-            .collect::<Vec<&str>>()
-            .join("::");
-
-        result.push_str("::");
-        result.push_str(&p);
-    };
-
-    result
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_seperated_class_extract_class_and_args() {
-        assert_eq!(
-            SeperatedClass::extract_class_and_args("container"),
-            ("container", None)
-        );
-
-        assert_eq!(
-            SeperatedClass::extract_class_and_args("py-5"),
-            ("py", Some(vec!["5"]))
-        );
-
-        assert_eq!(
-            SeperatedClass::extract_class_and_args("box-decoration-clone"),
-            ("box", Some(vec!["decoration", "clone"]))
-        );
-
-        assert_eq!(
-            SeperatedClass::extract_class_and_args("grid-flow-row-dense"),
-            ("grid", Some(vec!["flow", "row", "dense"]))
-        );
-
-        assert_eq!(
-            SeperatedClass::extract_class_and_args("hover:bg-slate-500"),
-            ("bg", Some(vec!["slate", "500"]))
-        );
-
-        assert_eq!(
-            SeperatedClass::extract_class_and_args("-slate-500"),
-            ("", Some(vec!["slate", "500"]))
-        );
-    }
-
-    #[test]
-    fn test_seperated_class_from_str() {
-        assert_eq!(
-            SeperatedClass::from_str("container").unwrap(),
-            SeperatedClass {
-                class: "container",
-                raw_class: "container",
-                args: None,
-                pseudo_classes: None,
-                pseudo_elements: None,
-                media_queries: None,
-            }
-        );
-
-        assert_eq!(
-            SeperatedClass::from_str("p-5").unwrap(),
-            SeperatedClass {
-                class: "p",
-                raw_class: "p-5",
-                args: Some(vec!["5"]),
-                pseudo_classes: None,
-                pseudo_elements: None,
-                media_queries: None,
-            }
-        );
-
-        assert_eq!(
-            SeperatedClass::from_str("overflow-x-hidden").unwrap(),
-            SeperatedClass {
-                class: "overflow",
-                raw_class: "overflow-x-hidden",
-                args: Some(vec!["x", "hidden"]),
-                pseudo_classes: None,
-                pseudo_elements: None,
-                media_queries: None,
-            }
-        );
-
-        assert_eq!(
-            SeperatedClass::from_str("sm:hover:bg-green-200").unwrap(),
-            SeperatedClass {
-                class: "bg",
-                raw_class: "sm:hover:bg-green-200",
-                args: Some(vec!["green", "200"]),
-                pseudo_classes: Some(vec![PseudoClass::Hover]),
-                pseudo_elements: None,
-                media_queries: Some(vec![MediaQuery::Sm]),
-            }
-        );
-
-        assert_eq!(
-            SeperatedClass::from_str("sm::bg--200").unwrap(),
-            SeperatedClass {
-                class: "bg",
-                raw_class: "sm::bg--200",
-                args: Some(vec!["", "200"]),
-                pseudo_classes: None,
-                pseudo_elements: None,
-                media_queries: Some(vec![MediaQuery::Sm]),
-            }
-        );
-    }
-
-    #[test]
-    fn test_generate_class_selector() {
-        let class = SeperatedClass {
-            class: "container",
-            raw_class: "container",
-            args: None,
-            pseudo_classes: None,
-            pseudo_elements: None,
-            media_queries: None,
-        };
-
-        assert_eq!(generate_class_selector(&class), "container".to_string());
-
-        let class = SeperatedClass {
-            class: "container",
-            raw_class: "hover:container",
-            args: None,
-            pseudo_classes: Some(vec![PseudoClass::Hover]),
-            pseudo_elements: None,
-            media_queries: None,
-        };
-
-        assert_eq!(
-            generate_class_selector(&class),
-            "hover\\:container:hover".to_string()
-        );
-
-        let class = SeperatedClass {
-            class: "container",
-            raw_class: "hover:after:container",
-            args: None,
-            pseudo_classes: Some(vec![PseudoClass::Hover]),
-            pseudo_elements: Some(vec![PseudoElement::After]),
-            media_queries: None,
-        };
-
-        assert_eq!(
-            generate_class_selector(&class),
-            "hover\\:after\\:container:hover::after".to_string()
-        );
+        Ok(())
     }
 }

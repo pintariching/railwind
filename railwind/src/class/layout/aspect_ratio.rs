@@ -1,20 +1,36 @@
-use crate::class::OneArgDeclaration;
+use crate::{class::check_arg_count, traits::IntoDeclaration, warning::WarningType};
 
-#[derive(Debug)]
-pub struct AspectRatio;
+#[derive(Debug, PartialEq)]
+pub enum AspectRatio {
+    Auto,
+    Square,
+    Video,
+}
 
-impl OneArgDeclaration for AspectRatio {
-    fn generate_declaration(arg: &str) -> Result<Vec<String>, String> {
-        let decl = format!(
-                "aspect-ratio: {}",
-                match arg {
-                    "auto" => "auto",
-                    "square" => "1 / 1",
-                    "video" => "16 / 9",
-                    _ => return Err("class doesn't contain a valid ratio, should be either 'auto', 'square' or 'video'".into()),
-                }
-            );
+impl AspectRatio {
+    pub fn new(args: &[&str; 3]) -> Result<Self, WarningType> {
+        check_arg_count(args, 1)?;
 
-        return Ok(vec![decl]);
+        match args[0] {
+            "auto" => Ok(AspectRatio::Auto),
+            "square" => Ok(AspectRatio::Square),
+            "video" => Ok(AspectRatio::Video),
+            _ => Err(WarningType::InvalidArg(
+                args[0].into(),
+                vec!["auto", "square", "video"],
+            )),
+        }
+    }
+}
+
+impl IntoDeclaration for AspectRatio {
+    fn into_decl(&self) -> Vec<String> {
+        let value = match self {
+            AspectRatio::Auto => "auto",
+            AspectRatio::Square => "1 / 1",
+            AspectRatio::Video => "16 / 9",
+        };
+
+        vec![format!("aspect-ratio: {}", value)]
     }
 }

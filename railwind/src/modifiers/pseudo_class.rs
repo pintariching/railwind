@@ -1,3 +1,7 @@
+use std::str::FromStr;
+
+use crate::traits::ToStaticStr;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum PseudoClass {
     Hover,
@@ -32,8 +36,48 @@ pub enum PseudoClass {
     Open,
 }
 
-impl PseudoClass {
-    pub fn as_str(&self) -> &'static str {
+impl FromStr for PseudoClass {
+    type Err = ();
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "hover" => Ok(PseudoClass::Hover),
+            "focus" => Ok(PseudoClass::Focus),
+            "focus-within" => Ok(PseudoClass::FocusWithin),
+            "focus-visible" => Ok(PseudoClass::FocusVisible),
+            "active" => Ok(PseudoClass::Active),
+            "visited" => Ok(PseudoClass::Visited),
+            "target" => Ok(PseudoClass::Target),
+            "first-child" => Ok(PseudoClass::First),
+            "last-child" => Ok(PseudoClass::Last),
+            "only-child" => Ok(PseudoClass::Only),
+            "nth-child(odd)" => Ok(PseudoClass::Odd),
+            "nth-child(even)" => Ok(PseudoClass::Even),
+            "first-of-type" => Ok(PseudoClass::FirstOfType),
+            "last-of-type" => Ok(PseudoClass::LastOfType),
+            "only-of-type" => Ok(PseudoClass::OnlyOfType),
+            "empty" => Ok(PseudoClass::Empty),
+            "disabled" => Ok(PseudoClass::Disabled),
+            "enabled" => Ok(PseudoClass::Enabled),
+            "checked" => Ok(PseudoClass::Checked),
+            "indeterminate" => Ok(PseudoClass::Indeterminate),
+            "default" => Ok(PseudoClass::Default),
+            "required" => Ok(PseudoClass::Required),
+            "valid" => Ok(PseudoClass::Valid),
+            "invalid" => Ok(PseudoClass::Invalid),
+            "in-range" => Ok(PseudoClass::InRange),
+            "out-of-range" => Ok(PseudoClass::OutOfRange),
+            "placeholder-shown" => Ok(PseudoClass::PlaceholderShown),
+            "autofill" => Ok(PseudoClass::Autofill),
+            "readonly" => Ok(PseudoClass::ReadOnly),
+            "open" => Ok(PseudoClass::Open),
+            _ => Err(()),
+        }
+    }
+}
+
+impl ToStaticStr for &PseudoClass {
+    fn to_static_str(&self) -> &'static str {
         match self {
             PseudoClass::Hover => "hover",
             PseudoClass::Focus => "focus",
@@ -65,42 +109,6 @@ impl PseudoClass {
             PseudoClass::Autofill => "autofill",
             PseudoClass::ReadOnly => "readonly",
             PseudoClass::Open => "open",
-        }
-    }
-
-    pub fn parse_from_str(str: &str) -> Option<PseudoClass> {
-        match str {
-            "hover" => Some(PseudoClass::Hover),
-            "focus" => Some(PseudoClass::Focus),
-            "focus-within" => Some(PseudoClass::FocusWithin),
-            "focus-visible" => Some(PseudoClass::FocusVisible),
-            "active" => Some(PseudoClass::Active),
-            "visited" => Some(PseudoClass::Visited),
-            "target" => Some(PseudoClass::Target),
-            "first-child" => Some(PseudoClass::First),
-            "last-child" => Some(PseudoClass::Last),
-            "only-child" => Some(PseudoClass::Only),
-            "nth-child(odd)" => Some(PseudoClass::Odd),
-            "nth-child(even)" => Some(PseudoClass::Even),
-            "first-of-type" => Some(PseudoClass::FirstOfType),
-            "last-of-type" => Some(PseudoClass::LastOfType),
-            "only-of-type" => Some(PseudoClass::OnlyOfType),
-            "empty" => Some(PseudoClass::Empty),
-            "disabled" => Some(PseudoClass::Disabled),
-            "enabled" => Some(PseudoClass::Enabled),
-            "checked" => Some(PseudoClass::Checked),
-            "indeterminate" => Some(PseudoClass::Indeterminate),
-            "default" => Some(PseudoClass::Default),
-            "required" => Some(PseudoClass::Required),
-            "valid" => Some(PseudoClass::Valid),
-            "invalid" => Some(PseudoClass::Invalid),
-            "in-range" => Some(PseudoClass::InRange),
-            "out-of-range" => Some(PseudoClass::OutOfRange),
-            "placeholder-shown" => Some(PseudoClass::PlaceholderShown),
-            "autofill" => Some(PseudoClass::Autofill),
-            "readonly" => Some(PseudoClass::ReadOnly),
-            "open" => Some(PseudoClass::Open),
-            _ => None,
         }
     }
 }

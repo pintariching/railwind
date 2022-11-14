@@ -1,19 +1,28 @@
 .aspect-auto {
     aspect-ratio: auto;
 }
-.p-5 {
-    padding: 1.25rem;
+
+.aspect-square:hover {
+    aspect-ratio: 1 / 1;
 }
-.mt-2 {
-    margin-top: 0.5rem;
+
+.aspect-auto:hover::after {
+    aspect-ratio: auto;
 }
-.space-x-reverse {
-    --tw-space-x-reverse: 1;
+
+@media (min-width: 640px) {
+    .aspect-auto:hover:active::before::after {
+        aspect-ratio: auto;
+    }
 }
-.bg-green-500 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(34 197 94 / var(--tw-bg-opacity));
-}
-.bg-fixed {
-    background-attachment: fixed;
+
+
+@media (min-width: 1024px) {
+    @media (min-width: 768px) {
+        @media (min-width: 640px) {
+            .aspect-auto:active {
+                aspect-ratio: auto;
+            }
+        }
+    }
 }

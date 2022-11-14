@@ -1,3 +1,7 @@
+use std::str::FromStr;
+
+use crate::traits::ToStaticStr;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum MediaQuery {
     Sm,
@@ -17,8 +21,33 @@ pub enum MediaQuery {
     Rtl,
 }
 
-impl MediaQuery {
-    pub fn as_str(&self) -> &'static str {
+impl FromStr for MediaQuery {
+    type Err = ();
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "sm" => Ok(MediaQuery::Sm),
+            "md" => Ok(MediaQuery::Md),
+            "lg" => Ok(MediaQuery::Lg),
+            "xl" => Ok(MediaQuery::Xl),
+            "2xl" => Ok(MediaQuery::Xxl),
+            "dark" => Ok(MediaQuery::Dark),
+            "motion-reduce" => Ok(MediaQuery::MotionReduce),
+            "motion-safe" => Ok(MediaQuery::MotionSafe),
+            "contrast-more" => Ok(MediaQuery::ContrastMore),
+            "contrast-less" => Ok(MediaQuery::ContrastLess),
+            "portrait" => Ok(MediaQuery::Portrait),
+            "landscape" => Ok(MediaQuery::Landscape),
+            "print" => Ok(MediaQuery::Print),
+            "ltr" => Ok(MediaQuery::Ltr),
+            "rtl" => Ok(MediaQuery::Rtl),
+            _ => Err(()),
+        }
+    }
+}
+
+impl ToStaticStr for MediaQuery {
+    fn to_static_str(&self) -> &'static str {
         match self {
             MediaQuery::Sm => "min-width: 640px",
             MediaQuery::Md => "min-width: 768px",
@@ -35,27 +64,6 @@ impl MediaQuery {
             MediaQuery::Print => "print",
             MediaQuery::Ltr => r#"[dir="ltr"]"#,
             MediaQuery::Rtl => r#"[dir="rtl"]"#,
-        }
-    }
-
-    pub fn parse_from_str(str: &str) -> Option<MediaQuery> {
-        match str {
-            "sm" => Some(MediaQuery::Sm),
-            "md" => Some(MediaQuery::Md),
-            "lg" => Some(MediaQuery::Lg),
-            "xl" => Some(MediaQuery::Xl),
-            "2xl" => Some(MediaQuery::Xxl),
-            "dark" => Some(MediaQuery::Dark),
-            "motion-reduce" => Some(MediaQuery::MotionReduce),
-            "motion-safe" => Some(MediaQuery::MotionSafe),
-            "contrast-more" => Some(MediaQuery::ContrastMore),
-            "contrast-less" => Some(MediaQuery::ContrastLess),
-            "portrait" => Some(MediaQuery::Portrait),
-            "landscape" => Some(MediaQuery::Landscape),
-            "print" => Some(MediaQuery::Print),
-            "ltr" => Some(MediaQuery::Ltr),
-            "rtl" => Some(MediaQuery::Rtl),
-            _ => None,
         }
     }
 }
