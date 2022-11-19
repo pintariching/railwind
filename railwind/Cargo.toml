@@ -15,11 +15,10 @@ edition = "2021"
 [dependencies]
 lazy_static = "1.4.0"
 regex = "1.6.0"
-ron = "0.8.0"
-serde = { version = "1.0.145", features = ["derive"] }
+ron = { version = "0.8.0", features = ["indexmap"] }
 hex = "0.4.3"
 line-col = "0.2.1"
-
+indexmap = "1.9.1"
 
 [dev-dependencies]
 walkdir = "2.3.2"

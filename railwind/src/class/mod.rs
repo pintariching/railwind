@@ -1,38 +1,31 @@
-use crate::traits::IntoDeclaration;
-use crate::warning::WarningType;
-
-use layout::Layout;
-
 mod layout;
 
-#[derive(Debug, PartialEq)]
-pub enum Class {
-    Layout(Layout),
-}
+use layout::parse_layout;
 
-impl Class {
-    pub fn new(class_name: &str, args: &[&str; 3]) -> Result<Self, WarningType> {
-        match Layout::new(class_name, args) {
-            Ok(layout) => return Ok(Class::Layout(layout)),
-            Err(e) => match e {
-                WarningType::ClassNotFound => (),
-                _ => return Err(e),
-            },
-        }
+use crate::warning::WarningType;
 
-        Err(WarningType::ClassNotFound)
+pub use layout::ASPECT_RATIO;
+pub fn parse_class(
+    class_name: &str,
+    args: &[&str; 3],
+    warnings: &mut Vec<WarningType>,
+) -> Option<Vec<String>> {
+    let warning_count = warnings.len();
+
+    if let Some(layout) = parse_layout(class_name, args, warnings) {
+        return Some(layout);
     }
-}
 
-impl IntoDeclaration for Class {
-    fn into_decl(&self) -> Vec<String> {
-        match self {
-            Class::Layout(l) => l.into_decl(),
-        }
+    // prevents duplicate error messages
+    // if a message has already been pushed to warnings, then there was a problem elsewhere
+    if warning_count == warnings.len() {
+        warnings.push(WarningType::ClassNotFound);
     }
+
+    None
 }
 
-pub fn check_arg_count(args: &[&str], count: usize) -> Result<(), WarningType> {
+pub fn check_arg_count(args: &[&str], count: usize, warnings: &mut Vec<WarningType>) {
     let mut non_empty_count = 0;
     for arg in args {
         if !arg.is_empty() {
@@ -41,8 +34,6 @@ pub fn check_arg_count(args: &[&str], count: usize) -> Result<(), WarningType> {
     }
 
     if non_empty_count > count {
-        Err(WarningType::TooManyArgs(non_empty_count, count))
-    } else {
-        Ok(())
+        warnings.push(WarningType::TooManyArgs(non_empty_count, count));
     }
 }

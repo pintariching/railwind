@@ -1,5 +1,6 @@
 use core::fmt;
 
+#[derive(Debug)]
 pub enum WarningType {
     StateNotFound(String),
     ClassNotFound,
@@ -27,13 +28,13 @@ impl Warning {
             WarningType::ClassNotFound => format!("Could not match class '{}'", class),
             WarningType::TooManyArgs(recieved, required) => {
                 format!(
-                    "Could not match class '{}', too many arguments, got {} but required {}",
+                    "Could not match class '{}', too many arguments, got '{}' but required '{}'",
                     class, recieved, required
                 )
             }
             WarningType::InvalidArg(recieved, required) => {
                 format!(
-                    "Could not match class '{}', invalid argument {}, possible arguments: {}",
+                    "Could not match class '{}', invalid argument '{}', possible arguments: '{}'",
                     class,
                     recieved,
                     required.join(", ")

@@ -17,23 +17,29 @@ pub enum State {
     MediaQuery(MediaQuery),
 }
 
-impl FromStr for State {
-    type Err = WarningType;
+impl State {
+    pub fn new(value: &str, warnings: &mut Vec<WarningType>) -> Option<Self> {
+        let warning_count = warnings.len();
 
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
         if let Some(pc) = PseudoClass::from_str(value).ok() {
-            return Ok(State::PseudoClass(pc));
+            return Some(State::PseudoClass(pc));
         }
 
         if let Some(pe) = PseudoElement::from_str(value).ok() {
-            return Ok(State::PseudoElement(pe));
+            return Some(State::PseudoElement(pe));
         }
 
         if let Some(mq) = MediaQuery::from_str(value).ok() {
-            return Ok(State::MediaQuery(mq));
+            return Some(State::MediaQuery(mq));
         }
 
-        Err(WarningType::StateNotFound(value.into()))
+        // prevents duplicate error messages
+        // if a message has already been pushed to warnings, then there was a problem elsewhere
+        if warning_count == warnings.len() {
+            warnings.push(WarningType::StateNotFound(value.into()));
+        }
+
+        None
     }
 }
 

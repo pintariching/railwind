@@ -1,7 +1,13 @@
+use indexmap::map::Keys;
+
 // Indents every line in a string with two spaces
 // and removes empty lines
 pub fn indent_string(str: &str) -> String {
     str.lines().map(|line| format!("    {}\n", line)).collect()
+}
+
+pub fn get_keys(keys: Keys<&'static str, &'static str>) -> Vec<&'static str> {
+    keys.into_iter().map(|k| *k).collect()
 }
 
 #[cfg(test)]

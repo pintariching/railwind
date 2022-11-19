@@ -1,36 +1,29 @@
-use crate::{class::check_arg_count, traits::IntoDeclaration, warning::WarningType};
+use crate::class::check_arg_count;
+use crate::utils::get_keys;
+use crate::warning::WarningType;
 
-#[derive(Debug, PartialEq)]
-pub enum AspectRatio {
-    Auto,
-    Square,
-    Video,
+use indexmap::IndexMap;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub static ref ASPECT_RATIO: IndexMap<&'static str, &'static str> =
+        ron::from_str(include_str!("aspect_ratio.ron")).unwrap();
 }
 
-impl AspectRatio {
-    pub fn new(args: &[&str; 3]) -> Result<Self, WarningType> {
-        check_arg_count(args, 1)?;
+pub fn parse_aspect_ratio(
+    args: &[&str; 3],
+    warnings: &mut Vec<WarningType>,
+) -> Option<Vec<String>> {
+    check_arg_count(args, 1, warnings);
 
-        match args[0] {
-            "auto" => Ok(AspectRatio::Auto),
-            "square" => Ok(AspectRatio::Square),
-            "video" => Ok(AspectRatio::Video),
-            _ => Err(WarningType::InvalidArg(
-                args[0].into(),
-                vec!["auto", "square", "video"],
-            )),
-        }
+    if let Some(aspect_ratio) = ASPECT_RATIO.get(args[0]) {
+        return Some(vec![format!("aspect-ratio: {}", aspect_ratio)]);
     }
-}
 
-impl IntoDeclaration for AspectRatio {
-    fn into_decl(&self) -> Vec<String> {
-        let value = match self {
-            AspectRatio::Auto => "auto",
-            AspectRatio::Square => "1 / 1",
-            AspectRatio::Video => "16 / 9",
-        };
+    warnings.push(WarningType::InvalidArg(
+        args[0].into(),
+        get_keys(ASPECT_RATIO.keys()),
+    ));
 
-        vec![format!("aspect-ratio: {}", value)]
-    }
+    None
 }
