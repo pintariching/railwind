@@ -1,0 +1,15 @@
+.columns-1 {
+    columns: 1;
+}
+
+.columns-auto {
+    columns: auto;
+}
+
+.columns-xs {
+    columns: 20rem;
+}
+
+.columns-4xl {
+    columns: 56rem;
+}

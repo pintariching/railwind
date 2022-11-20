@@ -4,7 +4,7 @@ Tailwind compiler rewritten in Rust
 
 ## Description
 
-The main goal, is to decouple the original Tailwind project from Node and NPM with the side goal of possibly making it even faster and smaller (Tailwind already has a [standalone version](https://tailwindcss.com/blog/standalone-cli), but the binary size is a *whooping 35 mb*).
+The main goal, is to decouple the original Tailwind project from Node and NPM and add warning messages with some recovery in specific situations with the side goal of possibly making it even faster and smaller (Tailwind already has a [standalone version](https://tailwindcss.com/blog/standalone-cli), but the binary size is a *whooping 35 mb*).
 
 # Getting started
 
@@ -18,35 +18,56 @@ Run `railwind_cli -i index.html` to generate a `railwind.css` file. You can opti
 
 # Features
 
+### Warning messages
+
+The CLI can write helpfull warning messages if you didn't pass the right value to a class or if you passed not enough or too many arguments. 
+
 Currently, not all Tailwind features are supported. At the moment, the following features are working:
 
 ### Layout
-- [x] Container
 - [x] Aspect Ratio
+- [ ] Container
+- [x] Columns
+- [x] Break After
+- [x] Break Before
+- [x] Break Inside
+- [x] Box Decoration Break
+- [x] Box Sizing
+- [x] Display
+- [x] Floats
+- [x] Clear
+- [x] Isolation
+- [x] Object Fit
+- [x] Object Position
+- [x] Overflow
+- [x] Overscroll Behavior 
+- [x] Position
+- [x] Top / Right / Bottom / Left
+- [x] Z-Index
 
 ### Spacing
-- [x] Padding
-- [x] Margin
+- [ ] Padding
+- [ ] Margin
 
 ### Flexbox & Grid
-- [x] Flex
+- [ ] Flex
 
 ### Background
-- [x] Attachment
-- [x] Clip
-- [x] Color
-- [x] Origin
-- [x] Position
-- [x] Repeat
-- [x] Size
+- [ ] Attachment
+- [ ] Clip
+- [ ] Color
+- [ ] Origin
+- [ ] Position
+- [ ] Repeat
+- [ ] Size
 - [ ] Image
 - [ ] Gradient Color Stops
 
 ### Border
-- [x] Border Radius
-- [x] Border Width
-- [x] Border Color
-- [x] Border Style
+- [ ] Border Radius
+- [ ] Border Width
+- [ ] Border Color
+- [ ] Border Style
 - [ ] Divide Width
 - [ ] Divide Color
 - [ ] Divide Style
@@ -63,7 +84,6 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Pseudo-Classes
 - [x] Pseudo-Elements
 - [x] Media Queries
-
 
 ## Authors
 

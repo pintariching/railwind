@@ -76,11 +76,18 @@ pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<W
                         // ':' have to be replaced to be valid CSS
                         // and State::PseudoElement and State::PseudoClass go after the class name
                         // .hover:aspect-auto:hover becomes .hover\:aspect-auto:hover
-                        let class_selector = format!(
-                            "{}:{}",
-                            cap.replace(':', "\\:"),
-                            generate_state_selector(&states_buf)
-                        );
+                        let class_selector = if states_buf.iter().any(|s| match s {
+                            State::PseudoClass(_) | State::PseudoElement(_) => true,
+                            _ => false,
+                        }) {
+                            format!(
+                                "{}:{}",
+                                cap.replace(':', "\\:"),
+                                generate_state_selector(&states_buf)
+                            )
+                        } else {
+                            cap.replace(':', "\\:")
+                        };
 
                         // generate the entire class with curly braces and new lines
                         let mut generated_class =
@@ -105,7 +112,7 @@ pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<W
                                     | MediaQuery::Portrait
                                     | MediaQuery::Landscape => {
                                         generated_class = format!(
-                                            "@media ({}) {{\n{}}}\n",
+                                            "@media ({}) {{\n{}}}",
                                             mq.to_static_str(),
                                             indent_string(&generated_class)
                                         );

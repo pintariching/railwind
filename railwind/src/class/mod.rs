@@ -25,7 +25,12 @@ pub fn parse_class(
     None
 }
 
-pub fn check_arg_count(args: &[&str], count: usize, warnings: &mut Vec<WarningType>) {
+pub fn max_arg_count(
+    class_name: &str,
+    args: &[&str],
+    count: usize,
+    warnings: &mut Vec<WarningType>,
+) {
     let mut non_empty_count = 0;
     for arg in args {
         if !arg.is_empty() {
@@ -34,6 +39,29 @@ pub fn check_arg_count(args: &[&str], count: usize, warnings: &mut Vec<WarningTy
     }
 
     if non_empty_count > count {
-        warnings.push(WarningType::TooManyArgs(non_empty_count, count));
+        warnings.push(WarningType::TooManyArgs(
+            non_empty_count,
+            count,
+            format!("{}-{}", class_name, args[..count].join("-"),),
+        ));
     }
+}
+
+/// Checks if args containt the minumum count of arguments that are not empty.
+/// Returns true, if args containt more than the minimum amount of arguments that are not empty
+/// otherwise returns false
+pub fn min_arg_count(args: &[&str], count: usize, warnings: &mut Vec<WarningType>) -> bool {
+    let mut non_empty_count = 0;
+    for arg in args {
+        if !arg.is_empty() {
+            non_empty_count += 1;
+        }
+    }
+
+    if non_empty_count < count {
+        warnings.push(WarningType::NotEnoughArgs(non_empty_count, count));
+        return false;
+    }
+
+    true
 }
