@@ -42,9 +42,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "clap"
-version = "4.0.13"
+version = "4.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69d64e88428747154bd8bc378d178377ef4dace7a5735ca1f3855be72f2c2cb5"
+checksum = "2148adefda54e14492fb9bddcc600b4344c5d1a3123bd666dcb939c6f0e0e57e"
 dependencies = [
  "atty",
  "bitflags",
@@ -57,9 +57,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "4.0.13"
+version = "4.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c42f169caba89a7d512b5418b09864543eeb4d497416c917d7137863bd2076ad"
+checksum = "0177313f9f02afc995627906bbd8967e2be069f5261954222dac78290c2b9014"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -195,16 +195,6 @@ dependencies = [
 
 [[package]]
 name = "railwind"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f69b276b3be9f25bc991a65003416e206e404b4aa5ceadc272f81b39ef907a6"
-dependencies = [
- "lazy_static",
- "regex",
-]
-
-[[package]]
-name = "railwind"
 version = "0.0.4"
 dependencies = [
  "hex",
@@ -216,11 +206,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "railwind"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2725f884171770c956f1e0d9cab30177a6b34e3efe4ec51b549f125e675fc535"
+dependencies = [
+ "hex",
+ "lazy_static",
+ "line-col",
+ "regex",
+ "ron",
+]
+
+[[package]]
 name = "railwind_cli"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "clap",
- "railwind 0.0.2",
+ "railwind 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
