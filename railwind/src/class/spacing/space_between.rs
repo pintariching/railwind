@@ -1,59 +1,66 @@
-use crate::class::MultiArgsDeclaration;
-use crate::config::convert_spacing;
+use crate::class::{max_arg_count, min_arg_count};
+use crate::warning::WarningType;
 
-#[derive(Debug)]
-pub struct SpaceBetween;
+use lazy_static::lazy_static;
+use std::collections::HashMap;
 
-impl MultiArgsDeclaration for SpaceBetween {
-    fn generate_declaration(class: &str, args: &Vec<&str>) -> Result<Vec<String>, String> {
-        let mut args_iter = args.iter();
+lazy_static! {
+    pub static ref SPACE_BETWEEN: HashMap<&'static str, &'static str> =
+        ron::from_str(include_str!("space_between.ron")).unwrap();
+}
 
-        let first = args_iter.next();
-        let second = args_iter.next();
-        let third = args_iter.next();
+pub fn parse_space_between(
+    class_name: &str,
+    args: &[&str; 3],
+    warnings: &mut Vec<WarningType>,
+) -> Option<Vec<String>> {
+    max_arg_count(class_name, args, 2, warnings);
 
-        if let (Some(direction), Some(value_str), None) = (first, second, third) {
-            if *value_str == "reverse" {
-                let decl = format!(
-                    "--tw-space-{}-reverse: 1",
-                    match *direction {
-                        "x" | "y" => direction,
-                        _ =>
-                            return Err(format!(
-                                "failed to match space between: {}-{}",
-                                class,
-                                args.join("-")
-                            )),
-                    }
-                );
+    if min_arg_count(args, 2, warnings) {
+        let negative = class_name.starts_with('-');
 
-                return Ok(vec![decl]);
+        match args[0] {
+            "x" => {
+                if let Some(value) = get_value(args[1], negative) {
+                    return Some(vec![format!("margin-left: {}", value)]);
+                }
+
+                if args[1] == "reverse" {
+                    return Some(vec!["--tw-space-x-reverse: 1".into()]);
+                }
+
+                warnings.push(WarningType::ValueNotFound(
+                    format!("{}-{}", class_name, args[0]),
+                    args[0].into(),
+                ))
             }
+            "y" => {
+                if let Some(value) = get_value(args[1], negative) {
+                    return Some(vec![format!("margin-top: {}", value)]);
+                }
 
-            let value = convert_spacing(value_str)?;
+                if args[1] == "reverse" {
+                    return Some(vec!["--tw-space-y-reverse: 1".into()]);
+                }
 
-            let decl = format!(
-                "margin-{}: {}",
-                match *direction {
-                    "x" => "left",
-                    "y" => "top",
-                    _ =>
-                        return Err(format!(
-                            "failed to match space between: {}-{}",
-                            class,
-                            args.join("-")
-                        )),
-                },
-                value
-            );
-
-            return Ok(vec![decl]);
+                warnings.push(WarningType::ValueNotFound(
+                    format!("{}-{}", class_name, args[0]),
+                    args[0].into(),
+                ))
+            }
+            _ => warnings.push(WarningType::InvalidArg(
+                format!("{}-{}", class_name, args[0]),
+                vec!["x", "y"],
+            )),
         }
-
-        return Err(format!(
-            "failed to match space between: {}-{}",
-            class,
-            args.join("-")
-        ));
     }
+
+    None
+}
+
+fn get_value(arg: &str, negative: bool) -> Option<String> {
+    if let Some(value) = SPACE_BETWEEN.get(arg) {
+        return Some(format!("{}{}", if negative { "-" } else { "" }, value));
+    }
+    None
 }

@@ -1,3 +1,11 @@
-.top-5-5 {
-    top: 1.25rem;
+.space-x-reverse {
+    --tw-space-x-reverse: 1;
+}
+
+.space-x-5 {
+    margin-left: 1.25rem;
+}
+
+.-space-y-4 {
+    margin-top: -1rem;
 }

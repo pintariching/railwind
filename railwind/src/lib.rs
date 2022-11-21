@@ -133,7 +133,15 @@ pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<W
                         cap.split("-")
                     };
 
-                    let class_name = split_args.next().unwrap();
+                    // this feels wonky, if the class starts with a -, then it should
+                    // be ignored in the split, but included in the class_name somehow
+                    // TODO: improve this
+                    let class_name = &if cap.starts_with('-') {
+                        format!("-{}", split_args.next().unwrap())
+                    } else {
+                        split_args.next().unwrap().into()
+                    };
+
                     let args = [split_args.next(), split_args.next(), split_args.next()]
                         .map(|arg| if let Some(a) = arg { a } else { "" });
 

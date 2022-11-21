@@ -1,10 +1,13 @@
 mod layout;
+mod spacing;
 
 use layout::parse_layout;
 
 use crate::warning::WarningType;
 
 pub use layout::ASPECT_RATIO;
+
+use self::spacing::parse_spacing;
 pub fn parse_class(
     class_name: &str,
     args: &[&str; 3],
@@ -14,6 +17,10 @@ pub fn parse_class(
 
     if let Some(layout) = parse_layout(class_name, args, warnings) {
         return Some(layout);
+    }
+
+    if let Some(spacing) = parse_spacing(class_name, args, warnings) {
+        return Some(spacing);
     }
 
     // prevents duplicate error messages

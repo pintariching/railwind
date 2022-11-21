@@ -32,6 +32,8 @@ use z_index::parse_z_index;
 
 pub use aspect_ratio::ASPECT_RATIO;
 pub use columns::COLUMNS;
+pub use top_right_bottom_left::TOP_RIGHT_BOTTOM_LEFT;
+pub use z_index::Z_INDEX;
 
 use crate::warning::WarningType;
 
