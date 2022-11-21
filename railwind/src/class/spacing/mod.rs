@@ -2,9 +2,15 @@ mod margin;
 mod padding;
 mod space_between;
 
-use crate::warning::WarningType;
+use margin::parse_margin;
+use padding::parse_padding;
+use space_between::parse_space_between;
 
-use self::{margin::parse_margin, padding::parse_padding, space_between::parse_space_between};
+pub use margin::MARGIN;
+pub use padding::PADDING;
+pub use space_between::SPACE_BETWEEN;
+
+use crate::warning::WarningType;
 
 pub fn parse_spacing(
     class_name: &str,

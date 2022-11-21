@@ -1,13 +1,17 @@
+mod flexbox_grid;
 mod layout;
 mod spacing;
 
 use layout::parse_layout;
+use spacing::parse_spacing;
 
 use crate::warning::WarningType;
 
-pub use layout::ASPECT_RATIO;
+pub use layout::{ASPECT_RATIO, COLUMNS, TOP_RIGHT_BOTTOM_LEFT, Z_INDEX};
+pub use spacing::{MARGIN, PADDING, SPACE_BETWEEN};
 
-use self::spacing::parse_spacing;
+use self::flexbox_grid::parse_flexbox_grid;
+
 pub fn parse_class(
     class_name: &str,
     args: &[&str; 3],
@@ -21,6 +25,10 @@ pub fn parse_class(
 
     if let Some(spacing) = parse_spacing(class_name, args, warnings) {
         return Some(spacing);
+    }
+
+    if let Some(flexbox_grid) = parse_flexbox_grid(class_name, args, warnings) {
+        return Some(flexbox_grid);
     }
 
     // prevents duplicate error messages

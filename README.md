@@ -46,10 +46,12 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Z-Index
 
 ### Spacing
-- [ ] Padding
-- [ ] Margin
+- [x] Padding
+- [x] Margin
+- [x] Space Between
 
 ### Flexbox & Grid
+- [x] Flex Basis
 - [ ] Flex
 
 ### Background
