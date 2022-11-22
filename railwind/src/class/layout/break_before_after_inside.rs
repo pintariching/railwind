@@ -1,7 +1,7 @@
-use crate::class::{max_arg_count, min_arg_count};
+use crate::class::{max_arg_count, min_arg_count, Decl};
 use crate::warning::WarningType;
 
-pub fn parse_breaks(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Option<Vec<String>> {
+pub fn parse_breaks(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Option<Decl> {
     if min_arg_count(args, 2, warnings) {
         if let Some(value) = match args[0] {
             "before" | "after" => match args[1] {
@@ -73,7 +73,7 @@ pub fn parse_breaks(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Option
                 None
             }
         } {
-            return Some(vec![format!("break-{}: {}", args[0], value)]);
+            return Some(Decl::Single(format!("break-{}: {}", args[0], value)));
         }
     }
 

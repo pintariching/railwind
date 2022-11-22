@@ -6,11 +6,10 @@ use regex::Regex;
 use std::fs::{self, File};
 use std::{io::Write, path::Path};
 use traits::ToStaticStr;
-use utils::indent_string;
+use utils::{indent_string, replace_invalid_chars};
 use warning::{Position, Warning};
 
 mod class;
-mod config;
 mod modifiers;
 mod traits;
 mod utils;
@@ -82,16 +81,16 @@ pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<W
                         }) {
                             format!(
                                 "{}:{}",
-                                cap.replace(':', "\\:"),
+                                replace_invalid_chars(cap),
                                 generate_state_selector(&states_buf)
                             )
                         } else {
-                            cap.replace(':', "\\:")
+                            replace_invalid_chars(cap)
                         };
 
                         // generate the entire class with curly braces and new lines
                         let mut generated_class =
-                            format!(".{} {{\n    {};\n}}", class_selector, class.join(";\n    "));
+                            format!(".{} {{\n    {};\n}}", class_selector, class.to_string());
 
                         // if it's a media query, wrap the entire class with a
                         // pair of curly braces and indent the CSS one level
@@ -148,8 +147,8 @@ pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<W
                     if let Some(class) = parse_class(class_name, &args, &mut warning_types) {
                         let generated_class = format!(
                             ".{} {{\n    {};\n}}",
-                            cap.replace(':', "\\:"),
-                            class.join(";\n    ")
+                            replace_invalid_chars(cap),
+                            class.to_string()
                         );
 
                         generated_classes.push_str(&generated_class);

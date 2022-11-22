@@ -6,7 +6,8 @@ mod columns;
 mod display;
 mod floats;
 mod isolation;
-mod object_fit_position;
+mod object_fit;
+mod object_position;
 mod overflow;
 mod overscroll;
 mod position;
@@ -22,7 +23,7 @@ use columns::parse_columns;
 use display::parse_display;
 use floats::parse_floats;
 use isolation::parse_isolation;
-use object_fit_position::parse_object_fit_position;
+use object_fit::parse_object_fit;
 use overflow::parse_overflow;
 use overscroll::parse_overscroll;
 use position::parse_position;
@@ -37,11 +38,15 @@ pub use z_index::Z_INDEX;
 
 use crate::warning::WarningType;
 
+use self::object_position::parse_object_position;
+
+use super::Decl;
+
 pub fn parse_layout(
     class_name: &str,
     args: &[&str; 3],
     warnings: &mut Vec<WarningType>,
-) -> Option<Vec<String>> {
+) -> Option<Decl> {
     match class_name {
         "aspect" => {
             if let Some(aspect_ratio) = parse_aspect_ratio(args, warnings) {
@@ -76,8 +81,12 @@ pub fn parse_layout(
             }
         }
         "object" => {
-            if let Some(object_fit) = parse_object_fit_position(args, warnings) {
+            if let Some(object_fit) = parse_object_fit(args, warnings) {
                 return Some(object_fit);
+            }
+
+            if let Some(object_position) = parse_object_position(args, warnings) {
+                return Some(object_position);
             }
         }
         "overflow" => {
@@ -90,8 +99,8 @@ pub fn parse_layout(
                 return Some(overscroll);
             }
         }
-        "z" => {
-            if let Some(z_index) = parse_z_index(args, warnings) {
+        "z" | "-z" => {
+            if let Some(z_index) = parse_z_index(class_name, args, warnings) {
                 return Some(z_index);
             }
         }

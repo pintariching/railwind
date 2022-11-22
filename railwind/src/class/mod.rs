@@ -1,6 +1,8 @@
 mod flexbox_grid;
 mod layout;
+mod macros;
 mod spacing;
+mod utils;
 
 use layout::parse_layout;
 use spacing::parse_spacing;
@@ -12,11 +14,30 @@ pub use spacing::{MARGIN, PADDING, SPACE_BETWEEN};
 
 use self::flexbox_grid::parse_flexbox_grid;
 
+#[derive(Debug)]
+pub enum Decl {
+    Lit(&'static str),
+    Single(String),
+    Double([String; 2]),
+    Quad([String; 4]),
+}
+
+impl Decl {
+    pub fn to_string(self) -> String {
+        match self {
+            Decl::Lit(lit) => lit.to_string(),
+            Decl::Single(s) => s,
+            Decl::Double(d) => d.join(";\n    "),
+            Decl::Quad(q) => q.join(";\n    "),
+        }
+    }
+}
+
 pub fn parse_class(
     class_name: &str,
     args: &[&str; 3],
     warnings: &mut Vec<WarningType>,
-) -> Option<Vec<String>> {
+) -> Option<Decl> {
     let warning_count = warnings.len();
 
     if let Some(layout) = parse_layout(class_name, args, warnings) {

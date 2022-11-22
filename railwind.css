@@ -2,10 +2,14 @@
     --tw-space-x-reverse: 1;
 }
 
-.space-x-5 {
-    margin-left: 1.25rem;
+.-space-x-5 {
+    margin-left: -1.25rem;
 }
 
 .-space-y-4 {
     margin-top: -1rem;
+}
+
+.space-y-\[23\%\] {
+    margin-top: 23%;
 }

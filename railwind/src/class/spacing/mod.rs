@@ -12,11 +12,13 @@ pub use space_between::SPACE_BETWEEN;
 
 use crate::warning::WarningType;
 
+use super::Decl;
+
 pub fn parse_spacing(
     class_name: &str,
     args: &[&str; 3],
     warnings: &mut Vec<WarningType>,
-) -> Option<Vec<String>> {
+) -> Option<Decl> {
     if class_name.starts_with('p') {
         if let Some(padding) = parse_padding(class_name, args, warnings) {
             return Some(padding);
