@@ -10,7 +10,7 @@ pub fn parse_visibility(
     match class_name {
         "visible" | "invisible" | "collapse" => {
             max_arg_count("visibility", args, 1, warnings);
-            ret_single_decl!("visibility", args[0])
+            ret_single_decl!("visibility", class_name)
         }
         _ => (),
     }

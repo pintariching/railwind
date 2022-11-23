@@ -52,7 +52,12 @@ Currently, not all Tailwind features are supported. At the moment, the following
 
 ### Flexbox & Grid
 - [x] Flex Basis
-- [ ] Flex
+- [x] Flex Direction
+- [x] Flex Wrap
+- [x] Flex
+- [x] Flex Grow
+- [x] Flex Shrink
+- [x] Order
 
 ### Background
 - [ ] Attachment

@@ -10,7 +10,7 @@ pub fn parse_position(
     match class_name {
         "static" | "fixed" | "absolute" | "relative" | "sticky" => {
             max_arg_count("position", args, 1, warnings);
-            ret_single_decl!("position", args[0])
+            ret_single_decl!("position", class_name)
         }
         _ => (),
     }
