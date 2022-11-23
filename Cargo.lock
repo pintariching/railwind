@@ -195,19 +195,6 @@ dependencies = [
 
 [[package]]
 name = "railwind"
-version = "0.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2725f884171770c956f1e0d9cab30177a6b34e3efe4ec51b549f125e675fc535"
-dependencies = [
- "hex",
- "lazy_static",
- "line-col",
- "regex",
- "ron",
-]
-
-[[package]]
-name = "railwind"
 version = "0.0.5"
 dependencies = [
  "hex",
@@ -219,11 +206,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "railwind"
+version = "0.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd5ef79ab0f3bef07b68d2b8fabc775bd67d3575a29ad0828beb0aeadb198279"
+dependencies = [
+ "hex",
+ "lazy_static",
+ "line-col",
+ "regex",
+ "ron",
+]
+
+[[package]]
 name = "railwind_cli"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "clap",
- "railwind 0.0.4",
+ "railwind 0.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
