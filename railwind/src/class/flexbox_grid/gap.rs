@@ -1,5 +1,5 @@
 use crate::class::utils::get_value;
-use crate::class::{max_arg_count, min_arg_count, Decl};
+use crate::class::{max_arg_count, Decl};
 use crate::ret_single_decl;
 use crate::warning::WarningType;
 

@@ -27,10 +27,10 @@ pub fn parse_padding(
 
                 warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
-            "pt" => return padding_single_dir(class_name, "top", args, warnings),
-            "pr" => return padding_single_dir(class_name, "right", args, warnings),
-            "pb" => return padding_single_dir(class_name, "bottom", args, warnings),
-            "pl" => return padding_single_dir(class_name, "left", args, warnings),
+            "pt" => return padding_single_dir("top", args, warnings),
+            "pr" => return padding_single_dir("right", args, warnings),
+            "pb" => return padding_single_dir("bottom", args, warnings),
+            "pl" => return padding_single_dir("left", args, warnings),
             "px" => {
                 if let Some(value) = get_value(args[0], &PADDING) {
                     return Some(Decl::Double([
@@ -62,7 +62,6 @@ pub fn parse_padding(
 }
 
 fn padding_single_dir(
-    class_name: &str,
     dir: &str,
     args: &[&str; 3],
     warnings: &mut Vec<WarningType>,
