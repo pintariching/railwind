@@ -25,10 +25,7 @@ pub fn parse_top_right_bottom_left(
                     ret_single_decl!(class_name, value)
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             "inset" => match args[0] {
                 // inset-x-1 inset-y-1
@@ -44,10 +41,7 @@ pub fn parse_top_right_bottom_left(
                             ]));
                         }
 
-                        warnings.push(WarningType::ValueNotFound(
-                            format!("{}-{}", class_name, args[1]),
-                            args[1].into(),
-                        ))
+                        warnings.push(WarningType::ValueNotFound(args[1].into()))
                     }
                 }
                 "y" => {
@@ -62,10 +56,7 @@ pub fn parse_top_right_bottom_left(
                             ]));
                         }
 
-                        warnings.push(WarningType::ValueNotFound(
-                            format!("{}-{}", class_name, args[1]),
-                            args[1].into(),
-                        ))
+                        warnings.push(WarningType::ValueNotFound(args[1].into()))
                     }
                 }
                 // inset-1
@@ -81,10 +72,7 @@ pub fn parse_top_right_bottom_left(
                         ]));
                     }
 
-                    warnings.push(WarningType::ValueNotFound(
-                        format!("{}-{}", class_name, args[0]),
-                        args[0].into(),
-                    ))
+                    warnings.push(WarningType::ValueNotFound(args[0].into()))
                 }
             },
             _ => (),

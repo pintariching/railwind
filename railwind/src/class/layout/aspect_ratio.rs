@@ -19,10 +19,7 @@ pub fn parse_aspect_ratio(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> 
             ret_single_decl!("aspect-ratio", aspect_ratio)
         }
 
-        warnings.push(WarningType::ValueNotFound(
-            format!("aspect-{}", args[0]),
-            args[0].into(),
-        ));
+        warnings.push(WarningType::ValueNotFound(args[0].into()));
     }
 
     None

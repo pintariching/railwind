@@ -19,10 +19,7 @@ pub fn parse_columns(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Optio
             ret_single_decl!("columns", value)
         }
 
-        warnings.push(WarningType::ValueNotFound(
-            format!("columns-{}", args[0]),
-            args[0].into(),
-        ));
+        warnings.push(WarningType::ValueNotFound(args[0].into()));
     }
 
     None

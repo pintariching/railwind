@@ -19,10 +19,7 @@ pub fn parse_basis(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Option<
             ret_single_decl!("flex-basis", value)
         }
 
-        warnings.push(WarningType::ValueNotFound(
-            format!("basis-{}", args[0]),
-            args[0].into(),
-        ));
+        warnings.push(WarningType::ValueNotFound(args[0].into()));
     }
 
     None

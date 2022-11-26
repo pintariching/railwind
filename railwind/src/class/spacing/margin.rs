@@ -25,10 +25,7 @@ pub fn parse_margin(
                     ret_single_decl!("margin", value)
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             "mt" | "-mt" => return margin_single_dir(class_name, "top", args, warnings),
             "mr" | "-mr" => return margin_single_dir(class_name, "right", args, warnings),
@@ -42,10 +39,7 @@ pub fn parse_margin(
                     ]));
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             "my" | "-my" => {
                 if let Some(value) = get_value_neg(class_name, args[0], &MARGIN) {
@@ -55,10 +49,7 @@ pub fn parse_margin(
                     ]));
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             _ => warnings.push(WarningType::InvalidArg(
                 format!("{}-{}", class_name, args[0]),
@@ -80,10 +71,7 @@ fn margin_single_dir(
         return Some(Decl::Single(format!("margin-{}: {}", dir, value)));
     }
 
-    warnings.push(WarningType::ValueNotFound(
-        format!("{}-{}", class_name, args[0]),
-        args[0].into(),
-    ));
+    warnings.push(WarningType::ValueNotFound(args[0].into()));
 
     None
 }

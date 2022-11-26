@@ -1,6 +1,6 @@
 use crate::{
     class::{max_arg_count, min_arg_count, Decl},
-    ret_lit, ret_single_decl,
+    ret_lit,
     warning::WarningType,
 };
 

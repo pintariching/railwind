@@ -58,6 +58,23 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Flex Grow
 - [x] Flex Shrink
 - [x] Order
+- [x] Grid Template Columns
+- [x] Grid Columns Start / End
+- [x] Grid Template Rows
+- [x] Grid Row Start / End
+- [x] Grid Auto Flow
+- [x] Grid Auto Columns
+- [x] Grid Auto Rows
+- [x] Gap
+- [x] Justify Content
+- [x] Justify Items
+- [x] Justify Self
+- [x] Align Content
+- [x] Align Items
+- [x] Align Self
+- [x] Place Content
+- [x] Place Items
+- [x] Place Self
 
 ### Background
 - [ ] Attachment

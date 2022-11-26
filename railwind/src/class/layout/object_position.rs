@@ -19,10 +19,7 @@ pub fn parse_object_position(args: &[&str; 3], warnings: &mut Vec<WarningType>) 
             ret_single_decl!("object-position", value.replace("_", " "))
         }
 
-        warnings.push(WarningType::ValueNotFound(
-            format!("object-{}", args[0]),
-            args[0].into(),
-        ));
+        warnings.push(WarningType::ValueNotFound(args[0].into()));
     }
 
     None

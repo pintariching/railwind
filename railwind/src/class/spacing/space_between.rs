@@ -29,10 +29,7 @@ pub fn parse_space_between(
                     ret_lit!("--tw-space-x-reverse: 1")
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             "y" => {
                 if let Some(value) = get_value_neg(class_name, args[1], &SPACE_BETWEEN) {
@@ -43,10 +40,7 @@ pub fn parse_space_between(
                     ret_lit!("--tw-space-y-reverse: 1")
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             _ => warnings.push(WarningType::InvalidArg(
                 format!("{}-{}", class_name, args[0]),

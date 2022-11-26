@@ -14,8 +14,8 @@ pub enum WarningType {
     /// (recieved, required)
     InvalidArg(String, Vec<&'static str>),
 
-    /// (recieved, value)
-    ValueNotFound(String, String),
+    /// (value)
+    ValueNotFound(String),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -52,10 +52,10 @@ impl Warning {
                     required.join(", ")
                 )
             }
-            WarningType::ValueNotFound(recieved, value) => {
+            WarningType::ValueNotFound(value) => {
                 format!(
-                    "Could not match class '{}', the value '{}' could not be found",
-                    recieved, value
+                    "Could not match class '{}','{}' could not be found",
+                    class, value
                 )
             }
         };

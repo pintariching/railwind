@@ -25,10 +25,7 @@ pub fn parse_padding(
                     ret_single_decl!("padding", value)
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             "pt" => return padding_single_dir(class_name, "top", args, warnings),
             "pr" => return padding_single_dir(class_name, "right", args, warnings),
@@ -42,10 +39,7 @@ pub fn parse_padding(
                     ]));
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             "py" => {
                 if let Some(value) = get_value(args[0], &PADDING) {
@@ -55,10 +49,7 @@ pub fn parse_padding(
                     ]));
                 }
 
-                warnings.push(WarningType::ValueNotFound(
-                    format!("{}-{}", class_name, args[0]),
-                    args[0].into(),
-                ))
+                warnings.push(WarningType::ValueNotFound(args[0].into()))
             }
             _ => warnings.push(WarningType::InvalidArg(
                 format!("{}-{}", class_name, args[0]),
@@ -80,10 +71,7 @@ fn padding_single_dir(
         return Some(Decl::Single(format!("padding-{}: {}", dir, value)));
     }
 
-    warnings.push(WarningType::ValueNotFound(
-        format!("{}-{}", class_name, args[0]),
-        args[0].into(),
-    ));
+    warnings.push(WarningType::ValueNotFound(args[0].into()));
 
     None
 }

@@ -23,10 +23,7 @@ pub fn parse_z_index(
             ret_single_decl!("z-index", z_index)
         }
 
-        warnings.push(WarningType::ValueNotFound(
-            format!("z-{}", args[0]),
-            args[0].into(),
-        ));
+        warnings.push(WarningType::ValueNotFound(args[0].into()));
     }
 
     None

@@ -15,14 +15,11 @@ pub fn parse_flex(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Option<D
     max_arg_count("flex", args, 1, warnings);
 
     if min_arg_count(args, 1, warnings) {
-        if let Some(aspect_ratio) = get_value(args[0], &FLEX) {
-            ret_single_decl!("flex", aspect_ratio)
+        if let Some(flex) = get_value(args[0], &FLEX) {
+            ret_single_decl!("flex", flex)
         }
 
-        warnings.push(WarningType::ValueNotFound(
-            format!("flex-{}", args[0]),
-            args[0].into(),
-        ));
+        warnings.push(WarningType::ValueNotFound(args[0].into()));
     }
 
     None

@@ -1,5 +1,5 @@
 use crate::class::utils::get_value;
-use crate::class::{max_arg_count, min_arg_count, Decl, TOP_RIGHT_BOTTOM_LEFT};
+use crate::class::{max_arg_count, Decl};
 use crate::warning::WarningType;
 use crate::{ret_lit, ret_single_decl};
 
@@ -24,10 +24,7 @@ pub fn parse_shrink(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Option
                 ret_single_decl!("shrink", shrink)
             }
 
-            warnings.push(WarningType::ValueNotFound(
-                format!("shrink-{}", args[0]),
-                args[0].into(),
-            ));
+            warnings.push(WarningType::ValueNotFound(args[0].into()));
         }
     }
 

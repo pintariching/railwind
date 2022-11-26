@@ -19,10 +19,7 @@ pub fn parse_order(args: &[&str; 3], warnings: &mut Vec<WarningType>) -> Option<
             ret_single_decl!("order", value)
         }
 
-        warnings.push(WarningType::ValueNotFound(
-            format!("order-{}", args[0]),
-            args[0].into(),
-        ));
+        warnings.push(WarningType::ValueNotFound(args[0].into()));
     }
 
     None
