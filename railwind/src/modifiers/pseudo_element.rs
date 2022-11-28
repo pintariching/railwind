@@ -1,8 +1,4 @@
-use std::str::FromStr;
-
-use crate::traits::ToStaticStr;
-
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum PseudoElement {
     Before,
     After,
@@ -16,28 +12,26 @@ pub enum PseudoElement {
     Backdrop,
 }
 
-impl FromStr for PseudoElement {
-    type Err = ();
+impl PseudoElement {
+    pub fn new(value: &str) -> Option<Self> {
+        let pe = match value {
+            "before" => PseudoElement::Before,
+            "after" => PseudoElement::After,
+            "placeholder" => PseudoElement::Placeholder,
+            "file" => PseudoElement::File,
+            "marker" => PseudoElement::Marker,
+            "selection" => PseudoElement::Selection,
+            "first-line" => PseudoElement::FirstLine,
+            "first-letter" => PseudoElement::FirstLetter,
+            "last-line" => PseudoElement::LastLine,
+            "backdrop" => PseudoElement::Backdrop,
+            _ => return None,
+        };
 
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        match value {
-            "before" => Ok(PseudoElement::Before),
-            "after" => Ok(PseudoElement::After),
-            "placeholder" => Ok(PseudoElement::Placeholder),
-            "file" => Ok(PseudoElement::File),
-            "marker" => Ok(PseudoElement::Marker),
-            "selection" => Ok(PseudoElement::Selection),
-            "first-line" => Ok(PseudoElement::FirstLine),
-            "first-letter" => Ok(PseudoElement::FirstLetter),
-            "last-line" => Ok(PseudoElement::LastLine),
-            "backdrop" => Ok(PseudoElement::Backdrop),
-            _ => Err(()),
-        }
+        Some(pe)
     }
-}
 
-impl ToStaticStr for &PseudoElement {
-    fn to_static_str(&self) -> &'static str {
+    pub fn to_static_str(self) -> &'static str {
         match self {
             PseudoElement::Before => "before",
             PseudoElement::After => "after",

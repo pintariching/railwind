@@ -1,33 +1,126 @@
-use class::parse_class;
+use std::{
+    fs::{self, File},
+    io::Write,
+    path::Path,
+};
+
+use class::{Class, Decl};
 use lazy_static::lazy_static;
 use line_col::LineColLookup;
 use modifiers::{generate_state_selector, MediaQuery, State};
 use regex::Regex;
-use std::fs::{self, File};
-use std::{io::Write, path::Path};
-use traits::ToStaticStr;
 use utils::{indent_string, replace_invalid_chars};
-use warning::{Position, Warning};
+use warning::{Position, Warning, WarningType};
 
 mod class;
 mod modifiers;
-mod traits;
 mod utils;
 mod warning;
 
 lazy_static! {
-    static ref STYLE_REGEX: Regex =
+    static ref CLASS_REGEX: Regex =
         Regex::new(r#"(?:class|className)=(?:["']\W+\s*(?:\w+)\()?["']([^'"]+)['"]"#).unwrap();
 }
 
-pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<Warning> {
+#[derive(Debug, PartialEq)]
+pub struct RawClass<'a> {
+    pub class: &'a str,
+    pub position: Position,
+}
+
+#[derive(Debug)]
+pub struct ParsedClass<'a> {
+    pub raw_class_name: &'a str,
+    pub class: Class<'a>,
+    pub states: Vec<State>,
+}
+
+impl<'a> ParsedClass<'a> {
+    pub fn new(raw_class_name: &'a str, class: Class<'a>, states: Vec<State>) -> Self {
+        Self {
+            raw_class_name,
+            class,
+            states,
+        }
+    }
+
+    pub fn try_to_string(self) -> Option<String> {
+        let decl = self.class.to_decl()?;
+
+        let class_selector = if self.states.iter().any(|s| match s {
+            State::PseudoClass(_) | State::PseudoElement(_) => true,
+            _ => false,
+        }) {
+            format!(
+                "{}:{}",
+                replace_invalid_chars(self.raw_class_name),
+                generate_state_selector(self.states.clone())
+            )
+        } else {
+            replace_invalid_chars(self.raw_class_name)
+        };
+
+        let mut generated_class = match decl {
+            Decl::FullClass(_) => decl.to_string().replace("container", &class_selector),
+            _ => format!(".{} {{\n    {};\n}}", class_selector, decl.to_string()),
+        };
+
+        for state in self.states {
+            match state {
+                State::MediaQuery(mq) => match mq {
+                    MediaQuery::Sm
+                    | MediaQuery::Md
+                    | MediaQuery::Lg
+                    | MediaQuery::Xl
+                    | MediaQuery::Xxl
+                    | MediaQuery::Dark
+                    | MediaQuery::MotionReduce
+                    | MediaQuery::MotionSafe
+                    | MediaQuery::ContrastMore
+                    | MediaQuery::ContrastLess
+                    | MediaQuery::Portrait
+                    | MediaQuery::Landscape => {
+                        generated_class = format!(
+                            "@media ({}) {{\n{}}}",
+                            mq.to_static_str(),
+                            indent_string(&generated_class)
+                        );
+                    }
+                    _ => (),
+                },
+                _ => (),
+            }
+        }
+
+        Some(generated_class)
+    }
+}
+
+pub fn parse_html_file(input: &Path, output: &Path) -> Vec<Warning> {
     let html = fs::read_to_string(input).unwrap();
-    let lookup = LineColLookup::new(&html);
+    let collected_classes = collect_classes_from_html(&html);
 
-    let mut generated_classes = String::new();
-    let mut generated_warnings = Vec::new();
+    let mut warnings = Vec::new();
+    let parsed_classes = parse_raw_classes(collected_classes, &mut warnings);
+    let generated_classes: Vec<String> = parsed_classes
+        .into_iter()
+        .filter_map(|c| c.try_to_string())
+        .collect();
 
-    for captures in STYLE_REGEX.captures_iter(&html) {
+    let css = generated_classes.join("\n\n");
+
+    let mut css_file = File::create(output).unwrap();
+    css_file.write_all(css.as_bytes()).unwrap();
+    css_file.write_all("\n".as_bytes()).unwrap();
+    warnings
+}
+
+fn collect_classes_from_html(html: &str) -> Vec<RawClass> {
+    let lookup = LineColLookup::new(html);
+
+    let mut classes = Vec::new();
+
+    for captures in CLASS_REGEX.captures_iter(html) {
         if let Some(group) = captures.get(1) {
             let mut index = group.start();
 
@@ -37,153 +130,86 @@ pub fn parse_html(input: &Path, output: &Path, include_preflight: bool) -> Vec<W
                     continue;
                 }
 
-                let mut warning_types = Vec::new();
-
-                // use linecol crate to get the current line and column
-                let position: Position = lookup.get(index).into();
-
-                // if the capture contains a colon ':' then split it and parse everything
-                // before the colon as states (hover, after...) and everything after as a regular class
-                // TODO: this could probably be improved as it contains a lot duplicated code from
-                // the else block
-                if let Some((states, raw_class)) = cap.rsplit_once(":") {
-                    // if the raw_class starts with a '-', used by negative margins, then skip over the first character
-                    let mut split_args = if raw_class.starts_with('-') {
-                        raw_class[1..].split("-")
-                    } else {
-                        raw_class.split("-")
-                    };
-
-                    // get the first argument as the class name
-                    let class_name = split_args.next().unwrap();
-
-                    // collect the rest into an array
-                    let args = [split_args.next(), split_args.next(), split_args.next()]
-                        .map(|arg| if let Some(a) = arg { a } else { "" });
-
-                    // parse all the states into a buffer
-                    let mut states_buf = Vec::new();
-                    for s in states.split(':') {
-                        if let Some(state) = State::new(s, &mut warning_types) {
-                            states_buf.push(state)
-                        }
-                    }
-
-                    // parse class from class_name and args
-                    if let Some(class) = parse_class(class_name, &args, &mut warning_types) {
-                        // generate a CSS selector for the class
-                        // ':' have to be replaced to be valid CSS
-                        // and State::PseudoElement and State::PseudoClass go after the class name
-                        // .hover:aspect-auto:hover becomes .hover\:aspect-auto:hover
-                        let class_selector = if states_buf.iter().any(|s| match s {
-                            State::PseudoClass(_) | State::PseudoElement(_) => true,
-                            _ => false,
-                        }) {
-                            format!(
-                                "{}:{}",
-                                replace_invalid_chars(cap),
-                                generate_state_selector(&states_buf)
-                            )
-                        } else {
-                            replace_invalid_chars(cap)
-                        };
-
-                        // generate the entire class with curly braces and new lines
-                        let mut generated_class =
-                            format!(".{} {{\n    {};\n}}", class_selector, class.to_string());
-
-                        // if it's a media query, wrap the entire class with a
-                        // pair of curly braces and indent the CSS one level
-                        // TODO: setup matches for MediaQuery::Print, MediaQuery::Ltr, MediaQuery::Rtl
-                        for state in states_buf {
-                            match state {
-                                State::MediaQuery(mq) => match mq {
-                                    MediaQuery::Sm
-                                    | MediaQuery::Md
-                                    | MediaQuery::Lg
-                                    | MediaQuery::Xl
-                                    | MediaQuery::Xxl
-                                    | MediaQuery::Dark
-                                    | MediaQuery::MotionReduce
-                                    | MediaQuery::MotionSafe
-                                    | MediaQuery::ContrastMore
-                                    | MediaQuery::ContrastLess
-                                    | MediaQuery::Portrait
-                                    | MediaQuery::Landscape => {
-                                        generated_class = format!(
-                                            "@media ({}) {{\n{}}}",
-                                            mq.to_static_str(),
-                                            indent_string(&generated_class)
-                                        );
-                                    }
-                                    _ => (),
-                                },
-                                _ => (),
-                            }
-                        }
-
-                        // push the generated class to a buffer
-                        generated_classes.push_str(&generated_class);
-                    }
-                } else {
-                    let mut split_args = if cap.starts_with('-') {
-                        cap[1..].split("-")
-                    } else {
-                        cap.split("-")
-                    };
-
-                    // this feels wonky, if the class starts with a -, then it should
-                    // be ignored in the split, but included in the class_name somehow
-                    // TODO: improve this
-                    let class_name = &if cap.starts_with('-') {
-                        format!("-{}", split_args.next().unwrap())
-                    } else {
-                        split_args.next().unwrap().into()
-                    };
-
-                    let args = [split_args.next(), split_args.next(), split_args.next()]
-                        .map(|arg| if let Some(a) = arg { a } else { "" });
-
-                    if let Some(class) = parse_class(class_name, &args, &mut warning_types) {
-                        let generated_class = format!(
-                            ".{} {{\n    {};\n}}",
-                            replace_invalid_chars(cap),
-                            class.to_string()
-                        );
-
-                        generated_classes.push_str(&generated_class);
-                    }
-                }
-
-                for warning_type in warning_types {
-                    generated_warnings.push(Warning::new(cap, &position, warning_type));
-                }
+                let position = lookup.get(index).into();
+                classes.push(RawClass {
+                    class: cap,
+                    position,
+                });
 
                 index += cap.len() + 1;
-
-                generated_classes.push('\n');
-                generated_classes.push('\n');
             }
         }
     }
 
-    // replaces a double newline with a single newline
-    if generated_classes.ends_with("\n\n") {
-        generated_classes = generated_classes.trim_end().to_string();
-        generated_classes.push('\n');
+    classes
+}
+
+fn collect_classes_from_str(text: &str) -> Vec<RawClass> {
+    let lookup = LineColLookup::new(text);
+    let mut classes = Vec::new();
+    let mut index = 0;
+
+    for cap in text.split([' ', '\n']) {
+        if cap.is_empty() {
+            index += cap.len() + 1;
+            continue;
+        }
+
+        let position = lookup.get(index).into();
+        classes.push(RawClass {
+            class: cap,
+            position,
+        });
+
+        index += cap.len() + 1;
     }
 
-    let mut css_file = File::create(output).unwrap();
+    classes
+}
 
-    if include_preflight {
-        let preflight = fs::read_to_string("preflight.css").unwrap();
-        css_file.write_all(preflight.as_bytes()).unwrap();
-        css_file.write_all("\n\n".as_bytes()).unwrap();
+fn parse_raw_classes<'a>(
+    raw_classes: Vec<RawClass<'a>>,
+    warnings: &mut Vec<Warning>,
+) -> Vec<ParsedClass<'a>> {
+    let mut parsed_classes = Vec::new();
+
+    for raw_class in raw_classes {
+        if let Some(colon_index) = raw_class.class.rfind(':') {
+            let states = &raw_class.class[..colon_index];
+            let entire_class = &raw_class.class[colon_index + 1..];
+
+            let mut parsed_states = Vec::new();
+            for state in states.split(':') {
+                if let Some(s) = State::new(state) {
+                    parsed_states.push(s)
+                }
+            }
+
+            if let Some(class) = Class::new(entire_class) {
+                parsed_classes.push(ParsedClass::new(raw_class.class, class, parsed_states))
+            } else {
+                let warning_type = WarningType::ClassNotFound;
+                warnings.push(Warning::new(
+                    raw_class.class,
+                    &raw_class.position,
+                    warning_type,
+                ));
+            }
+        } else {
+            if let Some(class) = Class::new(raw_class.class) {
+                parsed_classes.push(ParsedClass::new(raw_class.class, class, Vec::new()))
+            } else {
+                let warning_type = WarningType::ClassNotFound;
+                warnings.push(Warning::new(
+                    raw_class.class,
+                    &raw_class.position,
+                    warning_type,
+                ));
+            }
+        }
     }
 
-    css_file.write_all(generated_classes.as_bytes()).unwrap();
-
-    generated_warnings
+    parsed_classes
 }
 
 #[cfg(test)]
@@ -195,12 +221,77 @@ mod tests {
         let input = Path::new("../index.html");
         let output = Path::new("../railwind.css");
 
-        let warnings = parse_html(input, output, false);
+        let warnings = parse_html_file(input, output);
 
         for warning in warnings {
             println!("{}", warning);
         }
+    }
 
-        assert!(true)
+    #[test]
+    fn test_parse_raw_classes() {
+        let text = "px-5 hover:lg:justify-start sm:container";
+        let raw_classes = collect_classes_from_str(text);
+
+        let mut warnings = Vec::new();
+        let classes = parse_raw_classes(raw_classes, &mut warnings);
+
+        for w in warnings {
+            println!("{}", w);
+        }
+
+        for c in classes {
+            println!("{}", c.try_to_string().unwrap());
+        }
+    }
+
+    #[test]
+    fn test_collect_classes_from_str() {
+        let text = "px-5 justify-start container";
+        let classes = collect_classes_from_str(text);
+
+        assert!(!classes.is_empty());
+        assert_eq!(
+            classes,
+            vec![
+                RawClass {
+                    class: "px-5",
+                    position: Position::new(1, 1)
+                },
+                RawClass {
+                    class: "justify-start",
+                    position: Position::new(1, 6)
+                },
+                RawClass {
+                    class: "container",
+                    position: Position::new(1, 20)
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_classes_from_html() {
+        let text = r#"class="px-5 justify-start container""#;
+        let classes = collect_classes_from_html(text);
+
+        assert!(!classes.is_empty());
+        assert_eq!(
+            classes,
+            vec![
+                RawClass {
+                    class: "px-5",
+                    position: Position::new(1, 8)
+                },
+                RawClass {
+                    class: "justify-start",
+                    position: Position::new(1, 13)
+                },
+                RawClass {
+                    class: "container",
+                    position: Position::new(1, 27)
+                }
+            ]
+        );
     }
 }

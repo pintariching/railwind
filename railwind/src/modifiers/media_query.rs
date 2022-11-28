@@ -1,8 +1,4 @@
-use std::str::FromStr;
-
-use crate::traits::ToStaticStr;
-
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum MediaQuery {
     Sm,
     Md,
@@ -21,33 +17,31 @@ pub enum MediaQuery {
     Rtl,
 }
 
-impl FromStr for MediaQuery {
-    type Err = ();
+impl MediaQuery {
+    pub fn new(value: &str) -> Option<Self> {
+        let mq = match value {
+            "sm" => MediaQuery::Sm,
+            "md" => MediaQuery::Md,
+            "lg" => MediaQuery::Lg,
+            "xl" => MediaQuery::Xl,
+            "2xl" => MediaQuery::Xxl,
+            "dark" => MediaQuery::Dark,
+            "motion-reduce" => MediaQuery::MotionReduce,
+            "motion-safe" => MediaQuery::MotionSafe,
+            "contrast-more" => MediaQuery::ContrastMore,
+            "contrast-less" => MediaQuery::ContrastLess,
+            "portrait" => MediaQuery::Portrait,
+            "landscape" => MediaQuery::Landscape,
+            "print" => MediaQuery::Print,
+            "ltr" => MediaQuery::Ltr,
+            "rtl" => MediaQuery::Rtl,
+            _ => return None,
+        };
 
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        match value {
-            "sm" => Ok(MediaQuery::Sm),
-            "md" => Ok(MediaQuery::Md),
-            "lg" => Ok(MediaQuery::Lg),
-            "xl" => Ok(MediaQuery::Xl),
-            "2xl" => Ok(MediaQuery::Xxl),
-            "dark" => Ok(MediaQuery::Dark),
-            "motion-reduce" => Ok(MediaQuery::MotionReduce),
-            "motion-safe" => Ok(MediaQuery::MotionSafe),
-            "contrast-more" => Ok(MediaQuery::ContrastMore),
-            "contrast-less" => Ok(MediaQuery::ContrastLess),
-            "portrait" => Ok(MediaQuery::Portrait),
-            "landscape" => Ok(MediaQuery::Landscape),
-            "print" => Ok(MediaQuery::Print),
-            "ltr" => Ok(MediaQuery::Ltr),
-            "rtl" => Ok(MediaQuery::Rtl),
-            _ => Err(()),
-        }
+        Some(mq)
     }
-}
 
-impl ToStaticStr for MediaQuery {
-    fn to_static_str(&self) -> &'static str {
+    pub fn to_static_str(self) -> &'static str {
         match self {
             MediaQuery::Sm => "min-width: 640px",
             MediaQuery::Md => "min-width: 768px",

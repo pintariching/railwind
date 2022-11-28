@@ -1,19 +1,22 @@
 use std::collections::HashMap;
 
-pub fn get_value(arg: &str, hashmap: &HashMap<&'static str, &'static str>) -> Option<String> {
+pub fn get_value<'a>(
+    arg: &'a str,
+    hashmap: &HashMap<&'static str, &'static str>,
+) -> Option<&'a str> {
     if arg.starts_with('[') && arg.ends_with(']') {
-        return Some(arg[1..arg.len() - 1].to_string());
+        return Some(&arg[1..arg.len() - 1]);
     }
 
     if let Some(value) = hashmap.get(arg) {
-        return Some(value.to_string());
+        return Some(value);
     }
 
     None
 }
 
 pub fn get_value_neg(
-    class_name: &str,
+    negative: bool,
     arg: &str,
     hashmap: &HashMap<&'static str, &'static str>,
 ) -> Option<String> {
@@ -22,7 +25,7 @@ pub fn get_value_neg(
     }
 
     if let Some(value) = hashmap.get(arg) {
-        if class_name.starts_with('-') {
+        if negative {
             return Some(format!("-{}", value));
         }
 

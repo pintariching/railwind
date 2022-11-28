@@ -5,12 +5,6 @@ pub enum WarningType {
     StateNotFound(String),
     ClassNotFound,
 
-    /// (recieved, required, matched str)
-    TooManyArgs(usize, usize, String),
-
-    /// (recieved, required)
-    NotEnoughArgs(usize, usize),
-
     /// (recieved, required)
     InvalidArg(String, Vec<&'static str>),
 
@@ -32,18 +26,6 @@ impl Warning {
                 class, recieved
             ),
             WarningType::ClassNotFound => format!("Could not match class '{}'", class),
-            WarningType::TooManyArgs(recieved, required, matched) => {
-                format!(
-                    "Found match '{}' as '{}', but recieved too many arguments, got '{}' but required '{}'",
-                    class, matched, recieved, required
-                )
-            }
-            WarningType::NotEnoughArgs(recieved, required) => {
-                format!(
-                    "Could not match class '{}', not enough arguments, got '{}' but required '{}'",
-                    class, recieved, required
-                )
-            }
             WarningType::InvalidArg(recieved, required) => {
                 format!(
                     "Could not match class '{}', invalid argument '{}', possible arguments: '{}'",

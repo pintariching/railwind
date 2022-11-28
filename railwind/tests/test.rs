@@ -3,7 +3,7 @@ mod tests {
     use std::fs::read_to_string;
     use std::path::Path;
 
-    use railwind::parse_html;
+    use railwind::parse_html_file;
     use walkdir::WalkDir;
 
     #[test]
@@ -22,7 +22,7 @@ mod tests {
                             expected.set_file_name("expected.css");
                             output.set_file_name("output.css");
 
-                            parse_html(Path::new(&input), Path::new(&output), false);
+                            parse_html_file(Path::new(&input), Path::new(&output));
 
                             assert_eq!(
                                 read_to_string(output).unwrap(),

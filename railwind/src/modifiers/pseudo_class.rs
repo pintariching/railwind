@@ -1,8 +1,4 @@
-use std::str::FromStr;
-
-use crate::traits::ToStaticStr;
-
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum PseudoClass {
     Hover,
     Focus,
@@ -36,48 +32,46 @@ pub enum PseudoClass {
     Open,
 }
 
-impl FromStr for PseudoClass {
-    type Err = ();
+impl PseudoClass {
+    pub fn new(value: &str) -> Option<Self> {
+        let pc = match value {
+            "hover" => PseudoClass::Hover,
+            "focus" => PseudoClass::Focus,
+            "focus-within" => PseudoClass::FocusWithin,
+            "focus-visible" => PseudoClass::FocusVisible,
+            "active" => PseudoClass::Active,
+            "visited" => PseudoClass::Visited,
+            "target" => PseudoClass::Target,
+            "first-child" => PseudoClass::First,
+            "last-child" => PseudoClass::Last,
+            "only-child" => PseudoClass::Only,
+            "nth-child(odd)" => PseudoClass::Odd,
+            "nth-child(even)" => PseudoClass::Even,
+            "first-of-type" => PseudoClass::FirstOfType,
+            "last-of-type" => PseudoClass::LastOfType,
+            "only-of-type" => PseudoClass::OnlyOfType,
+            "empty" => PseudoClass::Empty,
+            "disabled" => PseudoClass::Disabled,
+            "enabled" => PseudoClass::Enabled,
+            "checked" => PseudoClass::Checked,
+            "indeterminate" => PseudoClass::Indeterminate,
+            "default" => PseudoClass::Default,
+            "required" => PseudoClass::Required,
+            "valid" => PseudoClass::Valid,
+            "invalid" => PseudoClass::Invalid,
+            "in-range" => PseudoClass::InRange,
+            "out-of-range" => PseudoClass::OutOfRange,
+            "placeholder-shown" => PseudoClass::PlaceholderShown,
+            "autofill" => PseudoClass::Autofill,
+            "readonly" => PseudoClass::ReadOnly,
+            "open" => PseudoClass::Open,
+            _ => return None,
+        };
 
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        match value {
-            "hover" => Ok(PseudoClass::Hover),
-            "focus" => Ok(PseudoClass::Focus),
-            "focus-within" => Ok(PseudoClass::FocusWithin),
-            "focus-visible" => Ok(PseudoClass::FocusVisible),
-            "active" => Ok(PseudoClass::Active),
-            "visited" => Ok(PseudoClass::Visited),
-            "target" => Ok(PseudoClass::Target),
-            "first-child" => Ok(PseudoClass::First),
-            "last-child" => Ok(PseudoClass::Last),
-            "only-child" => Ok(PseudoClass::Only),
-            "nth-child(odd)" => Ok(PseudoClass::Odd),
-            "nth-child(even)" => Ok(PseudoClass::Even),
-            "first-of-type" => Ok(PseudoClass::FirstOfType),
-            "last-of-type" => Ok(PseudoClass::LastOfType),
-            "only-of-type" => Ok(PseudoClass::OnlyOfType),
-            "empty" => Ok(PseudoClass::Empty),
-            "disabled" => Ok(PseudoClass::Disabled),
-            "enabled" => Ok(PseudoClass::Enabled),
-            "checked" => Ok(PseudoClass::Checked),
-            "indeterminate" => Ok(PseudoClass::Indeterminate),
-            "default" => Ok(PseudoClass::Default),
-            "required" => Ok(PseudoClass::Required),
-            "valid" => Ok(PseudoClass::Valid),
-            "invalid" => Ok(PseudoClass::Invalid),
-            "in-range" => Ok(PseudoClass::InRange),
-            "out-of-range" => Ok(PseudoClass::OutOfRange),
-            "placeholder-shown" => Ok(PseudoClass::PlaceholderShown),
-            "autofill" => Ok(PseudoClass::Autofill),
-            "readonly" => Ok(PseudoClass::ReadOnly),
-            "open" => Ok(PseudoClass::Open),
-            _ => Err(()),
-        }
+        Some(pc)
     }
-}
 
-impl ToStaticStr for &PseudoClass {
-    fn to_static_str(&self) -> &'static str {
+    pub fn to_static_str(self) -> &'static str {
         match self {
             PseudoClass::Hover => "hover",
             PseudoClass::Focus => "focus",

@@ -1,44 +1,52 @@
-mod margin;
-mod padding;
-mod space_between;
+mod types;
 
-use margin::parse_margin;
-use padding::parse_padding;
-use space_between::parse_space_between;
+use types::*;
 
-pub use margin::MARGIN;
-pub use padding::PADDING;
-pub use space_between::SPACE_BETWEEN;
+use crate::class::Decl;
+use crate::utils::{get_args, get_class_name};
 
-use crate::warning::WarningType;
+use lazy_static::lazy_static;
+use std::collections::HashMap;
 
-use super::Decl;
+lazy_static! {
+    pub static ref MARGIN: HashMap<&'static str, &'static str> =
+        ron::from_str(include_str!("margin.ron")).unwrap();
+    pub static ref PADDING: HashMap<&'static str, &'static str> =
+        ron::from_str(include_str!("padding.ron")).unwrap();
+    pub static ref SPACE_BETWEEN: HashMap<&'static str, &'static str> =
+        ron::from_str(include_str!("space_between.ron")).unwrap();
+}
 
-pub fn parse_spacing(
-    class_name: &str,
-    args: &[&str; 3],
-    warnings: &mut Vec<WarningType>,
-) -> Option<Decl> {
-    if class_name.starts_with('p') {
-        if let Some(padding) = parse_padding(class_name, args, warnings) {
-            return Some(padding);
-        }
+#[derive(Debug)]
+pub enum Spacing<'a> {
+    Padding(Padding<'a>),
+    Margin(Margin<'a>),
+    SpaceBetween(SpaceBetween<'a>),
+}
+
+impl<'a> Spacing<'a> {
+    pub fn new(value: &'a str) -> Option<Self> {
+        let class_name = get_class_name(value);
+        let args = get_args(value)?;
+
+        let spacing = if let Some(padding) = Padding::new(class_name, args) {
+            Spacing::Padding(padding)
+        } else if let Some(margin) = Margin::new(class_name, args) {
+            Spacing::Margin(margin)
+        } else if let Some(space_between) = SpaceBetween::new(class_name, args) {
+            Spacing::SpaceBetween(space_between)
+        } else {
+            return None;
+        };
+
+        Some(spacing)
     }
 
-    if class_name.starts_with('m') || class_name.starts_with("-m") {
-        if let Some(margin) = parse_margin(class_name, args, warnings) {
-            return Some(margin);
+    pub fn to_decl(self) -> Option<Decl> {
+        match self {
+            Spacing::Padding(s) => s.to_decl(),
+            Spacing::Margin(s) => s.to_decl(),
+            Spacing::SpaceBetween(s) => s.to_decl(),
         }
     }
-
-    match class_name {
-        "-space" | "space" => {
-            if let Some(spacing) = parse_space_between(class_name, args, warnings) {
-                return Some(spacing);
-            }
-        }
-        _ => (),
-    }
-
-    None
 }
