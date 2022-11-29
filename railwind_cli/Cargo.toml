@@ -1,6 +1,6 @@
 [package]
 name = "railwind_cli"
-version = "0.0.6"
+version = "0.0.7"
 authors = ["pintariching"]
 license = "MIT"
 description = "CLI tool for the Railwind compiler"
@@ -14,4 +14,4 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0.29", features = ["derive"] }
-railwind = "0.0.7" 
+railwind = "0.0.8" 
