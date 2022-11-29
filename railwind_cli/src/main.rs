@@ -20,7 +20,7 @@ fn main() {
     let input = Path::new(&args.input);
     let output = Path::new(&args.output);
 
-    let warnings = railwind::parse_html(input, output, args.include_preflight);
+    let warnings = railwind::parse_html_file(input, output, args.include_preflight);
 
     for warning in warnings {
         println!("{}", warning)

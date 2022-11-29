@@ -96,7 +96,7 @@ impl<'a> ParsedClass<'a> {
     }
 }
 
-pub fn parse_html_file(input: &Path, output: &Path) -> Vec<Warning> {
+pub fn parse_html_file(input: &Path, output: &Path, include_preflight: bool) -> Vec<Warning> {
     let html = fs::read_to_string(input).unwrap();
     let collected_classes = collect_classes_from_html(&html);
 
@@ -110,6 +110,13 @@ pub fn parse_html_file(input: &Path, output: &Path) -> Vec<Warning> {
     let css = generated_classes.join("\n\n");
 
     let mut css_file = File::create(output).unwrap();
+
+    if include_preflight {
+        let preflight = fs::read_to_string("preflight.css").unwrap();
+        css_file.write_all(preflight.as_bytes()).unwrap();
+        css_file.write_all("\n\n".as_bytes()).unwrap();
+    }
+
     css_file.write_all(css.as_bytes()).unwrap();
     css_file.write_all("\n".as_bytes()).unwrap();
     warnings
@@ -221,7 +228,7 @@ mod tests {
         let input = Path::new("../index.html");
         let output = Path::new("../railwind.css");
 
-        let warnings = parse_html_file(input, output);
+        let warnings = parse_html_file(input, output, false);
 
         for warning in warnings {
             println!("{}", warning);
