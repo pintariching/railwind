@@ -76,6 +76,14 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Place Items
 - [x] Place Self
 
+### Sizing
+- [x] Width
+- [x] Min-Width
+- [x] Max-Width
+- [x] Height
+- [x] Min-Height
+- [x] Max-Height
+
 ### Background
 - [ ] Attachment
 - [ ] Clip
