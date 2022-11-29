@@ -22,7 +22,7 @@ mod tests {
                             expected.set_file_name("expected.css");
                             output.set_file_name("output.css");
 
-                            parse_html_file(Path::new(&input), Path::new(&output));
+                            parse_html_file(Path::new(&input), Path::new(&output), false);
 
                             assert_eq!(
                                 read_to_string(output).unwrap(),
