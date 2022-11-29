@@ -1,10 +1,12 @@
 mod flexbox_grid;
 mod layout;
+mod sizing;
 mod spacing;
 mod utils;
 
 pub use flexbox_grid::*;
 pub use layout::*;
+pub use sizing::*;
 pub use spacing::*;
 
 #[derive(Debug)]
@@ -12,6 +14,7 @@ pub enum Class<'a> {
     Layout(Layout<'a>),
     Spacing(Spacing<'a>),
     FlexboxGrid(FlexboxGrid<'a>),
+    Sizing(Sizing<'a>),
 }
 
 impl<'a> Class<'a> {
@@ -22,6 +25,8 @@ impl<'a> Class<'a> {
             Class::Spacing(spacing)
         } else if let Some(flexbox_grid) = FlexboxGrid::new(value) {
             Class::FlexboxGrid(flexbox_grid)
+        } else if let Some(sizing) = Sizing::new(value) {
+            Class::Sizing(sizing)
         } else {
             return None;
         };
@@ -34,6 +39,7 @@ impl<'a> Class<'a> {
             Class::Layout(c) => c.to_decl(),
             Class::Spacing(c) => c.to_decl(),
             Class::FlexboxGrid(c) => c.to_decl(),
+            Class::Sizing(c) => c.to_decl(),
         }
     }
 }
