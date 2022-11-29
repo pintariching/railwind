@@ -1,6 +1,6 @@
 [package]
 name = "railwind"
-version = "0.0.7"
+version = "0.0.8"
 authors = ["pintariching"]
 license = "MIT"
 description = "Tailwind compiler for utility classes written in Rust"
