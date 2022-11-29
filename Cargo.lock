@@ -37,9 +37,9 @@ checksum = "e9f73505338f7d905b19d18738976aae232eb46b8efc15554ffc56deb5d9ebe4"
 
 [[package]]
 name = "clap"
-version = "4.0.27"
+version = "4.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0acbd8d28a0a60d7108d7ae850af6ba34cf2d1257fc646980e5f97ce14275966"
+checksum = "4d63b9e9c07271b9957ad22c173bae2a4d9a81127680962039296abcd2f8251d"
 dependencies = [
  "bitflags",
  "clap_derive",
@@ -143,9 +143,9 @@ dependencies = [
 
 [[package]]
 name = "is-terminal"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aae5bc6e2eb41c9def29a3e0f1306382807764b9b53112030eff57435667352d"
+checksum = "927609f78c2913a6f6ac3c27a4fe87f43e2a35367c0c4b0f8265e8f49a104330"
 dependencies = [
  "hermit-abi",
  "io-lifetimes",
@@ -239,19 +239,6 @@ dependencies = [
 
 [[package]]
 name = "railwind"
-version = "0.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6ee10ea484509feb2ff8cd254cb0bf9ff66462d118f3e55b9b79beee92b1b76"
-dependencies = [
- "hex",
- "lazy_static",
- "line-col",
- "regex",
- "ron",
-]
-
-[[package]]
-name = "railwind"
 version = "0.0.7"
 dependencies = [
  "hex",
@@ -263,11 +250,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "railwind"
+version = "0.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78736f2cecea15b5c7054e12618849a5171809eddf2268286a1eca833194d0f5"
+dependencies = [
+ "hex",
+ "lazy_static",
+ "line-col",
+ "regex",
+ "ron",
+]
+
+[[package]]
 name = "railwind_cli"
-version = "0.0.5"
+version = "0.0.6"
 dependencies = [
  "clap",
- "railwind 0.0.6",
+ "railwind 0.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -301,9 +301,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.36.3"
+version = "0.36.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b1fbb4dfc4eb1d390c02df47760bb19a84bb80b301ecc947ab5406394d8223e"
+checksum = "cb93e85278e08bb5788653183213d3a60fc242b10cb9be96586f5a73dcb67c23"
 dependencies = [
  "bitflags",
  "errno",
