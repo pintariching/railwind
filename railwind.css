@@ -9,3 +9,19 @@
 .space-y-\[23\%\] {
     margin-top: 23%;
 }
+
+.decoration-indigo-700 {
+    text-decoration-color: 4338ca;
+}
+
+.underline-offset-1 {
+    text-underline-offset: 1px;
+}
+
+.list-disc {
+    list-style-type: disc;
+}
+
+.text-stone-700 {
+    color: 44403c;
+}

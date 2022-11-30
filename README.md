@@ -84,6 +84,32 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Min-Height
 - [x] Max-Height
 
+### Typography
+- [x] Font Family
+- [x] Font Size
+- [x] Font Smoothing
+- [x] Font Style
+- [x] Font Weight
+- [x] Font Variant Numeric
+- [x] Letter Spacing
+- [x] Line Height
+- [x] List Style Type
+- [x] List Style Position
+- [x] Text Align
+- [x] Text Color
+- [x] Text Decoration
+- [x] Text Decoration Color
+- [x] Text Decoration Style
+- [x] Text Decoration Thickness
+- [x] Text Underline Offset
+- [x] Text Transform
+- [x] Text Overflow
+- [x] Text Indent
+- [x] Vertical Align
+- [x] Whitespace
+- [x] Word Break
+- [x] Content
+
 ### Background
 - [ ] Attachment
 - [ ] Clip

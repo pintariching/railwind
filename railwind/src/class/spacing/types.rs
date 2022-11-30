@@ -1,10 +1,6 @@
-use crate::{
-    class::{
-        utils::{get_value, get_value_neg},
-        Decl,
-    },
-    utils::{get_args, get_class_name},
-};
+use crate::class::utils::{get_value, get_value_neg};
+use crate::class::Decl;
+use crate::utils::{get_args, get_class_name};
 
 use super::{MARGIN, PADDING};
 

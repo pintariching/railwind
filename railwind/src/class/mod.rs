@@ -2,12 +2,14 @@ mod flexbox_grid;
 mod layout;
 mod sizing;
 mod spacing;
+mod typography;
 mod utils;
 
 pub use flexbox_grid::*;
 pub use layout::*;
 pub use sizing::*;
 pub use spacing::*;
+pub use typography::*;
 
 #[derive(Debug)]
 pub enum Class<'a> {
@@ -15,6 +17,7 @@ pub enum Class<'a> {
     Spacing(Spacing<'a>),
     FlexboxGrid(FlexboxGrid<'a>),
     Sizing(Sizing<'a>),
+    Typography(Typography<'a>),
 }
 
 impl<'a> Class<'a> {
@@ -27,6 +30,8 @@ impl<'a> Class<'a> {
             Class::FlexboxGrid(flexbox_grid)
         } else if let Some(sizing) = Sizing::new(value) {
             Class::Sizing(sizing)
+        } else if let Some(typography) = Typography::new(value) {
+            Class::Typography(typography)
         } else {
             return None;
         };
@@ -40,6 +45,7 @@ impl<'a> Class<'a> {
             Class::Spacing(c) => c.to_decl(),
             Class::FlexboxGrid(c) => c.to_decl(),
             Class::Sizing(c) => c.to_decl(),
+            Class::Typography(c) => c.to_decl(),
         }
     }
 }
@@ -49,7 +55,9 @@ pub enum Decl {
     Lit(&'static str),
     Single(String),
     Double([String; 2]),
+    Triple([String; 3]),
     Quad([String; 4]),
+    Multiple(Vec<String>),
     FullClass(String),
 }
 
@@ -58,8 +66,10 @@ impl Decl {
         match self {
             Decl::Lit(lit) => lit.to_string(),
             Decl::Single(s) => s,
+            Decl::Triple(t) => t.join(";\n    "),
             Decl::Double(d) => d.join(";\n    "),
             Decl::Quad(q) => q.join(";\n    "),
+            Decl::Multiple(m) => m.join(";\n    "),
             Decl::FullClass(fc) => fc,
         }
     }
