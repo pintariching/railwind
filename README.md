@@ -111,15 +111,15 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Content
 
 ### Background
-- [ ] Attachment
-- [ ] Clip
-- [ ] Color
-- [ ] Origin
-- [ ] Position
-- [ ] Repeat
-- [ ] Size
-- [ ] Image
-- [ ] Gradient Color Stops
+- [x] Background Attachment
+- [x] Background Clip
+- [x] Background Color
+- [x] Background Origin
+- [x] Background Position
+- [x] Background Repeat
+- [x] Background Size
+- [x] Background Image
+- [x] Gradient Color Stops
 
 ### Border
 - [ ] Border Radius

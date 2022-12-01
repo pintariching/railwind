@@ -1,27 +1,13 @@
-.-space-x-5 {
-    margin-left: -1.25rem;
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));;
 }
 
-.-space-y-4 {
-    margin-top: -1rem;
+.from-cyan-500 {
+    --tw-gradient-from: #06b6d4;
+    --tw-gradient-to: #06b6d400;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.space-y-\[23\%\] {
-    margin-top: 23%;
-}
-
-.decoration-indigo-700 {
-    text-decoration-color: 4338ca;
-}
-
-.underline-offset-1 {
-    text-underline-offset: 1px;
-}
-
-.list-disc {
-    list-style-type: disc;
-}
-
-.text-stone-700 {
-    color: 44403c;
+.to-blue-500 {
+    --tw-gradient-to: #3b82f6;
 }
