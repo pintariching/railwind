@@ -138,6 +138,13 @@ Currently, not all Tailwind features are supported. At the moment, the following
 - [x] Ring Offset Width
 - [x] Ring Offset Color
 
+### Effects
+- [x] Box Shadow
+- [x] Box Shadow Color
+- [x] Opacity
+- [x] Mix Blend Mode
+- [x] Background Blend Mode
+
 ### Other
 - [x] Pseudo-Classes
 - [x] Pseudo-Elements
