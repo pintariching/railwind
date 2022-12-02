@@ -11,3 +11,7 @@
 .to-blue-500 {
     --tw-gradient-to: #3b82f6;
 }
+
+.rounded-xl {
+    border-radius: 0.75rem;
+}

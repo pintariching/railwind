@@ -74,7 +74,7 @@ pub struct BackgroundColor<'a>(pub &'a str);
 impl<'a> BackgroundColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &BACKGROUND_COLOR)?;
-        Some(Decl::Single(format!("background-color: #{}", value)))
+        Some(Decl::Single(format!("background-color: {}", value)))
     }
 }
 
@@ -200,21 +200,21 @@ impl<'a> GradientColorStops<'a> {
             GradientColorStops::From(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
                 Some(Decl::Triple([
-                    format!("--tw-gradient-from: #{}", value),
-                    format!("--tw-gradient-to: #{}00", value),
+                    format!("--tw-gradient-from: {}", value),
+                    format!("--tw-gradient-to: {}00", value),
                     "--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)".into(),
                 ]))
             }
             GradientColorStops::To(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
-                Some(Decl::Single(format!("--tw-gradient-to: #{}", value)))
+                Some(Decl::Single(format!("--tw-gradient-to: {}", value)))
             }
             GradientColorStops::Via(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
                 Some(Decl::Double([
-                    format!("--tw-gradient-to: #{}00", value),
+                    format!("--tw-gradient-to: {}00", value),
                     format!(
-                        "--tw-gradient-stops: var(--tw-gradient-from), #{}, var(--tw-gradient-to)",
+                        "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to)",
                         value
                     ),
                 ]))

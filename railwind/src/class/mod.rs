@@ -1,4 +1,5 @@
 mod backgrounds;
+mod borders;
 mod flexbox_grid;
 mod layout;
 mod sizing;
@@ -7,6 +8,7 @@ mod typography;
 mod utils;
 
 pub use backgrounds::*;
+pub use borders::*;
 pub use flexbox_grid::*;
 pub use layout::*;
 pub use sizing::*;
@@ -21,6 +23,7 @@ pub enum Class<'a> {
     Sizing(Sizing<'a>),
     Typography(Typography<'a>),
     Backgrounds(Backgrounds<'a>),
+    Borders(Borders<'a>),
 }
 
 impl<'a> Class<'a> {
@@ -37,6 +40,8 @@ impl<'a> Class<'a> {
             Class::Typography(typography)
         } else if let Some(backgrounds) = Backgrounds::new(value) {
             Class::Backgrounds(backgrounds)
+        } else if let Some(borders) = Borders::new(value) {
+            Class::Borders(borders)
         } else {
             return None;
         };
@@ -52,6 +57,7 @@ impl<'a> Class<'a> {
             Class::Sizing(c) => c.to_decl(),
             Class::Typography(c) => c.to_decl(),
             Class::Backgrounds(c) => c.to_decl(),
+            Class::Borders(c) => c.to_decl(),
         }
     }
 }

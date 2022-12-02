@@ -252,7 +252,7 @@ pub struct TextColor<'a>(pub &'a str);
 impl<'a> TextColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &TEXT_COLOR)?;
-        Some(Decl::Single(format!("color: #{}", value)))
+        Some(Decl::Single(format!("color: {}", value)))
     }
 }
 
@@ -295,7 +295,7 @@ pub struct TextDecorationColor<'a>(pub &'a str);
 impl<'a> TextDecorationColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &TEXT_DECORATION_COLOR)?;
-        Some(Decl::Single(format!("text-decoration-color: #{}", value)))
+        Some(Decl::Single(format!("text-decoration-color: {}", value)))
     }
 }
 

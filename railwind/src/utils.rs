@@ -57,6 +57,22 @@ pub fn get_args<'a>(value: &'a str) -> Option<&'a str> {
     None
 }
 
+pub fn get_opt_args<'a>(value: &'a str) -> &'a str {
+    if value.starts_with('-') {
+        if let Some(index) = value[1..].find('-') {
+            return &value[index + 2..];
+        } else {
+            &value[1..]
+        }
+    } else {
+        if let Some(index) = value.find('-') {
+            return &value[index + 1..];
+        } else {
+            value
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -101,5 +117,14 @@ mod tests {
         let params = get_args(args).unwrap();
 
         assert_eq!(params, "5");
+    }
+
+    #[test]
+    fn test_get_opt_args() {
+        assert_eq!(get_opt_args("aspect-auto"), "auto");
+        assert_eq!(get_opt_args("flex"), "flex");
+        assert_eq!(get_opt_args("space-x-5"), "x-5");
+        assert_eq!(get_opt_args("-space-x-5"), "x-5");
+        assert_eq!(get_opt_args("-mx-5"), "5");
     }
 }
