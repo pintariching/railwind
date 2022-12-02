@@ -6,7 +6,7 @@ pub use media_query::MediaQuery;
 pub use pseudo_class::PseudoClass;
 pub use pseudo_element::PseudoElement;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum State {
     PseudoClass(PseudoClass),
     PseudoElement(PseudoElement),

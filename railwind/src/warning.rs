@@ -12,7 +12,7 @@ pub enum WarningType {
     ValueNotFound(String),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Warning {
     message: String,
     position: Position,
@@ -58,7 +58,7 @@ impl fmt::Display for Warning {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Position {
     line: usize,
     column: usize,

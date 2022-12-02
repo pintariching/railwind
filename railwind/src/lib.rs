@@ -22,7 +22,7 @@ lazy_static! {
         Regex::new(r#"(?:class|className)=(?:["']\W+\s*(?:\w+)\()?["']([^'"]+)['"]"#).unwrap();
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct RawClass<'a> {
     pub class: &'a str,
     pub position: Position,
@@ -202,17 +202,15 @@ fn parse_raw_classes<'a>(
                     warning_type,
                 ));
             }
+        } else if let Some(class) = Class::new(raw_class.class) {
+            parsed_classes.push(ParsedClass::new(raw_class.class, class, Vec::new()))
         } else {
-            if let Some(class) = Class::new(raw_class.class) {
-                parsed_classes.push(ParsedClass::new(raw_class.class, class, Vec::new()))
-            } else {
-                let warning_type = WarningType::ClassNotFound;
-                warnings.push(Warning::new(
-                    raw_class.class,
-                    &raw_class.position,
-                    warning_type,
-                ));
-            }
+            let warning_type = WarningType::ClassNotFound;
+            warnings.push(Warning::new(
+                raw_class.class,
+                &raw_class.position,
+                warning_type,
+            ));
         }
     }
 

@@ -245,7 +245,7 @@ impl<'a> DivideWidth<'a> {
             }
             "x-reverse" => Some(Self::ReverseX),
             "y-reverse" => Some(Self::ReverseY),
-            _ => return None,
+            _ => None,
         }
     }
 

@@ -34,12 +34,10 @@ pub fn get_class_name<'a>(value: &'a str) -> &'a str {
         {
             value
         }
+    } else if let Some(index) = value.find('-') {
+        &value[..index]
     } else {
-        if let Some(index) = value.find('-') {
-            return &value[..index];
-        } else {
-            value
-        }
+        value
     }
 }
 
@@ -48,10 +46,8 @@ pub fn get_args<'a>(value: &'a str) -> Option<&'a str> {
         if let Some(index) = value[1..].find('-') {
             return Some(&value[index + 2..]);
         }
-    } else {
-        if let Some(index) = value.find('-') {
-            return Some(&value[index + 1..]);
-        }
+    } else if let Some(index) = value.find('-') {
+        return Some(&value[index + 1..]);
     }
 
     None
@@ -60,16 +56,14 @@ pub fn get_args<'a>(value: &'a str) -> Option<&'a str> {
 pub fn get_opt_args<'a>(value: &'a str) -> &'a str {
     if value.starts_with('-') {
         if let Some(index) = value[1..].find('-') {
-            return &value[index + 2..];
+            &value[index + 2..]
         } else {
             &value[1..]
         }
+    } else if let Some(index) = value.find('-') {
+        &value[index + 1..]
     } else {
-        if let Some(index) = value.find('-') {
-            return &value[index + 1..];
-        } else {
-            value
-        }
+        value
     }
 }
 

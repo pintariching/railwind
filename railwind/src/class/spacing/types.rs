@@ -25,7 +25,7 @@ impl<'a> Padding<'a> {
             "pl" => Some(Self::Left(arg)),
             "px" => Some(Self::X(arg)),
             "py" => Some(Self::Y(arg)),
-            _ => return None,
+            _ => None,
         }
     }
 
@@ -93,7 +93,7 @@ impl<'a> Margin<'a> {
             "ml" => Some(Self::Left(arg, negative)),
             "mx" => Some(Self::X(arg, negative)),
             "my" => Some(Self::Y(arg, negative)),
-            _ => return None,
+            _ => None,
         }
     }
 
@@ -150,7 +150,7 @@ impl<'a> SpaceBetween<'a> {
         match get_class_name(arg) {
             "x" => Some(Self::X(get_args(arg)?, negative)),
             "y" => Some(Self::Y(get_args(arg)?, negative)),
-            _ => return None,
+            _ => None,
         }
     }
 
