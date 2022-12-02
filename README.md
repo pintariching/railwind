@@ -26,7 +26,7 @@ Currently, not all Tailwind features are supported. At the moment, the following
 
 ### Layout
 - [x] Aspect Ratio
-- [ ] Container
+- [x] Container
 - [x] Columns
 - [x] Break After
 - [x] Break Before
