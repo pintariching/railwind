@@ -58,12 +58,12 @@ pub fn get_opt_args<'a>(value: &'a str) -> &'a str {
         if let Some(index) = value[1..].find('-') {
             &value[index + 2..]
         } else {
-            &value[1..]
+            ""
         }
     } else if let Some(index) = value.find('-') {
         &value[index + 1..]
     } else {
-        value
+        ""
     }
 }
 

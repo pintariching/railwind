@@ -31,7 +31,7 @@ impl<'a> BorderRadius<'a> {
             "tr" => Self::TopRight(get_args(args)?),
             "br" => Self::BottomRight(get_args(args)?),
             "bl" => Self::BottomLeft(get_args(args)?),
-            "rounded" => Self::Around(""),
+            "" => Self::Around(""),
             _ => Self::Around(args),
         };
 
