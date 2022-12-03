@@ -57,7 +57,7 @@ pub enum Typography<'a> {
     TextTransform(TextTransform),
     TextOverflow(TextOverflow),
     TextIndent(TextIndent<'a>),
-    VerticalAlign(VerticalAlign<'a>),
+    VerticalAlign(VerticalAlign),
     Whitespace(Whitespace),
     WordBreak(WordBreak),
     Content(Content<'a>),

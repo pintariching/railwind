@@ -3,7 +3,7 @@ mod types;
 pub use types::*;
 
 use crate::class::Decl;
-use crate::utils::{get_args, get_class_name};
+use crate::utils::{get_args, get_class_name, get_opt_args};
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -92,9 +92,11 @@ impl<'a> FlexboxGrid<'a> {
                     return None;
                 }
             }
-            "grow" => FlexboxGrid::Grow(Grow(get_args(value)?)),
-            "shrink" => FlexboxGrid::Shrink(Shrink(get_args(value)?)),
-            "order" => FlexboxGrid::Order(Order::new(get_class_name(value), get_args(value)?)),
+            "grow" => FlexboxGrid::Grow(Grow(get_opt_args(value))),
+            "shrink" => FlexboxGrid::Shrink(Shrink(get_opt_args(value))),
+            "order" | "-order" => {
+                FlexboxGrid::Order(Order::new(get_class_name(value), get_args(value)?))
+            }
             "grid" => {
                 if let Some(args) = get_args(value) {
                     match get_class_name(args) {

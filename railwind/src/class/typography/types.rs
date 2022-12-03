@@ -443,7 +443,7 @@ impl<'a> TextIndent<'a> {
 }
 
 #[derive(Debug)]
-pub enum VerticalAlign<'a> {
+pub enum VerticalAlign {
     Baseline,
     Top,
     Middle,
@@ -452,11 +452,11 @@ pub enum VerticalAlign<'a> {
     TextBottom,
     Sub,
     Super,
-    Arbitrary(&'a str),
+    Arbitrary(String),
 }
 
-impl<'a> VerticalAlign<'a> {
-    pub fn new(arg: &'a str) -> Option<Self> {
+impl VerticalAlign {
+    pub fn new(arg: &str) -> Option<Self> {
         let value = match arg {
             "baseline" => Self::Baseline,
             "top" => Self::Top,
@@ -488,7 +488,12 @@ impl<'a> VerticalAlign<'a> {
             VerticalAlign::TextBottom => "text-bottom",
             VerticalAlign::Sub => "sub",
             VerticalAlign::Super => "super",
-            VerticalAlign::Arbitrary(a) => get_arbitrary_value(a)?,
+            VerticalAlign::Arbitrary(a) => {
+                return Some(Decl::Single(format!(
+                    "vertical-align: {}",
+                    get_arbitrary_value(&a)?
+                )))
+            }
         };
 
         Some(Decl::Single(format!("vertical-align: {}", value)))

@@ -96,7 +96,7 @@ impl<'a> ParsedClass<'a> {
     }
 }
 
-pub fn parse_html_file(input: &Path, output: &Path, include_preflight: bool) -> Vec<Warning> {
+pub fn parse_html_to_file(input: &Path, output: &Path, include_preflight: bool) -> Vec<Warning> {
     let html = fs::read_to_string(input).unwrap();
     let collected_classes = collect_classes_from_html(&html);
 
@@ -120,6 +120,56 @@ pub fn parse_html_file(input: &Path, output: &Path, include_preflight: bool) -> 
     css_file.write_all(css.as_bytes()).unwrap();
     css_file.write_all("\n".as_bytes()).unwrap();
     warnings
+}
+
+pub fn parse_html_to_string(
+    input: &Path,
+    include_preflight: bool,
+    warnings: &mut Vec<Warning>,
+) -> String {
+    let html = fs::read_to_string(input).unwrap();
+    let collected_classes = collect_classes_from_html(&html);
+
+    let parsed_classes = parse_raw_classes(collected_classes, warnings);
+    let generated_classes: Vec<String> = parsed_classes
+        .into_iter()
+        .filter_map(|c| c.try_to_string())
+        .collect();
+
+    let mut css = String::new();
+
+    if include_preflight {
+        let preflight = fs::read_to_string("preflight.css").unwrap();
+        css.push_str(&preflight);
+        css.push_str("\n\n");
+    }
+
+    css.push_str(&generated_classes.join("\n\n"));
+    css.push_str("\n");
+
+    css
+}
+
+pub fn parse_string(input: &str, include_preflight: bool, warnings: &mut Vec<Warning>) -> String {
+    let collected_classes = collect_classes_from_str(input);
+    let parsed_classes = parse_raw_classes(collected_classes, warnings);
+    let generated_classes: Vec<String> = parsed_classes
+        .into_iter()
+        .filter_map(|c| c.try_to_string())
+        .collect();
+
+    let mut css = String::new();
+
+    if include_preflight {
+        let preflight = fs::read_to_string("preflight.css").unwrap();
+        css.push_str(&preflight);
+        css.push_str("\n\n");
+    }
+
+    css.push_str(&generated_classes.join("\n\n"));
+    css.push_str("\n");
+
+    css
 }
 
 fn collect_classes_from_html(html: &str) -> Vec<RawClass> {
@@ -226,7 +276,7 @@ mod tests {
         let input = Path::new("../index.html");
         let output = Path::new("../railwind.css");
 
-        let warnings = parse_html_file(input, output, false);
+        let warnings = parse_html_to_file(input, output, false);
 
         for warning in warnings {
             println!("{}", warning);

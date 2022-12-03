@@ -3,7 +3,7 @@ mod types;
 pub use types::*;
 
 use crate::class::Decl;
-use crate::utils::{get_args, get_class_name};
+use crate::utils::{get_args, get_class_name, get_opt_args};
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -92,7 +92,7 @@ impl<'a> Layout<'a> {
             }
             "overflow" => Layout::Overflow(Overflow::new(get_args(value)?)?),
             "overscroll" => Layout::Overscroll(Overscroll::new(get_args(value)?)?),
-            "z" => Layout::ZIndex(ZIndex::new(get_class_name(value), get_args(value)?)),
+            "z" | "-z" => Layout::ZIndex(ZIndex::new(get_class_name(value), get_args(value)?)),
             _ => {
                 if let Some(display) = Display::new(value) {
                     Layout::Display(display)
@@ -101,7 +101,7 @@ impl<'a> Layout<'a> {
                 } else if let Some(position) = Position::new(value) {
                     Layout::Position(position)
                 } else if let Some(top_right_bottom_left) =
-                    TopRightBottomLeft::new(get_class_name(value), get_args(value)?)
+                    TopRightBottomLeft::new(get_class_name(value), get_opt_args(value))
                 {
                     Layout::TopRightBottomLeft(top_right_bottom_left)
                 } else if let Some(visibility) = Visibility::new(value) {

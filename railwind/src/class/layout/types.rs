@@ -1,6 +1,6 @@
 use crate::class::utils::{get_value, get_value_neg};
-use crate::class::Decl;
-use crate::utils::get_class_name;
+use crate::class::{Decl, Z_INDEX};
+use crate::utils::{get_args, get_class_name};
 
 use super::{ASPECT_RATIO, BOTTOM, COLUMNS, INSET, LEFT, OBJECT_POSITION, RIGHT, TOP};
 
@@ -21,37 +21,37 @@ impl Container {
     pub fn to_decl(self) -> Decl {
         Decl::FullClass(
             r#".container {
-  width: 100%;
+    width: 100%;
 }
 
 @media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-  }
+    .container {
+        max-width: 640px;
+    }
 }
 
 @media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
+    .container {
+        max-width: 768px;
+    }
 }
 
 @media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-  }
+    .container {
+        max-width: 1024px;
+    }
 }
 
 @media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
+    .container {
+        max-width: 1280px;
+    }
 }
 
 @media (min-width: 1536px) {
-  .container {
-    max-width: 1536px;
-  }
+    .container {
+        max-width: 1536px;
+    }
 }"#
             .into(),
         )
@@ -90,7 +90,7 @@ impl BreakAfter {
             "page" => Self::Page,
             "left" => Self::Left,
             "right" => Self::Right,
-            "Column" => Self::Column,
+            "column" => Self::Column,
             _ => return None,
         };
 
@@ -135,7 +135,7 @@ impl BreakBefore {
             "page" => Self::Page,
             "left" => Self::Left,
             "right" => Self::Right,
-            "Column" => Self::Column,
+            "column" => Self::Column,
             _ => return None,
         };
 
@@ -214,7 +214,10 @@ impl BoxDecoration {
             Self::Slice => "slice",
         };
 
-        Decl::Single(format!("box-decoration-break: {}", val))
+        Decl::Double([
+            format!("-webkit-box-decoration-break: {}", val),
+            format!("box-decoration-break: {}", val),
+        ])
     }
 }
 
@@ -645,14 +648,15 @@ impl<'a> TopRightBottomLeft<'a> {
         match self {
             Self::Inset(arg, neg) => match get_class_name(arg) {
                 "x" => {
-                    let val = get_value_neg(neg, arg, &INSET)?;
+                    let val = get_value_neg(neg, get_args(arg)?, &INSET)?;
+
                     Some(Decl::Double([
                         format!("left: {}", val),
                         format!("right: {}", val),
                     ]))
                 }
                 "y" => {
-                    let val = get_value_neg(neg, arg, &INSET)?;
+                    let val = get_value_neg(neg, get_args(arg)?, &INSET)?;
                     Some(Decl::Double([
                         format!("top: {}", val),
                         format!("bottom: {}", val),
@@ -728,7 +732,7 @@ impl<'a> ZIndex<'a> {
     }
 
     pub fn to_decl(self) -> Option<Decl> {
-        let value = get_value_neg(self.1, self.0, &COLUMNS)?;
+        let value = get_value_neg(self.1, self.0, &Z_INDEX)?;
         Some(Decl::Single(format!("z-index: {}", value)))
     }
 }

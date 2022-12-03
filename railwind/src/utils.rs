@@ -5,7 +5,7 @@ pub fn indent_string(str: &str) -> String {
 }
 
 pub fn replace_invalid_chars(selector: impl Into<String>) -> String {
-    let invalid_chars = ['[', ']', '%', ':'];
+    let invalid_chars = ['[', ']', '%', ':', '.', '/', '(', ')'];
     let mut val: String = selector.into();
 
     if val.contains(invalid_chars) {
@@ -23,7 +23,7 @@ pub fn replace_invalid_chars(selector: impl Into<String>) -> String {
         }
     }
 
-    val
+    val.replace(",", "\\2c ")
 }
 
 pub fn get_class_name<'a>(value: &'a str) -> &'a str {
@@ -116,7 +116,7 @@ mod tests {
     #[test]
     fn test_get_opt_args() {
         assert_eq!(get_opt_args("aspect-auto"), "auto");
-        assert_eq!(get_opt_args("flex"), "flex");
+        assert_eq!(get_opt_args("flex"), "");
         assert_eq!(get_opt_args("space-x-5"), "x-5");
         assert_eq!(get_opt_args("-space-x-5"), "x-5");
         assert_eq!(get_opt_args("-mx-5"), "5");

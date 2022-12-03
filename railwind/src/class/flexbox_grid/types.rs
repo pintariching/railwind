@@ -63,7 +63,7 @@ impl Wrap {
         let val = match arg {
             "wrap" => Self::Wrap,
             "wrap-reverse" => Self::WrapReverse,
-            "no-wrap" => Self::NoWrap,
+            "nowrap" => Self::NoWrap,
             _ => return None,
         };
 
