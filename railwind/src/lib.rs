@@ -19,7 +19,7 @@ mod warning;
 
 lazy_static! {
     static ref CLASS_REGEX: Regex =
-        Regex::new(r#"(?:class|className)=(?:["']\W+\s*(?:\w+)\()?["']([^'"]+)['"]"#).unwrap();
+        Regex::new(r#"(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]"#).unwrap();
 }
 
 #[derive(Debug, PartialEq, Eq)]

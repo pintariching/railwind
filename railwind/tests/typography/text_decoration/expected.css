@@ -1,0 +1,19 @@
+.underline {
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
+}
+
+.overline {
+    -webkit-text-decoration-line: overline;
+    text-decoration-line: overline;
+}
+
+.line-through {
+    -webkit-text-decoration-line: line-through;
+    text-decoration-line: line-through;
+}
+
+.no-underline {
+    -webkit-text-decoration-line: none;
+    text-decoration-line: none;
+}

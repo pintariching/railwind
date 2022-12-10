@@ -5,7 +5,7 @@ use types::*;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 
-use super::Decl;
+use super::{utils::value_is_size, Decl};
 use crate::utils::{get_args, get_class_name};
 
 lazy_static! {
@@ -67,7 +67,9 @@ impl<'a> Typography<'a> {
     pub fn new(value: &'a str) -> Option<Self> {
         let typography = match get_class_name(value) {
             "font" => {
-                if FONT_FAMILY.contains_key(get_args(value)?) {
+                let args = get_args(value)?;
+                if FONT_FAMILY.contains_key(args) || args.starts_with("['") && args.ends_with("']")
+                {
                     Typography::FontFamily(FontFamily(get_args(value)?))
                 } else {
                     Typography::FontWeight(FontWeight(get_args(value)?))
@@ -76,7 +78,11 @@ impl<'a> Typography<'a> {
             "text" => {
                 if let Some(text_align) = TextAlign::new(get_args(value)?) {
                     Typography::TextAlign(text_align)
-                } else if FONT_SIZE.contains_key(get_args(value)?) {
+                } else if let Some(text_overflow) = TextOverflow::new(get_args(value)?) {
+                    Typography::TextOverflow(text_overflow)
+                } else if FONT_SIZE.contains_key(get_args(value)?)
+                    || value_is_size(get_args(value)?)
+                {
                     Typography::FontSize(FontSize(get_args(value)?))
                 } else {
                     Typography::TextColor(TextColor(get_args(value)?))
@@ -101,18 +107,23 @@ impl<'a> Typography<'a> {
                     TextDecorationStyle::new(get_args(value)?)
                 {
                     Typography::TextDecorationStyle(text_decoration_style)
-                } else if TEXT_DECORATION_THICKNESS.contains_key(get_args(value)?) {
+                } else if TEXT_DECORATION_THICKNESS.contains_key(get_args(value)?)
+                    || value_is_size(get_args(value)?)
+                {
                     Typography::TextDecorationThickness(TextDecorationThickness(get_args(value)?))
                 } else {
                     Typography::TextDecorationColor(TextDecorationColor(get_args(value)?))
                 }
             }
             "underline" => {
-                let args = get_args(value)?;
-                if get_class_name(args) == "offset" {
-                    Typography::TextUnderlineOffset(TextUnderlineOffset(get_args(args)?))
+                if let Some(args) = get_args(value) {
+                    if get_class_name(args) == "offset" {
+                        Typography::TextUnderlineOffset(TextUnderlineOffset(get_args(args)?))
+                    } else {
+                        return None;
+                    }
                 } else {
-                    return None;
+                    Typography::TextDecoration(TextDecoration::new(value)?)
                 }
             }
             "indent" => {

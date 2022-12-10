@@ -51,7 +51,7 @@ pub fn generate_state_selector(states: Vec<State>) -> String {
     }
 
     if pc.is_empty() {
-        return pe;
+        return format!(":{}", pe);
     }
 
     format!("{}::{}", pc, pe)

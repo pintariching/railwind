@@ -1,0 +1,24 @@
+.decoration-solid {
+    -webkit-text-decoration-style: solid;
+    text-decoration-style: solid;
+}
+
+.decoration-double {
+    -webkit-text-decoration-style: double;
+    text-decoration-style: double;
+}
+
+.decoration-dotted {
+    -webkit-text-decoration-style: dotted;
+    text-decoration-style: dotted;
+}
+
+.decoration-dashed {
+    -webkit-text-decoration-style: dashed;
+    text-decoration-style: dashed;
+}
+
+.decoration-wavy {
+    -webkit-text-decoration-style: wavy;
+    text-decoration-style: wavy;
+}

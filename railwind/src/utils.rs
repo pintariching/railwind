@@ -5,7 +5,7 @@ pub fn indent_string(str: &str) -> String {
 }
 
 pub fn replace_invalid_chars(selector: impl Into<String>) -> String {
-    let invalid_chars = ['[', ']', '%', ':', '.', '/', '(', ')'];
+    let invalid_chars = ['[', ']', '%', ':', '.', '/', '(', ')', '\'', '#'];
     let mut val: String = selector.into();
 
     if val.contains(invalid_chars) {

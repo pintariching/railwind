@@ -1,0 +1,9 @@
+.content-none {
+    --tw-content: none;
+    content: var(--tw-content);
+}
+
+.before\:content-\[\'Hello_World\'\]::before {
+    --tw-content: "Hello World";
+    content: var(--tw-content);
+}

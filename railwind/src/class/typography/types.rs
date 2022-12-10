@@ -1,9 +1,12 @@
-use crate::class::utils::{get_arbitrary_value, get_tuple_value, get_value, get_value_neg};
+use crate::class::utils::{
+    get_arbitrary_value, get_tuple_value, get_value, get_value_neg, hex_to_rgb_color,
+};
 use crate::class::Decl;
 
 use super::{
-    CONTENT, FONT_FAMILY, FONT_SIZE, FONT_WEIGHT, LETTER_SPACING, LINE_STYLE_TYPE, TEXT_COLOR,
-    TEXT_DECORATION_COLOR, TEXT_DECORATION_THICKNESS, TEXT_INDENT, TEXT_UNDERLINE_OFFSET,
+    CONTENT, FONT_FAMILY, FONT_SIZE, FONT_WEIGHT, LETTER_SPACING, LINE_HEIGHT, LINE_STYLE_TYPE,
+    TEXT_COLOR, TEXT_DECORATION_COLOR, TEXT_DECORATION_THICKNESS, TEXT_INDENT,
+    TEXT_UNDERLINE_OFFSET,
 };
 
 #[derive(Debug)]
@@ -22,10 +25,15 @@ pub struct FontSize<'a>(pub &'a str);
 impl<'a> FontSize<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_tuple_value(self.0, &FONT_SIZE)?;
-        Some(Decl::Double([
-            format!("font-size: {}", value.0),
-            format!("line-height: {}", value.1),
-        ]))
+
+        if FONT_SIZE.contains_key(self.0) {
+            Some(Decl::Double([
+                format!("font-size: {}", value.0),
+                format!("line-height: {}", value.1),
+            ]))
+        } else {
+            Some(Decl::Single(format!("font-size: {}", value.0)))
+        }
     }
 }
 
@@ -70,7 +78,7 @@ impl FontStyle {
     pub fn new(arg: &str) -> Option<Self> {
         let value = match arg {
             "italic" => Self::Italic,
-            "non-italic" => Self::NonItalic,
+            "not-italic" => Self::NonItalic,
             _ => return None,
         };
 
@@ -130,18 +138,24 @@ impl FontVariantNumeric {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            FontVariantNumeric::NormalNums => "normal",
-            FontVariantNumeric::Ordinal => "ordinal",
-            FontVariantNumeric::SlashedZero => "slashed-zero",
-            FontVariantNumeric::LiningNums => "lining-nums",
-            FontVariantNumeric::OldstyleNums => "oldstyle-nums",
-            FontVariantNumeric::ProportialNums => "proportional-nums",
-            FontVariantNumeric::TabularNums => "tabular-nums",
-            FontVariantNumeric::DiagonalFractions => "diagonal-fractions",
-            FontVariantNumeric::StackedFractions => "stacked-fractions",
+            FontVariantNumeric::NormalNums => return Decl::Lit("font-variant-numeric: normal"),
+            FontVariantNumeric::Ordinal => "--tw-ordinal: ordinal",
+            FontVariantNumeric::SlashedZero => "--tw-slashed-zero: slashed-zero",
+            FontVariantNumeric::LiningNums => "--tw-numeric-figure: lining-nums",
+            FontVariantNumeric::OldstyleNums => "--tw-numeric-figure: oldstyle-nums",
+            FontVariantNumeric::ProportialNums => "--tw-numeric-spacing: proportional-nums",
+            FontVariantNumeric::TabularNums => "--tw-numeric-spacing: tabular-nums",
+            FontVariantNumeric::DiagonalFractions => "--tw-numeric-fraction: diagonal-fractions",
+            FontVariantNumeric::StackedFractions => "--tw-numeric-fraction: stacked-fractions",
         };
 
-        Decl::Single(format!("font-variant-numeric: {}", value))
+        Decl::Double([
+            value.into(),
+            "font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero)
+        var(--tw-numeric-figure) var(--tw-numeric-spacing)
+        var(--tw-numeric-fraction)"
+                .into(),
+        ])
     }
 }
 
@@ -156,7 +170,7 @@ impl<'a> LetterSpacing<'a> {
 
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value_neg(self.1, self.0, &LETTER_SPACING)?;
-        Some(Decl::Single(format!("font-weight: {}", value)))
+        Some(Decl::Single(format!("letter-spacing: {}", value)))
     }
 }
 
@@ -165,7 +179,7 @@ pub struct LineHeight<'a>(pub &'a str);
 
 impl<'a> LineHeight<'a> {
     pub fn to_decl(self) -> Option<Decl> {
-        let value = get_value(self.0, &LETTER_SPACING)?;
+        let value = get_value(self.0, &LINE_HEIGHT)?;
         Some(Decl::Single(format!("line-height: {}", value)))
     }
 }
@@ -252,7 +266,18 @@ pub struct TextColor<'a>(pub &'a str);
 impl<'a> TextColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &TEXT_COLOR)?;
-        Some(Decl::Single(format!("color: {}", value)))
+
+        if let Some(color) = hex_to_rgb_color(&value) {
+            Some(Decl::Double([
+                "--tw-text-opacity: 1".into(),
+                format!(
+                    "color: rgb({} {} {} / var(--tw-text-opacity))",
+                    color[0], color[1], color[2]
+                ),
+            ]))
+        } else {
+            return Some(Decl::Single(format!("color: {}", value)));
+        }
     }
 }
 
@@ -285,7 +310,10 @@ impl TextDecoration {
             TextDecoration::NoUnderline => "none",
         };
 
-        Decl::Single(format!("text-decoration-line: {}", value))
+        Decl::Double([
+            format!("-webkit-text-decoration-line: {}", value),
+            format!("text-decoration-line: {}", value),
+        ])
     }
 }
 
@@ -295,7 +323,10 @@ pub struct TextDecorationColor<'a>(pub &'a str);
 impl<'a> TextDecorationColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &TEXT_DECORATION_COLOR)?;
-        Some(Decl::Single(format!("text-decoration-color: {}", value)))
+        Some(Decl::Double([
+            format!("-webkit-text-decoration-color: {}", value),
+            format!("text-decoration-color: {}", value),
+        ]))
     }
 }
 
@@ -331,7 +362,10 @@ impl TextDecorationStyle {
             TextDecorationStyle::Wavy => "wavy",
         };
 
-        Decl::Single(format!("text-decoration-style: {}", value))
+        Decl::Double([
+            format!("-webkit-text-decoration-style: {}", value),
+            format!("text-decoration-style: {}", value),
+        ])
     }
 }
 
@@ -402,8 +436,8 @@ impl TextOverflow {
     pub fn new(arg: &str) -> Option<Self> {
         let value = match arg {
             "truncate" => Self::Truncate,
-            "text-ellipsis" => Self::TextEllipsis,
-            "text-clip" => Self::TextClip,
+            "ellipsis" => Self::TextEllipsis,
+            "clip" => Self::TextClip,
             _ => return None,
         };
 
@@ -419,7 +453,7 @@ impl TextOverflow {
                     "white-space: nowrap".into(),
                 ])
             }
-            TextOverflow::TextEllipsis => "elipsis",
+            TextOverflow::TextEllipsis => "ellipsis",
             TextOverflow::TextClip => "clip",
         };
 
@@ -489,10 +523,7 @@ impl VerticalAlign {
             VerticalAlign::Sub => "sub",
             VerticalAlign::Super => "super",
             VerticalAlign::Arbitrary(a) => {
-                return Some(Decl::Single(format!(
-                    "vertical-align: {}",
-                    get_arbitrary_value(&a)?
-                )))
+                return Some(Decl::Single(format!("vertical-align: {}", a)))
             }
         };
 
@@ -577,6 +608,9 @@ pub struct Content<'a>(pub &'a str);
 impl<'a> Content<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &CONTENT)?;
-        Some(Decl::Single(format!("content: {}", value)))
+        Some(Decl::Double([
+            format!("--tw-content: {}", value),
+            "content: var(--tw-content)".into(),
+        ]))
     }
 }
