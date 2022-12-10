@@ -100,6 +100,10 @@ pub fn value_is_size(arg: &str) -> bool {
     false
 }
 
+pub fn value_is_hex(arg: &str) -> bool {
+    (arg.starts_with("[#") && arg.ends_with("]")) || arg.starts_with("#")
+}
+
 pub fn hex_to_rgb_color(value: &str) -> Option<[u8; 3]> {
     let value = if value.starts_with('#') {
         &value[1..]

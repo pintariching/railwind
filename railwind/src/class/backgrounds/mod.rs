@@ -5,7 +5,7 @@ pub use types::*;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 
-use super::Decl;
+use super::{utils::value_is_hex, Decl};
 use crate::utils::{get_args, get_class_name};
 
 lazy_static! {
@@ -42,17 +42,22 @@ impl<'a> Backgrounds<'a> {
             "bg" => match get_class_name(args) {
                 "clip" => Backgrounds::BackgroundClip(BackgroundClip::new(get_args(args)?)?),
                 "origin" => Backgrounds::BackgroundOrigin(BackgroundOrigin::new(get_args(args)?)?),
+                "gradient" | "none" if BACKGROUND_IMAGE.contains_key(args) => {
+                    Backgrounds::BackgroundImage(BackgroundImage(args))
+                }
                 _ => {
                     if let Some(attachment) = BackgroundAttachment::new(args) {
                         Backgrounds::BackgroundAttachment(attachment)
                     } else if let Some(repeat) = BackgroundRepeat::new(args) {
                         Backgrounds::BackgroundRepeat(repeat)
-                    } else if BACKGROUND_POSITION.contains_key(args) {
-                        Backgrounds::BackgroundPosition(BackgroundPosition(args))
-                    } else if BACKGROUND_SIZE.contains_key(args) {
+                    } else if BACKGROUND_SIZE.contains_key(args) || args.starts_with("[length:") {
                         Backgrounds::BackgroundSize(BackgroundSize(args))
-                    } else if BACKGROUND_IMAGE.contains_key(args) {
+                    } else if args.contains("url(") {
                         Backgrounds::BackgroundImage(BackgroundImage(args))
+                    } else if BACKGROUND_POSITION.contains_key(args)
+                        || (!value_is_hex(args) && !&BACKGROUND_COLOR.contains_key(args))
+                    {
+                        Backgrounds::BackgroundPosition(BackgroundPosition(args))
                     } else {
                         Backgrounds::BackgroundColor(BackgroundColor(args))
                     }

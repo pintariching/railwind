@@ -1,4 +1,4 @@
-use crate::class::utils::get_value;
+use crate::class::utils::{get_value, hex_to_rgb_color};
 use crate::class::Decl;
 
 use super::{
@@ -61,7 +61,12 @@ impl BackgroundClip {
             BackgroundClip::Border => "border-box",
             BackgroundClip::Padding => "padding-box",
             BackgroundClip::Content => "content-box",
-            BackgroundClip::Text => "text",
+            BackgroundClip::Text => {
+                return Decl::Double([
+                    "-webkit-background-clip: text".into(),
+                    "background-clip: text".into(),
+                ])
+            }
         };
 
         Decl::Single(format!("background-clip: {}", val))
@@ -74,7 +79,18 @@ pub struct BackgroundColor<'a>(pub &'a str);
 impl<'a> BackgroundColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &BACKGROUND_COLOR)?;
-        Some(Decl::Single(format!("background-color: {}", value)))
+
+        if let Some(color) = hex_to_rgb_color(&value) {
+            Some(Decl::Double([
+                "--tw-bg-opacity: 1".into(),
+                format!(
+                    "background-color: rgb({} {} {} / var(--tw-bg-opacity))",
+                    color[0], color[1], color[2]
+                ),
+            ]))
+        } else {
+            return Some(Decl::Single(format!("background-color: {}", value)));
+        }
     }
 }
 
@@ -162,7 +178,12 @@ pub struct BackgroundSize<'a>(pub &'a str);
 
 impl<'a> BackgroundSize<'a> {
     pub fn to_decl(self) -> Option<Decl> {
-        let value = get_value(self.0, &BACKGROUND_SIZE)?;
+        let mut value = get_value(self.0, &BACKGROUND_SIZE)?;
+
+        if value.starts_with("length:") {
+            value = value[7..].into();
+        }
+
         Some(Decl::Single(format!("background-size: {}", value)))
     }
 }
@@ -199,11 +220,35 @@ impl<'a> GradientColorStops<'a> {
         match self {
             GradientColorStops::From(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
-                Some(Decl::Triple([
-                    format!("--tw-gradient-from: {}", value),
-                    format!("--tw-gradient-to: {}00", value),
-                    "--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)".into(),
-                ]))
+
+                if let Some(color) = hex_to_rgb_color(&value) {
+                    Some(Decl::Triple([
+                        format!("--tw-gradient-from: {}", value),
+                        format!(
+                            "--tw-gradient-to: rgb({} {} {} / 0)",
+                            color[0], color[1], color[2]
+                        ),
+                        "--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)"
+                            .into(),
+                    ]))
+                } else {
+                    let color = match value.as_str() {
+                        "inherit" => [255, 255, 255],
+                        "currentColor" => [255, 255, 255],
+                        "transparent" => [0, 0, 0],
+                        _ => return None,
+                    };
+
+                    Some(Decl::Triple([
+                        format!("--tw-gradient-from: {}", value),
+                        format!(
+                            "--tw-gradient-to: rgb({} {} {} / 0)",
+                            color[0], color[1], color[2]
+                        ),
+                        "--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)"
+                            .into(),
+                    ]))
+                }
             }
             GradientColorStops::To(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
@@ -211,13 +256,34 @@ impl<'a> GradientColorStops<'a> {
             }
             GradientColorStops::Via(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
-                Some(Decl::Double([
-                    format!("--tw-gradient-to: {}00", value),
-                    format!(
-                        "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to)",
-                        value
-                    ),
-                ]))
+
+                if let Some(color) = hex_to_rgb_color(&value) {
+                    Some(Decl::Double([
+                        format!(
+                            "--tw-gradient-to: rgb({} {} {} / 0)",
+                            color[0], color[1], color[2]
+                        ),
+                        format!("--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to)", value),
+                    ]))
+                } else {
+                    let color = match value.as_str() {
+                        "inherit" => [255, 255, 255],
+                        "currentColor" => [255, 255, 255],
+                        "transparent" => [0, 0, 0],
+                        _ => return None,
+                    };
+
+                    Some(Decl::Double([
+                        format!(
+                            "--tw-gradient-to: rgb({} {} {} / 0)",
+                            color[0], color[1], color[2]
+                        ),
+                        format!(
+                            "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to)",
+                            value
+                        ),
+                    ]))
+                }
             }
         }
     }

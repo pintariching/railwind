@@ -1,0 +1,15 @@
+.bg-auto {
+    background-size: auto;
+}
+
+.bg-cover {
+    background-size: cover;
+}
+
+.bg-contain {
+    background-size: contain;
+}
+
+.bg-\[length\:200px_100px\] {
+    background-size: 200px 100px;
+}

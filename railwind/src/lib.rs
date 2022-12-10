@@ -244,6 +244,15 @@ fn parse_raw_classes<'a>(
 
     for raw_class in raw_classes {
         if let Some(colon_index) = raw_class.class.rfind(':') {
+            // if an arbitrary value inside [...] contains a colon
+            if let Some(left_bracket_index) = raw_class.class.rfind('[') {
+                if left_bracket_index < colon_index {
+                    if let Some(class) = Class::new(raw_class.class) {
+                        parsed_classes.push(ParsedClass::new(raw_class.class, class, Vec::new()))
+                    }
+                }
+            }
+
             let states = &raw_class.class[..colon_index];
             let entire_class = &raw_class.class[colon_index + 1..];
 
