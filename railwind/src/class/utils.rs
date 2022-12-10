@@ -83,7 +83,11 @@ static UNITS: [&'static str; 26] = [
 ];
 
 pub fn value_is_size(arg: &str) -> bool {
-    let value = arg.get(1..arg.len() - 1).unwrap();
+    let value = if arg.starts_with('[') && arg.ends_with(']') {
+        arg.get(1..arg.len() - 1).unwrap()
+    } else {
+        arg
+    };
 
     for unit in UNITS {
         if value.ends_with(unit) {
@@ -133,7 +137,7 @@ mod tests {
     fn test_value_is_size() {
         assert!(value_is_size("5rem"));
         assert!(value_is_size("50%"));
-        assert!(value_is_size("25px"));
+        assert!(value_is_size("[25px]"));
         assert!(!value_is_size("red-500"));
     }
 

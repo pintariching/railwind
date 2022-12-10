@@ -75,13 +75,16 @@ mod tests {
         assert_eq!(generate_state_selector(states), "active:hover".to_string());
 
         let states = vec![State::PseudoElement(PseudoElement::Before)];
-        assert_eq!(generate_state_selector(states), "before".to_string());
+        assert_eq!(generate_state_selector(states), ":before".to_string());
 
         let states = vec![
             State::PseudoElement(PseudoElement::Before),
             State::PseudoElement(PseudoElement::After),
         ];
-        assert_eq!(generate_state_selector(states), "before::after".to_string());
+        assert_eq!(
+            generate_state_selector(states),
+            ":before::after".to_string()
+        );
 
         let states = vec![
             State::PseudoClass(PseudoClass::Active),
