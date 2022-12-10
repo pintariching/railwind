@@ -1,6 +1,6 @@
-use crate::class::utils::{get_value, get_value_neg};
+use crate::class::utils::{get_arbitrary_value, get_value, get_value_neg};
 use crate::class::Decl;
-use crate::utils::{get_args, get_class_name};
+use crate::utils::{get_args, get_class_name, get_opt_args};
 
 use super::{
     BASIS, FLEX, GAP, GAP_X, GAP_Y, GRID_AUTO_COLUMNS, GRID_AUTO_ROWS, GRID_COLUMN_END,
@@ -194,18 +194,18 @@ pub enum GridRow<'a> {
     Span(&'a str),
     Start(&'a str),
     End(&'a str),
+    Arbitrary(&'a str),
 }
 
 impl<'a> GridRow<'a> {
     pub fn new(args: &'a str) -> Option<Self> {
-        let arg = get_args(args)?;
-
+        let arg = get_opt_args(args);
         let val = match get_class_name(args) {
             "auto" => Self::Auto,
             "span" => Self::Span(arg),
             "start" => Self::Start(arg),
             "end" => Self::End(arg),
-            _ => return None,
+            _ => Self::Arbitrary(args),
         };
 
         Some(val)
@@ -225,6 +225,10 @@ impl<'a> GridRow<'a> {
             Self::End(v) => {
                 let value = get_value(v, &GRID_ROW_END)?;
                 Some(Decl::Single(format!("grid-row-end: {}", value)))
+            }
+            Self::Arbitrary(v) => {
+                let value = get_arbitrary_value(v)?;
+                Some(Decl::Single(format!("grid-row: {}", value)))
             }
         }
     }
@@ -291,7 +295,7 @@ pub struct Gap<'a>(pub &'a str);
 
 impl<'a> Gap<'a> {
     pub fn to_decl(self) -> Option<Decl> {
-        match get_class_name(get_class_name(self.0)) {
+        match get_class_name(self.0) {
             "x" => {
                 let val = get_value(get_args(self.0)?, &GAP_X)?;
                 Some(Decl::Single(format!("column-gap: {}", val)))
@@ -301,7 +305,7 @@ impl<'a> Gap<'a> {
                 Some(Decl::Single(format!("row-gap: {}", val)))
             }
             _ => {
-                let val = get_value(get_args(self.0)?, &GAP)?;
+                let val = get_value(self.0, &GAP)?;
                 Some(Decl::Single(format!("gap: {}", val)))
             }
         }

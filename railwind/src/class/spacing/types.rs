@@ -156,13 +156,35 @@ impl<'a> SpaceBetween<'a> {
 
     pub fn to_decl(self) -> Option<Decl> {
         match self {
-            Self::X(m, n) => {
-                let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("margin-left: {}", value)))
+            Self::X(s, n) => {
+                if s == "reverse" {
+                    return Some(Decl::Lit("--tw-space-x-reverse: 1"));
+                }
+
+                let value = get_value_neg(n, s, &MARGIN)?;
+                Some(Decl::Triple([
+                    "--tw-space-x-reverse: 0".into(),
+                    format!("margin-right: calc({} * var(--tw-space-x-reverse))", value),
+                    format!(
+                        "margin-left: calc({} * calc(1 - var(--tw-space-x-reverse)))",
+                        value
+                    ),
+                ]))
             }
-            Self::Y(m, n) => {
-                let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("margin-top: {}", value)))
+            Self::Y(s, n) => {
+                if s == "reverse" {
+                    return Some(Decl::Lit("--tw-space-y-reverse: 1"));
+                }
+
+                let value = get_value_neg(n, s, &MARGIN)?;
+                Some(Decl::Triple([
+                    "--tw-space-y-reverse: 0".into(),
+                    format!(
+                        "margin-top: calc({} * calc(1 - var(--tw-space-y-reverse)))",
+                        value
+                    ),
+                    format!("margin-bottom: calc({} * var(--tw-space-y-reverse))", value),
+                ]))
             }
         }
     }

@@ -103,8 +103,8 @@ impl<'a> FlexboxGrid<'a> {
                         "cols" => {
                             FlexboxGrid::GridTemplateColumns(GridTemplateColumns(get_args(args)?))
                         }
-                        "rows" => FlexboxGrid::GridTepmlateRows(GridTepmlateRows(get_args(value)?)),
-                        "flow" => FlexboxGrid::GridAutoFlow(GridAutoFlow::new(get_args(value)?)?),
+                        "rows" => FlexboxGrid::GridTepmlateRows(GridTepmlateRows(get_args(args)?)),
+                        "flow" => FlexboxGrid::GridAutoFlow(GridAutoFlow::new(get_args(args)?)?),
                         _ => return None,
                     }
                 } else {
@@ -149,7 +149,7 @@ impl<'a> FlexboxGrid<'a> {
                 if let Some(args) = get_args(value) {
                     match get_class_name(args) {
                         "content" => FlexboxGrid::PlaceContent(PlaceContent::new(get_args(args)?)?),
-                        "items" => FlexboxGrid::PlaceItems(PlaceItems::new(get_args(value)?)?),
+                        "items" => FlexboxGrid::PlaceItems(PlaceItems::new(get_args(args)?)?),
                         "self" => FlexboxGrid::PlaceSelf(PlaceSelf::new(get_args(args)?)?),
                         _ => return None,
                     }

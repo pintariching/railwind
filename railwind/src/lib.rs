@@ -4,7 +4,7 @@ use std::{
     path::Path,
 };
 
-use class::{Class, Decl};
+use class::{Class, Decl, Spacing};
 use lazy_static::lazy_static;
 use line_col::LineColLookup;
 use modifiers::{generate_state_selector, MediaQuery, State};
@@ -45,9 +45,17 @@ impl<'a> ParsedClass<'a> {
     }
 
     pub fn try_to_string(self) -> Option<String> {
+        let selector_to_append = match &self.class {
+            Class::Spacing(spacing) => match spacing {
+                Spacing::SpaceBetween(_) => Some("> :not([hidden]) ~ :not([hidden])"),
+                _ => None,
+            },
+            _ => None,
+        };
+
         let decl = self.class.to_decl()?;
 
-        let class_selector = if self.states.iter().any(|s| match s {
+        let mut class_selector = if self.states.iter().any(|s| match s {
             State::PseudoClass(_) | State::PseudoElement(_) => true,
             _ => false,
         }) {
@@ -59,6 +67,10 @@ impl<'a> ParsedClass<'a> {
         } else {
             replace_invalid_chars(self.raw_class_name)
         };
+
+        if let Some(to_append) = selector_to_append {
+            class_selector = format!("{} {}", class_selector, to_append);
+        }
 
         let mut generated_class = match decl {
             Decl::FullClass(_) => decl.to_string().replace("container", &class_selector),

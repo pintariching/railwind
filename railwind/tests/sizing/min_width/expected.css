@@ -1,0 +1,24 @@
+.min-w-0 {
+    min-width: 0px;
+}
+
+.min-w-full {
+    min-width: 100%;
+}
+
+.min-w-min {
+    min-width: min-content;
+}
+
+.min-w-max {
+    min-width: max-content;
+}
+
+.min-w-fit {
+    min-width: -moz-fit-content;
+    min-width: fit-content;
+}
+
+.min-w-\[50\%\] {
+    min-width: 50%;
+}

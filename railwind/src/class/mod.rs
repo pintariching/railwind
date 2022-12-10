@@ -33,10 +33,10 @@ impl<'a> Class<'a> {
     pub fn new(value: &'a str) -> Option<Self> {
         let class = if let Some(layout) = Layout::new(value) {
             Class::Layout(layout)
-        } else if let Some(spacing) = Spacing::new(value) {
-            Class::Spacing(spacing)
         } else if let Some(flexbox_grid) = FlexboxGrid::new(value) {
             Class::FlexboxGrid(flexbox_grid)
+        } else if let Some(spacing) = Spacing::new(value) {
+            Class::Spacing(spacing)
         } else if let Some(sizing) = Sizing::new(value) {
             Class::Sizing(sizing)
         } else if let Some(typography) = Typography::new(value) {
@@ -57,8 +57,8 @@ impl<'a> Class<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         match self {
             Class::Layout(c) => c.to_decl(),
-            Class::Spacing(c) => c.to_decl(),
             Class::FlexboxGrid(c) => c.to_decl(),
+            Class::Spacing(c) => c.to_decl(),
             Class::Sizing(c) => c.to_decl(),
             Class::Typography(c) => c.to_decl(),
             Class::Backgrounds(c) => c.to_decl(),
