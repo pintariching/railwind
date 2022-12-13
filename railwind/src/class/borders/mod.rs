@@ -16,7 +16,7 @@ lazy_static! {
         ron::from_str(include_str!("border_width.ron")).unwrap();
     pub static ref BORDER_COLOR: HashMap<&'static str, &'static str> =
         ron::from_str(include_str!("../colors.ron")).unwrap();
-    pub static ref DIVIDE_WIDTH: HashMap<&'static str, (&'static str, &'static str)> =
+    pub static ref DIVIDE_WIDTH: HashMap<&'static str, &'static str> =
         ron::from_str(include_str!("divide_width.ron")).unwrap();
     pub static ref DIVIDE_COLOR: HashMap<&'static str, &'static str> =
         ron::from_str(include_str!("../colors.ron")).unwrap();
@@ -58,12 +58,18 @@ impl<'a> Borders<'a> {
         let borders = match get_class_name(value) {
             "rounded" => Borders::BorderRadius(BorderRadius::new(get_opt_args(value))?),
             "border" => {
-                if let Some(style) = BorderStyle::new(get_args(value)?) {
-                    Borders::BorderStyle(style)
-                } else if let Some(width) = BorderWidth::new(get_args(value)?) {
-                    Borders::BorderWidth(width)
+                if let Some(args) = get_args(value) {
+                    if let Some(style) = BorderStyle::new(args) {
+                        Borders::BorderStyle(style)
+                    } else if let Some(border_color) = BorderColor::new(args) {
+                        Borders::BorderColor(border_color)
+                    } else if let Some(width) = BorderWidth::new(args) {
+                        Borders::BorderWidth(width)
+                    } else {
+                        return None;
+                    }
                 } else {
-                    Borders::BorderColor(BorderColor(get_args(value)?))
+                    Borders::BorderWidth(BorderWidth::new("border")?)
                 }
             }
             "divide" => {
@@ -73,7 +79,7 @@ impl<'a> Borders<'a> {
                 } else if let Some(width) = DivideWidth::new(args) {
                     Borders::DivideWidth(width)
                 } else {
-                    Borders::BorderColor(BorderColor(get_args(value)?))
+                    return None;
                 }
             }
             "outline" => match get_class_name(get_opt_args(value)) {

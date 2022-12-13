@@ -4,7 +4,7 @@ use std::{
     path::Path,
 };
 
-use class::{Class, Decl, Spacing};
+use class::{Borders, Class, Decl, Spacing};
 use lazy_static::lazy_static;
 use line_col::LineColLookup;
 use modifiers::{generate_state_selector, MediaQuery, State};
@@ -48,6 +48,10 @@ impl<'a> ParsedClass<'a> {
         let selector_to_append = match &self.class {
             Class::Spacing(spacing) => match spacing {
                 Spacing::SpaceBetween(_) => Some("> :not([hidden]) ~ :not([hidden])"),
+                _ => None,
+            },
+            Class::Borders(borders) => match borders {
+                Borders::DivideWidth(_) => Some("> :not([hidden]) ~ :not([hidden])"),
                 _ => None,
             },
             _ => None,

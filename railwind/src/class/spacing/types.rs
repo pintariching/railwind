@@ -147,6 +147,10 @@ impl<'a> SpaceBetween<'a> {
     pub fn new(name: &'a str, arg: &'a str) -> Option<Self> {
         let negative = name.starts_with('-');
 
+        if !name.ends_with("space") {
+            return None;
+        }
+
         match get_class_name(arg) {
             "x" => Some(Self::X(get_args(arg)?, negative)),
             "y" => Some(Self::Y(get_args(arg)?, negative)),

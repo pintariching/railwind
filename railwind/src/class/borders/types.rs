@@ -1,6 +1,6 @@
-use crate::class::utils::{get_tuple_value, get_value};
+use crate::class::utils::{get_value, hex_to_rgb_color, value_is_hex};
 use crate::class::Decl;
-use crate::utils::{get_args, get_class_name};
+use crate::utils::{get_args, get_class_name, get_opt_args};
 
 use super::{
     BORDER_COLOR, BORDER_RADIUS, BORDER_WIDTH, DIVIDE_COLOR, DIVIDE_WIDTH, OUTLINE_OFFSET,
@@ -23,14 +23,14 @@ pub enum BorderRadius<'a> {
 impl<'a> BorderRadius<'a> {
     pub fn new(args: &'a str) -> Option<Self> {
         let value = match get_class_name(args) {
-            "t" => Self::Top(get_args(args)?),
-            "r" => Self::Right(get_args(args)?),
-            "b" => Self::Bottom(get_args(args)?),
-            "l" => Self::Left(get_args(args)?),
-            "tl" => Self::TopLeft(get_args(args)?),
-            "tr" => Self::TopRight(get_args(args)?),
-            "br" => Self::BottomRight(get_args(args)?),
-            "bl" => Self::BottomLeft(get_args(args)?),
+            "t" => Self::Top(get_opt_args(args)),
+            "r" => Self::Right(get_opt_args(args)),
+            "b" => Self::Bottom(get_opt_args(args)),
+            "l" => Self::Left(get_opt_args(args)),
+            "tl" => Self::TopLeft(get_opt_args(args)),
+            "tr" => Self::TopRight(get_opt_args(args)),
+            "br" => Self::BottomRight(get_opt_args(args)),
+            "bl" => Self::BottomLeft(get_opt_args(args)),
             "" => Self::Around(""),
             _ => Self::Around(args),
         };
@@ -61,8 +61,8 @@ impl<'a> BorderRadius<'a> {
             Self::Bottom(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
                 Decl::Double([
-                    format!("border-bottom-left-radius: {}", value),
                     format!("border-bottom-right-radius: {}", value),
+                    format!("border-bottom-left-radius: {}", value),
                 ])
             }
             Self::Left(b) => {
@@ -108,15 +108,15 @@ pub enum BorderWidth<'a> {
 impl<'a> BorderWidth<'a> {
     pub fn new(args: &'a str) -> Option<Self> {
         let value = match get_class_name(args) {
-            "x" => Self::X(get_args(args)?),
-            "y" => Self::Y(get_args(args)?),
-            "t" => Self::Top(get_args(args)?),
-            "r" => Self::Right(get_args(args)?),
-            "b" => Self::Bottom(get_args(args)?),
-            "l" => Self::Left(get_args(args)?),
-
+            "x" => Self::X(get_opt_args(args)),
+            "y" => Self::Y(get_opt_args(args)),
+            "t" => Self::Top(get_opt_args(args)),
+            "r" => Self::Right(get_opt_args(args)),
+            "b" => Self::Bottom(get_opt_args(args)),
+            "l" => Self::Left(get_opt_args(args)),
+            "border" => Self::Around(""),
             _ => {
-                if BORDER_WIDTH.contains_key(get_args(args)?) {
+                if BORDER_WIDTH.contains_key(get_opt_args(args)) {
                     Self::Around(args)
                 } else {
                     return None;
@@ -170,12 +170,135 @@ impl<'a> BorderWidth<'a> {
 }
 
 #[derive(Debug)]
-pub struct BorderColor<'a>(pub &'a str);
+pub enum BorderColor<'a> {
+    Around(&'a str),
+    X(&'a str),
+    Y(&'a str),
+    Top(&'a str),
+    Right(&'a str),
+    Bottom(&'a str),
+    Left(&'a str),
+}
 
 impl<'a> BorderColor<'a> {
+    pub fn new(args: &'a str) -> Option<Self> {
+        let contains_key = BORDER_COLOR.contains_key(get_opt_args(args));
+
+        let value = match get_class_name(args) {
+            "x" if contains_key => Self::X(get_opt_args(args)),
+            "y" if contains_key => Self::Y(get_opt_args(args)),
+            "t" if contains_key => Self::Top(get_opt_args(args)),
+            "r" if contains_key => Self::Right(get_opt_args(args)),
+            "b" if contains_key => Self::Bottom(get_opt_args(args)),
+            "l" if contains_key => Self::Left(get_opt_args(args)),
+            _ => {
+                if BORDER_COLOR.contains_key(args) || value_is_hex(args) {
+                    Self::Around(args)
+                } else {
+                    return None;
+                }
+            }
+        };
+
+        Some(value)
+    }
+
     pub fn to_decl(self) -> Option<Decl> {
-        let value = get_value(self.0, &BORDER_COLOR)?;
-        Some(Decl::Single(format!("border-color: {}", value)))
+        let arg = match self {
+            BorderColor::Around(arg) => arg,
+            BorderColor::X(arg) => arg,
+            BorderColor::Y(arg) => arg,
+            BorderColor::Top(arg) => arg,
+            BorderColor::Right(arg) => arg,
+            BorderColor::Bottom(arg) => arg,
+            BorderColor::Left(arg) => arg,
+        };
+
+        let value = get_value(arg, &BORDER_COLOR)?;
+
+        if let Some(color) = hex_to_rgb_color(&value) {
+            let decl = match self {
+                BorderColor::Around(_) => Decl::Double([
+                    "--tw-border-opacity: 1".into(),
+                    format!(
+                        "border-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                ]),
+                BorderColor::X(_) => Decl::Triple([
+                    "--tw-border-opacity: 1".into(),
+                    format!(
+                        "border-left-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                    format!(
+                        "border-right-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                ]),
+                BorderColor::Y(_) => Decl::Triple([
+                    "--tw-border-opacity: 1".into(),
+                    format!(
+                        "border-top-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                    format!(
+                        "border-bottom-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                ]),
+                BorderColor::Top(_) => Decl::Double([
+                    "--tw-border-opacity: 1".into(),
+                    format!(
+                        "border-top-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                ]),
+                BorderColor::Right(_) => Decl::Double([
+                    "--tw-border-opacity: 1".into(),
+                    format!(
+                        "border-right-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                ]),
+                BorderColor::Bottom(_) => Decl::Double([
+                    "--tw-border-opacity: 1".into(),
+                    format!(
+                        "border-bottom-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                ]),
+                BorderColor::Left(_) => Decl::Double([
+                    "--tw-border-opacity: 1".into(),
+                    format!(
+                        "border-left-color: rgb({} {} {} / var(--tw-border-opacity))",
+                        color[0], color[1], color[2]
+                    ),
+                ]),
+            };
+
+            Some(decl)
+        } else {
+            match self {
+                BorderColor::Around(_) => Some(Decl::Single(format!("border-color: {}", value))),
+                BorderColor::X(_) => Some(Decl::Double([
+                    format!("border-left-color: {}", value),
+                    format!("border-right-color: {}", value),
+                ])),
+                BorderColor::Y(_) => Some(Decl::Double([
+                    format!("border-top-color: {}", value),
+                    format!("border-bottom-color: {}", value),
+                ])),
+                BorderColor::Top(_) => Some(Decl::Single(format!("border-top-color: {}", value))),
+                BorderColor::Right(_) => {
+                    Some(Decl::Single(format!("border-right-color: {}", value)))
+                }
+                BorderColor::Bottom(_) => {
+                    Some(Decl::Single(format!("border-bottom-color: {}", value)))
+                }
+                BorderColor::Left(_) => Some(Decl::Single(format!("border-left-color: {}", value))),
+            }
+        }
     }
 }
 
@@ -230,39 +353,60 @@ impl<'a> DivideWidth<'a> {
     pub fn new(arg: &'a str) -> Option<Self> {
         match get_class_name(arg) {
             "x" => {
-                if arg == "x" {
-                    Some(Self::X(""))
+                if let Some(value) = get_args(arg) {
+                    if value == "reverse" {
+                        Some(Self::ReverseX)
+                    } else {
+                        Some(Self::X(value))
+                    }
                 } else {
-                    Some(Self::X(get_args(arg)?))
+                    Some(Self::X(""))
                 }
             }
             "y" => {
-                if arg == "y" {
-                    Some(Self::Y(""))
+                if let Some(value) = get_args(arg) {
+                    if value == "reverse" {
+                        Some(Self::ReverseY)
+                    } else {
+                        Some(Self::Y(value))
+                    }
                 } else {
-                    Some(Self::Y(get_args(arg)?))
+                    Some(Self::Y(""))
                 }
             }
-            "x-reverse" => Some(Self::ReverseX),
-            "y-reverse" => Some(Self::ReverseY),
             _ => None,
         }
     }
 
     pub fn to_decl(self) -> Option<Decl> {
+        dbg!(&self);
         let val = match self {
             Self::X(m) => {
-                let value = get_tuple_value(m, &DIVIDE_WIDTH)?;
-                Decl::Double([
-                    format!("border-right-width: {}", value.0),
-                    format!("border-left-width: {}", value.1),
+                let value = get_value(m, &DIVIDE_WIDTH)?;
+                Decl::Triple([
+                    "--tw-divide-x-reverse: 0".into(),
+                    format!(
+                        "border-right-width: calc({} * var(--tw-divide-x-reverse))",
+                        value
+                    ),
+                    format!(
+                        "border-left-width: calc({} * calc(1 - var(--tw-divide-x-reverse)))",
+                        value
+                    ),
                 ])
             }
             Self::Y(m) => {
-                let value = get_tuple_value(m, &DIVIDE_WIDTH)?;
-                Decl::Double([
-                    format!("border-top-width: {}", value.1),
-                    format!("border-bottom-width    : {}", value.0),
+                let value = get_value(m, &DIVIDE_WIDTH)?;
+                Decl::Triple([
+                    "--tw-divide-y-reverse: 0".into(),
+                    format!(
+                        "border-top-width: calc({} * calc(1 - var(--tw-divide-y-reverse)))",
+                        value
+                    ),
+                    format!(
+                        "border-bottom-width: calc({} * var(--tw-divide-y-reverse))",
+                        value
+                    ),
                 ])
             }
             Self::ReverseX => Decl::Lit("--tw-divide-x-reverse: 1"),
