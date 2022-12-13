@@ -264,7 +264,7 @@ dependencies = [
 
 [[package]]
 name = "railwind_cli"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "clap",
  "railwind 0.0.11",

@@ -1,6 +1,6 @@
 [package]
 name = "railwind_cli"
-version = "0.0.8"
+version = "0.0.9"
 authors = ["pintariching"]
 license = "MIT"
 description = "CLI tool for the Railwind compiler"
