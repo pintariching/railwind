@@ -6,6 +6,7 @@ mod layout;
 mod sizing;
 mod spacing;
 mod transitions_animation;
+mod transforms;
 mod typography;
 mod utils;
 
@@ -17,6 +18,7 @@ pub use layout::*;
 pub use sizing::*;
 pub use spacing::*;
 pub use transitions_animation::*;
+pub use transforms::*;
 pub use typography::*;
 
 #[derive(Debug)]
@@ -26,6 +28,7 @@ pub enum Class<'a> {
     FlexboxGrid(FlexboxGrid<'a>),
     Sizing(Sizing<'a>),
     TransitionsAnimation(TransitionsAnimation<'a>),
+    Transform(Transform<'a>),
     Typography(Typography<'a>),
     Backgrounds(Backgrounds<'a>),
     Borders(Borders<'a>),
@@ -44,6 +47,8 @@ impl<'a> Class<'a> {
             Class::Sizing(sizing)
         } else if let Some(transitions_animation) = TransitionsAnimation::new(value) {
             Class::TransitionsAnimation(transitions_animation)
+        } else if let Some(transform) = Transform::new(value) {
+            Class::Transform(transform)
         } else if let Some(typography) = Typography::new(value) {
             Class::Typography(typography)
         } else if let Some(backgrounds) = Backgrounds::new(value) {
@@ -66,6 +71,7 @@ impl<'a> Class<'a> {
             Class::Spacing(c) => c.to_decl(),
             Class::Sizing(c) => c.to_decl(),
             Class::TransitionsAnimation(c) => c.to_decl(),
+            Class::Transform(c) => c.to_decl(),
             Class::Typography(c) => c.to_decl(),
             Class::Backgrounds(c) => c.to_decl(),
             Class::Borders(c) => c.to_decl(),
