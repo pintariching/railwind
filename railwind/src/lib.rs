@@ -1,16 +1,15 @@
-use std::{
-    fs::{self, File},
-    io::Write,
-    path::Path,
-};
-
 use class::{Borders, Class, Decl, Spacing};
-use lazy_static::lazy_static;
-use line_col::LineColLookup;
 use modifiers::{generate_state_selector, MediaQuery, State};
-use regex::Regex;
 use utils::{indent_string, replace_invalid_chars};
 use warning::{Position, Warning, WarningType};
+
+use lazy_static::lazy_static;
+use line_col::LineColLookup;
+use regex::Regex;
+use std::collections::HashMap;
+use std::fs::{self, File};
+use std::io::Write;
+use std::path::Path;
 
 mod class;
 mod modifiers;
@@ -20,12 +19,6 @@ mod warning;
 lazy_static! {
     static ref CLASS_REGEX: Regex =
         Regex::new(r#"(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]"#).unwrap();
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub struct RawClass<'a> {
-    pub class: &'a str,
-    pub position: Position,
 }
 
 #[derive(Debug)]
@@ -188,10 +181,10 @@ pub fn parse_string(input: &str, include_preflight: bool, warnings: &mut Vec<War
     css
 }
 
-fn collect_classes_from_html(html: &str) -> Vec<RawClass> {
+fn collect_classes_from_html(html: &str) -> HashMap<&str, Position> {
     let lookup = LineColLookup::new(html);
 
-    let mut classes = Vec::new();
+    let mut classes = HashMap::new();
 
     for captures in CLASS_REGEX.captures_iter(html) {
         if let Some(group) = captures.get(1) {
@@ -204,10 +197,7 @@ fn collect_classes_from_html(html: &str) -> Vec<RawClass> {
                 }
 
                 let position = lookup.get(index).into();
-                classes.push(RawClass {
-                    class: cap,
-                    position,
-                });
+                classes.insert(cap, position);
 
                 index += cap.len() + 1;
             }
@@ -217,9 +207,9 @@ fn collect_classes_from_html(html: &str) -> Vec<RawClass> {
     classes
 }
 
-fn collect_classes_from_str(text: &str) -> Vec<RawClass> {
+fn collect_classes_from_str(text: &str) -> HashMap<&str, Position> {
     let lookup = LineColLookup::new(text);
-    let mut classes = Vec::new();
+    let mut classes = HashMap::new();
     let mut index = 0;
 
     for cap in text.split([' ', '\n']) {
@@ -229,10 +219,7 @@ fn collect_classes_from_str(text: &str) -> Vec<RawClass> {
         }
 
         let position = lookup.get(index).into();
-        classes.push(RawClass {
-            class: cap,
-            position,
-        });
+        classes.insert(cap, position);
 
         index += cap.len() + 1;
     }
@@ -241,24 +228,24 @@ fn collect_classes_from_str(text: &str) -> Vec<RawClass> {
 }
 
 fn parse_raw_classes<'a>(
-    raw_classes: Vec<RawClass<'a>>,
+    raw_classes: HashMap<&'a str, Position>,
     warnings: &mut Vec<Warning>,
 ) -> Vec<ParsedClass<'a>> {
     let mut parsed_classes = Vec::new();
 
-    for raw_class in raw_classes {
-        if let Some(colon_index) = raw_class.class.rfind(':') {
+    for (raw_class, position) in raw_classes {
+        if let Some(colon_index) = raw_class.rfind(':') {
             // if an arbitrary value inside [...] contains a colon
-            if let Some(left_bracket_index) = raw_class.class.rfind('[') {
+            if let Some(left_bracket_index) = raw_class.rfind('[') {
                 if left_bracket_index < colon_index {
-                    if let Some(class) = Class::new(raw_class.class) {
-                        parsed_classes.push(ParsedClass::new(raw_class.class, class, Vec::new()))
+                    if let Some(class) = Class::new(raw_class) {
+                        parsed_classes.push(ParsedClass::new(raw_class, class, Vec::new()))
                     }
                 }
             }
 
-            let states = &raw_class.class[..colon_index];
-            let entire_class = &raw_class.class[colon_index + 1..];
+            let states = &raw_class[..colon_index];
+            let entire_class = &raw_class[colon_index + 1..];
 
             let mut parsed_states = Vec::new();
             for state in states.split(':') {
@@ -268,24 +255,16 @@ fn parse_raw_classes<'a>(
             }
 
             if let Some(class) = Class::new(entire_class) {
-                parsed_classes.push(ParsedClass::new(raw_class.class, class, parsed_states))
+                parsed_classes.push(ParsedClass::new(raw_class, class, parsed_states))
             } else {
                 let warning_type = WarningType::ClassNotFound;
-                warnings.push(Warning::new(
-                    raw_class.class,
-                    &raw_class.position,
-                    warning_type,
-                ));
+                warnings.push(Warning::new(raw_class, &position, warning_type));
             }
-        } else if let Some(class) = Class::new(raw_class.class) {
-            parsed_classes.push(ParsedClass::new(raw_class.class, class, Vec::new()))
+        } else if let Some(class) = Class::new(raw_class) {
+            parsed_classes.push(ParsedClass::new(raw_class, class, Vec::new()))
         } else {
             let warning_type = WarningType::ClassNotFound;
-            warnings.push(Warning::new(
-                raw_class.class,
-                &raw_class.position,
-                warning_type,
-            ));
+            warnings.push(Warning::new(raw_class, &position, warning_type));
         }
     }
 
@@ -333,20 +312,11 @@ mod tests {
         assert!(!classes.is_empty());
         assert_eq!(
             classes,
-            vec![
-                RawClass {
-                    class: "px-5",
-                    position: Position::new(1, 1)
-                },
-                RawClass {
-                    class: "justify-start",
-                    position: Position::new(1, 6)
-                },
-                RawClass {
-                    class: "container",
-                    position: Position::new(1, 20)
-                }
-            ]
+            HashMap::from([
+                ("px-5", Position::new(1, 1)),
+                ("justify-start", Position::new(1, 6)),
+                ("container", Position::new(1, 20))
+            ])
         );
     }
 
@@ -358,20 +328,11 @@ mod tests {
         assert!(!classes.is_empty());
         assert_eq!(
             classes,
-            vec![
-                RawClass {
-                    class: "px-5",
-                    position: Position::new(1, 8)
-                },
-                RawClass {
-                    class: "justify-start",
-                    position: Position::new(1, 13)
-                },
-                RawClass {
-                    class: "container",
-                    position: Position::new(1, 27)
-                }
-            ]
+            HashMap::from([
+                ("px-5", Position::new(1, 8)),
+                ("justify-start", Position::new(1, 13)),
+                ("container", Position::new(1, 27))
+            ])
         );
     }
 }
