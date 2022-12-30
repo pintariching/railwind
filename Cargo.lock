@@ -255,6 +255,7 @@ name = "railwind"
 version = "0.0.12"
 dependencies = [
  "hex",
+ "indexmap",
  "lazy_static",
  "line-col",
  "regex",

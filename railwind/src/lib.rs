@@ -1,4 +1,5 @@
 use class::{Borders, Class, Decl, Spacing};
+use indexmap::IndexMap;
 use modifiers::{generate_state_selector, MediaQuery, State};
 use utils::{indent_string, replace_invalid_chars};
 use warning::{Position, Warning, WarningType};
@@ -6,7 +7,6 @@ use warning::{Position, Warning, WarningType};
 use lazy_static::lazy_static;
 use line_col::LineColLookup;
 use regex::Regex;
-use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
@@ -181,10 +181,10 @@ pub fn parse_string(input: &str, include_preflight: bool, warnings: &mut Vec<War
     css
 }
 
-fn collect_classes_from_html(html: &str) -> HashMap<&str, Position> {
+fn collect_classes_from_html(html: &str) -> IndexMap<&str, Position> {
     let lookup = LineColLookup::new(html);
 
-    let mut classes = HashMap::new();
+    let mut classes = IndexMap::new();
 
     for captures in CLASS_REGEX.captures_iter(html) {
         if let Some(group) = captures.get(1) {
@@ -207,9 +207,9 @@ fn collect_classes_from_html(html: &str) -> HashMap<&str, Position> {
     classes
 }
 
-fn collect_classes_from_str(text: &str) -> HashMap<&str, Position> {
+fn collect_classes_from_str(text: &str) -> IndexMap<&str, Position> {
     let lookup = LineColLookup::new(text);
-    let mut classes = HashMap::new();
+    let mut classes = IndexMap::new();
     let mut index = 0;
 
     for cap in text.split([' ', '\n']) {
@@ -228,7 +228,7 @@ fn collect_classes_from_str(text: &str) -> HashMap<&str, Position> {
 }
 
 fn parse_raw_classes<'a>(
-    raw_classes: HashMap<&'a str, Position>,
+    raw_classes: IndexMap<&'a str, Position>,
     warnings: &mut Vec<Warning>,
 ) -> Vec<ParsedClass<'a>> {
     let mut parsed_classes = Vec::new();
@@ -312,7 +312,7 @@ mod tests {
         assert!(!classes.is_empty());
         assert_eq!(
             classes,
-            HashMap::from([
+            IndexMap::from([
                 ("px-5", Position::new(1, 1)),
                 ("justify-start", Position::new(1, 6)),
                 ("container", Position::new(1, 20))
@@ -328,7 +328,7 @@ mod tests {
         assert!(!classes.is_empty());
         assert_eq!(
             classes,
-            HashMap::from([
+            IndexMap::from([
                 ("px-5", Position::new(1, 8)),
                 ("justify-start", Position::new(1, 13)),
                 ("container", Position::new(1, 27))
