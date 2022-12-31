@@ -1,30 +1,33 @@
 mod backgrounds;
 mod borders;
 mod effects;
+mod filters;
 mod flexbox_grid;
 mod layout;
 mod sizing;
 mod spacing;
-mod transitions_animation;
 mod transforms;
+mod transitions_animation;
 mod typography;
 mod utils;
 
 pub use backgrounds::*;
 pub use borders::*;
 pub use effects::*;
+pub use filters::*;
 pub use flexbox_grid::*;
 pub use layout::*;
 pub use sizing::*;
 pub use spacing::*;
-pub use transitions_animation::*;
 pub use transforms::*;
+pub use transitions_animation::*;
 pub use typography::*;
 
 #[derive(Debug)]
 pub enum Class<'a> {
     Layout(Layout<'a>),
     Spacing(Spacing<'a>),
+    Filter(Filter<'a>),
     FlexboxGrid(FlexboxGrid<'a>),
     Sizing(Sizing<'a>),
     TransitionsAnimation(TransitionsAnimation<'a>),
@@ -39,6 +42,8 @@ impl<'a> Class<'a> {
     pub fn new(value: &'a str) -> Option<Self> {
         let class = if let Some(layout) = Layout::new(value) {
             Class::Layout(layout)
+        } else if let Some(filter) = Filter::new(value) {
+            Class::Filter(filter)
         } else if let Some(flexbox_grid) = FlexboxGrid::new(value) {
             Class::FlexboxGrid(flexbox_grid)
         } else if let Some(spacing) = Spacing::new(value) {
@@ -67,6 +72,7 @@ impl<'a> Class<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         match self {
             Class::Layout(c) => c.to_decl(),
+            Class::Filter(c) => c.to_decl(),
             Class::FlexboxGrid(c) => c.to_decl(),
             Class::Spacing(c) => c.to_decl(),
             Class::Sizing(c) => c.to_decl(),
