@@ -9,7 +9,7 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 lazy_static! {
-    pub static ref COLOR: HashMap<&'static str, &'static str> =
+    pub static ref COLORS: HashMap<&'static str, &'static str> =
         ron::from_str(include_str!("../colors.ron")).unwrap();
     pub static ref CURSOR: HashMap<&'static str, &'static str> =
         ron::from_str(include_str!("cursor.ron")).unwrap();

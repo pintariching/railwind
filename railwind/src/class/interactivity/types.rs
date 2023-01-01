@@ -2,7 +2,7 @@ use crate::class::utils::{get_value, get_value_neg};
 use crate::class::Decl;
 use crate::utils::{get_class_name, get_opt_args};
 
-use super::{COLOR, CURSOR, MARGIN, PADDING};
+use super::{COLORS, CURSOR, MARGIN, PADDING};
 
 const TOUCH_ACTION_STYLE: &str =
     "touch-action: var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)";
@@ -12,7 +12,7 @@ pub struct AccentColor<'a>(pub &'a str);
 
 impl<'a> AccentColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
-        let value = get_value(self.0, &COLOR)?;
+        let value = get_value(self.0, &COLORS)?;
         Some(Decl::Single(format!("accent-color: {}", value)))
     }
 }
@@ -58,7 +58,7 @@ pub struct CaretColor<'a>(pub &'a str);
 
 impl<'a> CaretColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
-        let value = get_value(self.0, &COLOR)?;
+        let value = get_value(self.0, &COLORS)?;
         Some(Decl::Single(format!("caret-color: {}", value)))
     }
 }
