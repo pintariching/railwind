@@ -2,6 +2,7 @@ mod accessibility;
 mod backgrounds;
 mod borders;
 mod effects;
+mod filters;
 mod flexbox_grid;
 mod interactivity;
 mod layout;
@@ -29,6 +30,8 @@ pub use transforms::*;
 pub use transitions_animation::*;
 pub use typography::*;
 
+use self::filters::Filter;
+
 #[derive(Debug)]
 pub enum Class<'a> {
     Interactivity(Interactivity<'a>),
@@ -45,6 +48,7 @@ pub enum Class<'a> {
     Backgrounds(Backgrounds<'a>),
     Borders(Borders<'a>),
     Effects(Effects<'a>),
+    Filters(Filter<'a>),
 }
 
 impl<'a> Class<'a> {
@@ -77,6 +81,8 @@ impl<'a> Class<'a> {
             Class::Borders(borders)
         } else if let Some(effects) = Effects::new(value) {
             Class::Effects(effects)
+        } else if let Some(filter) = Filter::new(value) {
+            Class::Filters(filter)
         } else {
             return None;
         };
@@ -100,6 +106,7 @@ impl<'a> Class<'a> {
             Class::Backgrounds(c) => c.to_decl(),
             Class::Borders(c) => c.to_decl(),
             Class::Effects(c) => c.to_decl(),
+            Class::Filters(c) => c.to_decl(),
         }
     }
 }
