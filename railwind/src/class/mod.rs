@@ -1,3 +1,4 @@
+mod accessibility;
 mod backgrounds;
 mod borders;
 mod effects;
@@ -11,6 +12,7 @@ mod transitions_animation;
 mod typography;
 mod utils;
 
+pub use accessibility::*;
 pub use backgrounds::*;
 pub use borders::*;
 pub use effects::*;
@@ -33,6 +35,7 @@ pub enum Class<'a> {
     TransitionsAnimation(TransitionsAnimation<'a>),
     Transform(Transform<'a>),
     Typography(Typography<'a>),
+    Accessibility(Accessibility),
     Backgrounds(Backgrounds<'a>),
     Borders(Borders<'a>),
     Effects(Effects<'a>),
@@ -56,6 +59,8 @@ impl<'a> Class<'a> {
             Class::Transform(transform)
         } else if let Some(typography) = Typography::new(value) {
             Class::Typography(typography)
+        } else if let Some(accessibility) = Accessibility::new(value) {
+            Class::Accessibility(accessibility)
         } else if let Some(backgrounds) = Backgrounds::new(value) {
             Class::Backgrounds(backgrounds)
         } else if let Some(borders) = Borders::new(value) {
@@ -79,6 +84,7 @@ impl<'a> Class<'a> {
             Class::TransitionsAnimation(c) => c.to_decl(),
             Class::Transform(c) => c.to_decl(),
             Class::Typography(c) => c.to_decl(),
+            Class::Accessibility(c) => c.to_decl(),
             Class::Backgrounds(c) => c.to_decl(),
             Class::Borders(c) => c.to_decl(),
             Class::Effects(c) => c.to_decl(),
