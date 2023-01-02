@@ -7,6 +7,8 @@ mod interactivity;
 mod layout;
 mod sizing;
 mod spacing;
+mod svg;
+mod tables;
 mod transforms;
 mod transitions_animation;
 mod typography;
@@ -21,6 +23,8 @@ pub use interactivity::*;
 pub use layout::*;
 pub use sizing::*;
 pub use spacing::*;
+pub use svg::*;
+pub use tables::*;
 pub use transforms::*;
 pub use transitions_animation::*;
 pub use typography::*;
@@ -32,6 +36,8 @@ pub enum Class<'a> {
     Spacing(Spacing<'a>),
     FlexboxGrid(FlexboxGrid<'a>),
     Sizing(Sizing<'a>),
+    Svg(Svg<'a>),
+    Table(Table<'a>),
     TransitionsAnimation(TransitionsAnimation<'a>),
     Transform(Transform<'a>),
     Typography(Typography<'a>),
@@ -53,6 +59,10 @@ impl<'a> Class<'a> {
             Class::Spacing(spacing)
         } else if let Some(sizing) = Sizing::new(value) {
             Class::Sizing(sizing)
+        } else if let Some(svg) = Svg::new(value) {
+            Class::Svg(svg)
+        } else if let Some(table) = Table::new(value) {
+            Class::Table(table)
         } else if let Some(transitions_animation) = TransitionsAnimation::new(value) {
             Class::TransitionsAnimation(transitions_animation)
         } else if let Some(transform) = Transform::new(value) {
@@ -81,6 +91,8 @@ impl<'a> Class<'a> {
             Class::FlexboxGrid(c) => c.to_decl(),
             Class::Spacing(c) => c.to_decl(),
             Class::Sizing(c) => c.to_decl(),
+            Class::Svg(c) => c.to_decl(),
+            Class::Table(c) => c.to_decl(),
             Class::TransitionsAnimation(c) => c.to_decl(),
             Class::Transform(c) => c.to_decl(),
             Class::Typography(c) => c.to_decl(),
