@@ -65,6 +65,18 @@ impl<'a> ParsedClass<'a> {
             replace_invalid_chars(self.raw_class_name)
         };
 
+        for state in self.states.iter() {
+            match state {
+                State::Group(g) => {
+                    class_selector = format!("{}{}", g.to_static_str(), class_selector)
+                }
+                State::Peer(p) => {
+                    class_selector = format!("{}{}", p.to_static_str(), class_selector)
+                }
+                _ => (),
+            }
+        }
+
         if let Some(to_append) = selector_to_append {
             class_selector = format!("{} {}", class_selector, to_append);
         }
@@ -191,7 +203,7 @@ fn collect_classes_from_html(html: &str) -> IndexMap<&str, Position> {
             let mut index = group.start();
 
             for cap in group.as_str().split([' ', '\n']) {
-                if cap.is_empty() {
+                if cap.is_empty() || (cap == "group") || (cap == "peer") {
                     index += cap.len() + 1;
                     continue;
                 }
