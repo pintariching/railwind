@@ -1,12 +1,11 @@
 mod backgrounds;
 mod borders;
 mod effects;
-mod filters;
 mod flexbox_grid;
+mod interactivity;
 mod layout;
 mod sizing;
 mod spacing;
-mod tables;
 mod transforms;
 mod transitions_animation;
 mod typography;
@@ -15,24 +14,22 @@ mod utils;
 pub use backgrounds::*;
 pub use borders::*;
 pub use effects::*;
-pub use filters::*;
 pub use flexbox_grid::*;
+pub use interactivity::*;
 pub use layout::*;
 pub use sizing::*;
 pub use spacing::*;
-pub use tables::*;
 pub use transforms::*;
 pub use transitions_animation::*;
 pub use typography::*;
 
 #[derive(Debug)]
 pub enum Class<'a> {
+    Interactivity(Interactivity<'a>),
     Layout(Layout<'a>),
     Spacing(Spacing<'a>),
-    Filter(Filter<'a>),
     FlexboxGrid(FlexboxGrid<'a>),
     Sizing(Sizing<'a>),
-    Table(Table<'a>),
     TransitionsAnimation(TransitionsAnimation<'a>),
     Transform(Transform<'a>),
     Typography(Typography<'a>),
@@ -43,18 +40,16 @@ pub enum Class<'a> {
 
 impl<'a> Class<'a> {
     pub fn new(value: &'a str) -> Option<Self> {
-        let class = if let Some(layout) = Layout::new(value) {
+        let class = if let Some(interactivity) = Interactivity::new(value) {
+            Class::Interactivity(interactivity)
+        } else if let Some(layout) = Layout::new(value) {
             Class::Layout(layout)
-        } else if let Some(filter) = Filter::new(value) {
-            Class::Filter(filter)
         } else if let Some(flexbox_grid) = FlexboxGrid::new(value) {
             Class::FlexboxGrid(flexbox_grid)
         } else if let Some(spacing) = Spacing::new(value) {
             Class::Spacing(spacing)
         } else if let Some(sizing) = Sizing::new(value) {
             Class::Sizing(sizing)
-        } else if let Some(table) = Table::new(value) {
-            Class::Table(table)
         } else if let Some(transitions_animation) = TransitionsAnimation::new(value) {
             Class::TransitionsAnimation(transitions_animation)
         } else if let Some(transform) = Transform::new(value) {
@@ -76,12 +71,11 @@ impl<'a> Class<'a> {
 
     pub fn to_decl(self) -> Option<Decl> {
         match self {
+            Class::Interactivity(c) => c.to_decl(),
             Class::Layout(c) => c.to_decl(),
-            Class::Filter(c) => c.to_decl(),
             Class::FlexboxGrid(c) => c.to_decl(),
             Class::Spacing(c) => c.to_decl(),
             Class::Sizing(c) => c.to_decl(),
-            Class::Table(c) => c.to_decl(),
             Class::TransitionsAnimation(c) => c.to_decl(),
             Class::Transform(c) => c.to_decl(),
             Class::Typography(c) => c.to_decl(),
