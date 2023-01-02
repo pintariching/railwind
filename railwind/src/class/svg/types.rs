@@ -34,7 +34,6 @@ pub struct StrokeWidth<'a>(pub &'a str);
 
 impl<'a> StrokeWidth<'a> {
     pub fn new(arg: &str) -> Option<Self> {
-        println!("number: {}", arg);
         let value = match arg {
             "0" => Self("0"),
             "1" => Self("1"),

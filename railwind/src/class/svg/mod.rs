@@ -10,7 +10,7 @@ use std::collections::HashMap;
 
 lazy_static! {
     pub static ref COLORS: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("colors.ron")).unwrap();
+        ron::from_str(include_str!("../colors.ron")).unwrap();
 }
 
 #[derive(Debug)]
