@@ -557,3 +557,9 @@
     --tw-border-spacing-y: 24rem;
     border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
 }
+
+.border-spacing-\[5px\] {
+    --tw-border-spacing-x: 5px;
+    --tw-border-spacing-y: 5px;
+    border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
+}

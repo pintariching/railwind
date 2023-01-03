@@ -44,7 +44,7 @@ impl<'a> BorderSpacing<'a> {
             "x" => Self::X(get_opt_args(args)),
             "y" => Self::Y(get_opt_args(args)),
             _ => {
-                if BORDER_SPACING.contains_key(args) {
+                if BORDER_SPACING.contains_key(get_opt_args(args)) {
                     Self::All(args)
                 } else {
                     return None;
