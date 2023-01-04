@@ -75,12 +75,12 @@ impl<'a> Class<'a> {
             Class::Typography(typography)
         } else if let Some(accessibility) = Accessibility::new(value) {
             Class::Accessibility(accessibility)
+        } else if let Some(effects) = Effects::new(value) {
+            Class::Effects(effects)
         } else if let Some(backgrounds) = Backgrounds::new(value) {
             Class::Backgrounds(backgrounds)
         } else if let Some(borders) = Borders::new(value) {
             Class::Borders(borders)
-        } else if let Some(effects) = Effects::new(value) {
-            Class::Effects(effects)
         } else if let Some(filter) = Filter::new(value) {
             Class::Filters(filter)
         } else {

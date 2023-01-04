@@ -1,7 +1,10 @@
 use crate::class::utils::get_value;
 use crate::class::Decl;
+use regex::{ Regex, Captures };
 
 use super::{BOX_SHADOW, BOX_SHADOW_COLOR, OPACITY};
+
+const BOX_SHADOW_STYLE: &str = "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)";
 
 #[derive(Debug)]
 pub struct BoxShadow<'a>(pub &'a str);
@@ -15,8 +18,18 @@ impl<'a> BoxShadow<'a> {
     }
 
     pub fn to_decl(self) -> Option<Decl> {
-        let value = get_value(self.0, &BOX_SHADOW)?;
-        Some(Decl::Single(format!("box-shadow: {}", value)))
+        let tw_shadow = get_value(self.0, &BOX_SHADOW)?;
+        let re = Regex::new(r"rgb\(.*?\)").unwrap();
+        let tw_shadow_colored = re.replace_all(&tw_shadow,
+            |_: &Captures| {
+                String::from("var(--tw-shadow-color)")
+            }
+        );
+        Some(Decl::Triple([
+            format!("--tw-shadow: {}", tw_shadow),
+            format!("--tw-shadow-colored: {}", tw_shadow_colored),
+            BOX_SHADOW_STYLE.into(),
+        ]))
     }
 }
 
@@ -25,7 +38,10 @@ pub struct BoxShadowColor<'a>(pub &'a str);
 impl<'a> BoxShadowColor<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &BOX_SHADOW_COLOR)?;
-        Some(Decl::Single(format!("--tw-shadow-color: {}", value)))
+        Some(Decl::Double([
+            format!("--tw-shadow-color: {}", value),
+            "--tw-shadow: var(--tw-shadow-colored)".into(),
+        ]))
     }
 }
 
