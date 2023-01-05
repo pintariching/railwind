@@ -36,7 +36,7 @@ impl PseudoElement {
             PseudoElement::Before => "before",
             PseudoElement::After => "after",
             PseudoElement::Placeholder => "placeholder",
-            PseudoElement::File => "file",
+            PseudoElement::File => "file-selector-button",
             PseudoElement::Marker => "marker",
             PseudoElement::Selection => "selection",
             PseudoElement::FirstLine => "first-line",
