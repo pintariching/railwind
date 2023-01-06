@@ -4,6 +4,8 @@ use crate::utils::{get_args, get_class_name, get_opt_args};
 
 use super::{ORIGIN, ROTATE, SCALE, SKEW, TRANSLATE};
 
+const TRANSFORM_STYLE: &str = "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))";
+
 #[derive(Debug)]
 pub struct TranslateX<'a>(pub &'a str, bool);
 
@@ -17,7 +19,7 @@ impl<'a> TranslateX<'a> {
         let value = get_value_neg(self.1, self.0, &TRANSLATE)?;
         Some(Decl::Double([
                 format!("--tw-translate-x: {}", value),
-                "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -35,7 +37,7 @@ impl<'a> TranslateY<'a> {
         let value = get_value_neg(self.1, self.0, &TRANSLATE)?;
         Some(Decl::Double([
                 format!("--tw-translate-y: {}", value),
-                "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -53,7 +55,7 @@ impl<'a> Rotate<'a> {
         let value = get_value_neg(self.1, self.0, &ROTATE)?;
         Some(Decl::Double([
                 format!("--tw-rotate: {}", value),
-                "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -71,7 +73,7 @@ impl<'a> SkewX<'a> {
         let value = get_value_neg(self.1, self.0, &SKEW)?;
         Some(Decl::Double([
                 format!("--tw-skew-x: {}", value),
-                "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -89,7 +91,7 @@ impl<'a> SkewY<'a> {
         let value = get_value_neg(self.1, self.0, &SKEW)?;
         Some(Decl::Double([
                 format!("--tw-skew-y: {}", value),
-                "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -108,13 +110,7 @@ impl<'a> Scale<'a> {
         let value = match get_class_name(args) {
             "x" => Self::X(get_opt_args(args), negative),
             "y" => Self::Y(get_opt_args(args), negative),
-            _ => {
-                if SCALE.contains_key(get_opt_args(value)) {
-                    Self::All(args, negative)
-                } else {
-                    return None;
-                }
-            }
+            _ => Self::All(args, negative),
         };
 
         Some(value)
@@ -127,21 +123,21 @@ impl<'a> Scale<'a> {
                 Some(Decl::Triple([
                    format!("--tw-scale-x: {}", value),
                    format!("--tw-scale-y: {}", value),
-                   "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                   TRANSFORM_STYLE.into(),
                 ]))
             }
             Self::X(s, n) => {
                 let value = get_value_neg(n, s, &SCALE)?;
                 Some(Decl::Double([
                    format!("--tw-scale-x: {}", value),
-                   "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                   TRANSFORM_STYLE.into(),
                 ]))
             }
             Self::Y(s, n) => {
                 let value = get_value_neg(n, s, &SCALE)?;
                 Some(Decl::Double([
                    format!("--tw-scale-y: {}", value),
-                   "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));".into(),
+                   TRANSFORM_STYLE.into(),
                 ]))
             }
         }
