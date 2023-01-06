@@ -34,25 +34,57 @@ impl Transition {
     }
 
     pub fn to_decl(self) -> Option<Decl> {
-        let val = match self {
+        match self {
             Transition::None => {
-                return Some(Decl::Lit("transition-property: none"))
+                Some(Decl::Lit("transition-property: none"))
             }
-            Transition::All => "all",
-            Transition::ColorsOpacityShadowTransform => "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+            Transition::All => {
+                Some(Decl::Triple([
+                    "transition-property: all".into(),
+                    "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                    "transition-duration: 150ms".into(),
+                ]))
+            }
+            Transition::ColorsOpacityShadowTransform => {
+                let mut strings = vec![];
+                strings.push(String::from("transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter"));
+                strings.push(String::from("transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter"));
+                strings.push(String::from("transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter"));
+                strings.push(String::from("transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"));
+                strings.push(String::from("transition-duration: 150ms"));
+                Some(Decl::Multiple(strings))
+            }
             Transition::Colors => {
-                "color, background-color, border-color, text-decoration-color, fill, stroke"
+                let mut strings = vec![];
+                strings.push(String::from("transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color"));
+                strings.push(String::from("transition-property: color, background-color, border-color, text-decoration-color, fill, stroke"));
+                strings.push(String::from("transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color"));
+                strings.push(String::from("transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"));
+                strings.push(String::from("transition-duration: 150ms"));
+                Some(Decl::Multiple(strings))
             }
-            Transition::Opacity => "opacity",
-            Transition::Shadow => "box-shadow",
-            Transition::Transform => "transform",
-        };
-
-        Some(Decl::Triple([
-            format!("transition-property: {}", val),
-            "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
-            "transition-duration: 150ms".into(),
-        ]))
+            Transition::Opacity => {
+                Some(Decl::Triple([
+                    "transition-property: opacity".into(),
+                    "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                    "transition-duration: 150ms".into(),
+                ]))
+            }
+            Transition::Shadow => {
+                Some(Decl::Triple([
+                    "transition-property: box-shadow".into(),
+                    "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                    "transition-duration: 150ms".into(),
+                ]))
+            }
+            Transition::Transform => {
+                Some(Decl::Triple([
+                    "transition-property: transform".into(),
+                    "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                    "transition-duration: 150ms".into(),
+                ]))
+            }
+        }
     }
 }
 
@@ -72,7 +104,7 @@ pub struct TimingFunction<'a>(pub &'a str);
 impl<'a> TimingFunction<'a> {
     pub fn to_decl(self) -> Option<Decl> {
         let value = get_value(self.0, &TIMING_FUNCTION)?;
-        Some(Decl::Single(format!("transition-duration: {}", value)))
+        Some(Decl::Single(format!("transition-timing-function: {}", value)))
     }
 }
 
