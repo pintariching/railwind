@@ -1,4 +1,5 @@
 {
+    "none": "none",
     "inherit": "inherit",
     "current": "currentColor",
     "transparent": "transparent",
