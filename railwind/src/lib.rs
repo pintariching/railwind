@@ -14,11 +14,12 @@ use std::path::Path;
 mod class;
 mod modifiers;
 mod utils;
-mod warning;
+pub mod warning;
 
 lazy_static! {
     static ref CLASS_REGEX: Regex =
         Regex::new(r#"(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]"#).unwrap();
+    static ref PREFLIGHT: &'static str = include_str!("../preflight.css");
 }
 
 #[derive(Debug)]
@@ -133,8 +134,7 @@ pub fn parse_html_to_file(input: &Path, output: &Path, include_preflight: bool) 
     let mut css_file = File::create(output).unwrap();
 
     if include_preflight {
-        let preflight = fs::read_to_string("preflight.css").unwrap();
-        css_file.write_all(preflight.as_bytes()).unwrap();
+        css_file.write_all(PREFLIGHT.as_bytes()).unwrap();
         css_file.write_all("\n\n".as_bytes()).unwrap();
     }
 
@@ -160,8 +160,7 @@ pub fn parse_html_to_string(
     let mut css = String::new();
 
     if include_preflight {
-        let preflight = fs::read_to_string("preflight.css").unwrap();
-        css.push_str(&preflight);
+        css.push_str(&PREFLIGHT);
         css.push_str("\n\n");
     }
 
@@ -182,8 +181,7 @@ pub fn parse_string(input: &str, include_preflight: bool, warnings: &mut Vec<War
     let mut css = String::new();
 
     if include_preflight {
-        let preflight = fs::read_to_string("preflight.css").unwrap();
-        css.push_str(&preflight);
+        css.push_str(&PREFLIGHT);
         css.push_str("\n\n");
     }
 
