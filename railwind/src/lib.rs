@@ -143,13 +143,12 @@ pub fn parse_html_to_file(input: &Path, output: &Path, include_preflight: bool) 
     warnings
 }
 
-pub fn parse_html_to_string(
-    input: &Path,
+pub fn parse_html_string_to_string(
+    html: &str,
     include_preflight: bool,
     warnings: &mut Vec<Warning>,
 ) -> String {
-    let html = fs::read_to_string(input).unwrap();
-    let collected_classes = collect_classes_from_html(&html);
+    let collected_classes = collect_classes_from_html(html);
 
     let parsed_classes = parse_raw_classes(collected_classes, warnings);
     let generated_classes: Vec<String> = parsed_classes
@@ -168,6 +167,15 @@ pub fn parse_html_to_string(
     css.push_str("\n");
 
     css
+}
+
+pub fn parse_html_to_string(
+    input: &Path,
+    include_preflight: bool,
+    warnings: &mut Vec<Warning>,
+) -> String {
+    let html = fs::read_to_string(input).unwrap();
+    parse_html_string_to_string(&html, include_preflight, warnings)
 }
 
 pub fn parse_string(input: &str, include_preflight: bool, warnings: &mut Vec<Warning>) -> String {
