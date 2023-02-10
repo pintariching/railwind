@@ -1,8 +1,6 @@
 [workspace]
 members = ["railwind", "railwind_cli"]
 
-
-
 [profile.small]
 inherits = 'release'
 opt-level = 'z'     # Optimize for size
