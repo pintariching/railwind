@@ -2,9 +2,8 @@
 mod tests {
     use std::fs::{read_to_string, File};
     use std::io::Write;
-    use std::path::Path;
 
-    use railwind::parse_html_to_string;
+    use railwind::{parse_to_file, CollectionOptions, Source, SourceOptions};
     use walkdir::WalkDir;
 
     #[test]
@@ -23,7 +22,15 @@ mod tests {
 
                             expected.set_file_name("expected.css");
 
-                            let css = parse_html_to_string(Path::new(&input), false, &mut vec![]);
+                            let css = parse_to_file(
+                                Source::File(SourceOptions {
+                                    input: &input,
+                                    option: CollectionOptions::Html,
+                                }),
+                                None,
+                                false,
+                                &mut vec![],
+                            );
                             let expected_string = read_to_string(&expected).unwrap();
 
                             let mut output = path.clone();

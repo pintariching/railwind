@@ -1,9 +1,0 @@
-.w-full {
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .md\:w-full {
-        width: 100%;
-    }
-}

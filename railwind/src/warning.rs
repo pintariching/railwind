@@ -60,19 +60,25 @@ impl fmt::Display for Warning {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Position {
+    file: String,
     line: usize,
     column: usize,
 }
 
 impl Position {
-    pub fn new(line: usize, column: usize) -> Self {
-        Self { line, column }
+    pub fn new(file: impl ToString, line: usize, column: usize) -> Self {
+        Self {
+            file: file.to_string(),
+            line,
+            column,
+        }
     }
 }
 
 impl From<(usize, usize)> for Position {
     fn from(pos: (usize, usize)) -> Self {
         Self {
+            file: String::new(),
             line: pos.0,
             column: pos.1,
         }
