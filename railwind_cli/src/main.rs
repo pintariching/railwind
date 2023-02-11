@@ -47,7 +47,6 @@ fn main() {
             }
         }
         for entry in globwalk::glob(&c).unwrap() {
-            dbg!(&entry);
             match entry {
                 Ok(path) => input.push(path.into_path()),
                 Err(err) => panic!("{err}"),
