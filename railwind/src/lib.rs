@@ -7,9 +7,10 @@ use warning::{Position, Warning, WarningType};
 use lazy_static::lazy_static;
 use line_col::LineColLookup;
 use regex::Regex;
+use std::ffi::OsStr;
 use std::fs::{read_to_string, File};
 use std::io::Write;
-use std::path::Path;
+use std::path::PathBuf;
 
 mod class;
 mod modifiers;
@@ -160,7 +161,7 @@ impl<'a> ParsedClass<'a> {
 }
 
 pub struct SourceOptions<'a> {
-    pub input: &'a Path,
+    pub input: &'a PathBuf,
     pub option: CollectionOptions<'a>,
 }
 
@@ -176,13 +177,44 @@ pub enum CollectionOptions<'a> {
     Regex(&'a Regex),
 }
 
-/// Parses a source to a `railwind` CSS file
+impl<'a> From<&OsStr> for CollectionOptions<'a> {
+    fn from(value: &OsStr) -> Self {
+        if let Some(str) = value.to_str() {
+            match str {
+                "html" => CollectionOptions::Html,
+                _ => CollectionOptions::String,
+            }
+        } else {
+            CollectionOptions::String
+        }
+    }
+}
+
+/// A convenience function to write a `Source` to a `railwind` CSS file
 pub fn parse_to_file(
     source: Source,
-    output: Option<&Path>,
+    output: &str,
+    include_preflight: bool,
+    warnings: &mut Vec<Warning>,
+) {
+    let css = parse_to_string(source, include_preflight, warnings);
+
+    let mut file = File::create(output).unwrap();
+    file.write_all(css.as_bytes()).unwrap();
+}
+
+/// Parses a source to a `railwind` CSS string
+pub fn parse_to_string(
+    source: Source,
     include_preflight: bool,
     warnings: &mut Vec<Warning>,
 ) -> String {
+    let mut css = if include_preflight {
+        PREFLIGHT.to_string()
+    } else {
+        String::new()
+    };
+
     match source {
         Source::File(opt) => {
             let file_string = read_to_string(opt.input).unwrap();
@@ -194,22 +226,7 @@ pub fn parse_to_file(
             let parsed_classes = parse_classes(raw_classes, warnings);
             let generated_classes = generate_strings(parsed_classes);
 
-            let mut css = generated_classes.join("\n\n");
-
-            if let Some(output) = output {
-                let mut css_file = File::create(output).unwrap();
-
-                if include_preflight {
-                    css_file.write_all(PREFLIGHT.as_bytes()).unwrap();
-                    css_file.write_all("\n\n".as_bytes()).unwrap();
-                }
-
-                css_file.write_all(css.as_bytes()).unwrap();
-                css_file.write_all("\n".as_bytes()).unwrap();
-            }
-
-            css.push('\n');
-            css
+            css.push_str(&generated_classes.join("\n\n"));
         }
         Source::Files(opts) => {
             let mut raw_string_classes: IndexMap<String, Position> = IndexMap::new();
@@ -234,22 +251,7 @@ pub fn parse_to_file(
             let parsed_classes = parse_classes(raw_classes, warnings);
             let generated_classes = generate_strings(parsed_classes);
 
-            let mut css = generated_classes.join("\n\n");
-
-            if let Some(output) = output {
-                let mut css_file = File::create(output).unwrap();
-
-                if include_preflight {
-                    css_file.write_all(PREFLIGHT.as_bytes()).unwrap();
-                    css_file.write_all("\n\n".as_bytes()).unwrap();
-                }
-
-                css_file.write_all(css.as_bytes()).unwrap();
-                css_file.write_all("\n".as_bytes()).unwrap();
-            }
-
-            css.push('\n');
-            css
+            css.push_str(&generated_classes.join("\n\n"));
         }
         Source::String(str, opt) => {
             let raw_classes: IndexMap<&str, Position> = match opt {
@@ -261,24 +263,12 @@ pub fn parse_to_file(
             let parsed_classes = parse_classes(raw_classes, warnings);
             let generated_classes = generate_strings(parsed_classes);
 
-            let mut css = generated_classes.join("\n\n");
-
-            if let Some(output) = output {
-                let mut css_file = File::create(output).unwrap();
-
-                if include_preflight {
-                    css_file.write_all(PREFLIGHT.as_bytes()).unwrap();
-                    css_file.write_all("\n\n".as_bytes()).unwrap();
-                }
-
-                css_file.write_all(css.as_bytes()).unwrap();
-                css_file.write_all("\n".as_bytes()).unwrap();
-            }
-
-            css.push('\n');
-            css
+            css.push_str(&generated_classes.join("\n\n"));
         }
     }
+
+    css.push_str("\n");
+    css
 }
 
 fn collect_with_regex<'a>(str: &'a str, regex: &Regex) -> IndexMap<&'a str, Position> {

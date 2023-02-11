@@ -1,4 +1,6 @@
-#[derive(Deserialize)]
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
 pub struct Config {
-    content: Option<Vec<String>>,
+    pub content: Vec<String>,
 }

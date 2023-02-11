@@ -3,7 +3,7 @@ mod tests {
     use std::fs::{read_to_string, File};
     use std::io::Write;
 
-    use railwind::{parse_to_file, CollectionOptions, Source, SourceOptions};
+    use railwind::{parse_to_string, CollectionOptions, Source, SourceOptions};
     use walkdir::WalkDir;
 
     #[test]
@@ -22,12 +22,11 @@ mod tests {
 
                             expected.set_file_name("expected.css");
 
-                            let css = parse_to_file(
+                            let css = parse_to_string(
                                 Source::File(SourceOptions {
                                     input: &input,
                                     option: CollectionOptions::Html,
                                 }),
-                                None,
                                 false,
                                 &mut vec![],
                             );
