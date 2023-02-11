@@ -1,6 +1,9 @@
-use std::{fs, io::Write, path::Path};
-
 use clap::Parser;
+use config::Config;
+use railwind::{parse_to_file, CollectionOptions, Source, SourceOptions};
+use std::path::{Path, PathBuf};
+
+mod config;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -12,6 +15,9 @@ struct Args {
 
     #[arg(short = 'p', long, default_value = "false")]
     include_preflight: bool,
+
+    #[arg(short = 'c', long, default_value = "railwind.config.ron")]
+    config: PathBuf,
 }
 
 fn main() {
@@ -21,17 +27,40 @@ fn main() {
     let output = Path::new(&args.output);
 
     let mut warnings = Vec::new();
-    if let Some(extension) = input.extension() {
-        match extension.to_str().unwrap() {
-            "html" => {
-                warnings = railwind::parse_html_to_file(input, output, args.include_preflight)
-            }
-            _ => {
-                let file_string = fs::read_to_string(input).unwrap();
-                let css =
-                    railwind::parse_string(&file_string, args.include_preflight, &mut warnings);
-                let mut file = fs::File::create(args.output).unwrap();
-                file.write_all(css.as_bytes()).unwrap();
+
+    if let Ok(config_file) = std::fs::read_to_string(args.config) {
+        // if let Ok(config) = ron::from_str::<Config>(&config_file) {}
+    }
+
+    if input.is_dir() {
+        todo!()
+    }
+
+    if input.is_file() {
+        if let Some(extension) = input.extension() {
+            match extension.to_str().unwrap() {
+                "html" => {
+                    _ = parse_to_file(
+                        Source::File(SourceOptions {
+                            input,
+                            option: CollectionOptions::Html,
+                        }),
+                        Some(output),
+                        args.include_preflight,
+                        &mut warnings,
+                    )
+                }
+                _ => {
+                    _ = parse_to_file(
+                        Source::File(SourceOptions {
+                            input,
+                            option: CollectionOptions::String,
+                        }),
+                        Some(output),
+                        args.include_preflight,
+                        &mut warnings,
+                    )
+                }
             }
         }
     }

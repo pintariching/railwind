@@ -176,6 +176,7 @@ pub enum CollectionOptions<'a> {
     Regex(&'a Regex),
 }
 
+/// Parses a source to a `railwind` CSS file
 pub fn parse_to_file(
     source: Source,
     output: Option<&Path>,

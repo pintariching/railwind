@@ -13,5 +13,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.0.32", features = ["derive"] }
-railwind = "0.0.12" 
+ron = { version = "0.8.0" }
+serde = { version = "1.0.152" }
+clap = { version = "4.1.4", features = ["derive"] }
+railwind = "0.1.0" 
