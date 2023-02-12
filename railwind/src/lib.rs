@@ -261,6 +261,7 @@ pub fn parse_to_string(
             };
 
             let parsed_classes = parse_classes(raw_classes, warnings);
+
             let generated_classes = generate_strings(parsed_classes);
 
             css.push_str(&generated_classes.join("\n\n"));

@@ -1,5 +1,5 @@
 (
     content: [
-        "../../railwind_cli/tests"
+        "*.{html,rs}"
     ]
 )
