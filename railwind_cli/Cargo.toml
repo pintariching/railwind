@@ -17,5 +17,5 @@ ron = { version = "0.8.0" }
 serde = { version = "1.0.152", features = ["derive"] }
 clap = { version = "4.1.4", features = ["derive"] }
 globwalk = "0.8.1"
-railwind = { path = "../railwind" } #"0.1.1"
+railwind = "0.1.2"
 notify = "5.1.0"
