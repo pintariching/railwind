@@ -10,6 +10,9 @@ pub enum WarningType {
 
     /// (value)
     ValueNotFound(String),
+
+    ///
+    InvalidArgCount(String),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -36,9 +39,12 @@ impl Warning {
             }
             WarningType::ValueNotFound(value) => {
                 format!(
-                    "Could not match class '{}','{}' could not be found",
+                    "Could not match class '{}', argument '{}' could not be found",
                     class, value
                 )
+            }
+            WarningType::InvalidArgCount(value) => {
+                format!("Could not match class '{class}', invalid argument count '{value}'")
             }
         };
 

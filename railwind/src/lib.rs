@@ -2,12 +2,12 @@ use class::{Borders, Class, Decl, Spacing};
 use indexmap::IndexMap;
 use modifiers::{generate_state_selector, MediaQuery, State};
 use utils::{indent_string, replace_invalid_chars};
-use warning::{Position, Warning, WarningType};
+use warning::{Position, Warning};
 
 use lazy_static::lazy_static;
 use line_col::LineColLookup;
 use regex::Regex;
-use std::ffi::OsStr;
+use std::collections::HashMap;
 use std::fs::{read_to_string, File};
 use std::io::Write;
 use std::path::PathBuf;
@@ -44,9 +44,11 @@ impl<'a> ParsedClass<'a> {
             // if an arbitrary value inside [...] contains a colon
             if let Some(left_bracket_index) = raw_class.rfind('[') {
                 if left_bracket_index < colon_index {
-                    if let Some(class) = Class::new(raw_class) {
-                        return Ok(Self::new(raw_class, class, Vec::new()));
-                    }
+                    return Ok(Self::new(
+                        raw_class,
+                        Class::new(raw_class, raw_class, position)?,
+                        Vec::new(),
+                    ));
                 }
             }
 
@@ -55,27 +57,19 @@ impl<'a> ParsedClass<'a> {
 
             let mut parsed_states = Vec::new();
             for state in states.split(':') {
-                if let Some(s) = State::new(state) {
-                    parsed_states.push(s)
-                }
+                parsed_states.push(State::new(raw_class, state, position)?)
             }
 
-            if let Some(class) = Class::new(entire_class) {
-                Ok(Self::new(raw_class, class, parsed_states))
-            } else {
-                Err(Warning::new(
-                    raw_class,
-                    &position,
-                    WarningType::ClassNotFound,
-                ))
-            }
-        } else if let Some(class) = Class::new(raw_class) {
-            Ok(Self::new(raw_class, class, Vec::new()))
-        } else {
-            Err(Warning::new(
+            Ok(Self::new(
                 raw_class,
-                &position,
-                WarningType::ClassNotFound,
+                Class::new(raw_class, entire_class, position)?,
+                parsed_states,
+            ))
+        } else {
+            Ok(Self::new(
+                raw_class,
+                Class::new(raw_class, raw_class, position)?,
+                Vec::new(),
             ))
         }
     }
@@ -162,30 +156,33 @@ impl<'a> ParsedClass<'a> {
 
 pub struct SourceOptions<'a> {
     pub input: &'a PathBuf,
-    pub option: CollectionOptions<'a>,
+    pub option: CollectionOptions,
 }
 
 pub enum Source<'a> {
     File(SourceOptions<'a>),
     Files(Vec<SourceOptions<'a>>),
-    String(String, CollectionOptions<'a>),
+    String(String, CollectionOptions),
 }
 
-pub enum CollectionOptions<'a> {
+#[derive(Debug, Clone)]
+pub enum CollectionOptions {
     Html,
     String,
-    Regex(&'a Regex),
+    Regex(Regex),
 }
 
-impl<'a> From<&OsStr> for CollectionOptions<'a> {
-    fn from(value: &OsStr) -> Self {
-        if let Some(str) = value.to_str() {
-            match str {
-                "html" => CollectionOptions::Html,
-                _ => CollectionOptions::String,
+impl CollectionOptions {
+    pub fn new(value: &str, expand: Option<HashMap<&str, CollectionOptions>>) -> Self {
+        if let Some(exp) = expand {
+            if let Some(opt) = exp.get(value) {
+                return opt.clone();
             }
-        } else {
-            CollectionOptions::String
+        }
+
+        match value {
+            "html" => CollectionOptions::Html,
+            _ => CollectionOptions::String,
         }
     }
 }
@@ -221,7 +218,7 @@ pub fn parse_to_string(
             let raw_classes: IndexMap<&str, Position> = match opt.option {
                 CollectionOptions::Html => collect_with_regex(&file_string, &HTML_CLASS_REGEX),
                 CollectionOptions::String => collect(&file_string),
-                CollectionOptions::Regex(r) => collect_with_regex(&file_string, r),
+                CollectionOptions::Regex(r) => collect_with_regex(&file_string, &r),
             };
             let parsed_classes = parse_classes(raw_classes, warnings);
             let generated_classes = generate_strings(parsed_classes);
@@ -237,7 +234,7 @@ pub fn parse_to_string(
                 for (raw_str, position) in match opt.option {
                     CollectionOptions::Html => collect_with_regex(&file_string, &HTML_CLASS_REGEX),
                     CollectionOptions::String => collect(&file_string),
-                    CollectionOptions::Regex(r) => collect_with_regex(&file_string, r),
+                    CollectionOptions::Regex(r) => collect_with_regex(&file_string, &r),
                 } {
                     raw_string_classes.insert(raw_str.to_string(), position);
                 }
@@ -257,7 +254,7 @@ pub fn parse_to_string(
             let raw_classes: IndexMap<&str, Position> = match opt {
                 CollectionOptions::Html => collect_with_regex(&str, &HTML_CLASS_REGEX),
                 CollectionOptions::String => collect(&str),
-                CollectionOptions::Regex(r) => collect_with_regex(&str, r),
+                CollectionOptions::Regex(r) => collect_with_regex(&str, &r),
             };
 
             let parsed_classes = parse_classes(raw_classes, warnings);
@@ -377,5 +374,25 @@ mod tests {
                 ("container", Position::new("", 1, 27))
             ])
         );
+    }
+
+    #[test]
+    fn test_collection_options() {
+        let opts = CollectionOptions::new("html", None);
+
+        match opts {
+            CollectionOptions::Html => assert!(true),
+            CollectionOptions::String => assert!(false),
+            CollectionOptions::Regex(_) => assert!(false),
+        }
+
+        let opts =
+            CollectionOptions::new("rs", Some(HashMap::from([("rs", CollectionOptions::Html)])));
+
+        match opts {
+            CollectionOptions::Html => assert!(true),
+            CollectionOptions::String => assert!(false),
+            CollectionOptions::Regex(_) => assert!(false),
+        }
     }
 }

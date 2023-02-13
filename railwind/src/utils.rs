@@ -1,3 +1,5 @@
+use crate::warning::WarningType;
+
 // Indents every line in a string with two spaces
 // and removes empty lines
 pub fn indent_string(str: &str) -> String {
@@ -41,16 +43,16 @@ pub fn get_class_name<'a>(value: &'a str) -> &'a str {
     }
 }
 
-pub fn get_args<'a>(value: &'a str) -> Option<&'a str> {
+pub fn get_args<'a>(value: &'a str) -> Result<&'a str, WarningType> {
     if value.starts_with('-') {
         if let Some(index) = value[1..].find('-') {
-            return Some(&value[index + 2..]);
+            return Ok(&value[index + 2..]);
         }
     } else if let Some(index) = value.find('-') {
-        return Some(&value[index + 1..]);
+        return Ok(&value[index + 1..]);
     }
 
-    None
+    Err(WarningType::InvalidArgCount(value.to_string()))
 }
 
 pub fn get_opt_args<'a>(value: &'a str) -> &'a str {

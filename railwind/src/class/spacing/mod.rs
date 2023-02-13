@@ -4,6 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -25,7 +26,7 @@ pub enum Spacing<'a> {
 }
 
 impl<'a> Spacing<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let class_name = get_class_name(value);
         let args = get_args(value)?;
 
@@ -33,16 +34,20 @@ impl<'a> Spacing<'a> {
             Spacing::Padding(padding)
         } else if let Some(margin) = Margin::new(class_name, args) {
             Spacing::Margin(margin)
-        } else if let Some(space_between) = SpaceBetween::new(class_name, args) {
-            Spacing::SpaceBetween(space_between)
+        } else if let Ok(space_between) = SpaceBetween::new(class_name, args) {
+            if let Some(sb) = space_between {
+                Spacing::SpaceBetween(sb)
+            } else {
+                return Ok(None);
+            }
         } else {
-            return None;
+            return Ok(None);
         };
 
-        Some(spacing)
+        Ok(Some(spacing))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Spacing::Padding(s) => s.to_decl(),
             Spacing::Margin(s) => s.to_decl(),

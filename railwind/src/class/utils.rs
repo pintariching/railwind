@@ -1,50 +1,52 @@
 use std::collections::HashMap;
 
+use crate::warning::WarningType;
+
 pub fn get_value<'a>(
     arg: &'a str,
     hashmap: &HashMap<&'static str, &'static str>,
-) -> Option<String> {
+) -> Result<String, WarningType> {
     if let Some(arbitrary) = get_arbitrary_value(arg) {
-        return Some(arbitrary);
+        return Ok(arbitrary);
     }
 
     if let Some(value) = hashmap.get(arg) {
-        return Some(value.to_string());
+        return Ok(value.to_string());
     }
 
-    None
+    Err(WarningType::ValueNotFound(arg.to_string()))
 }
 
 pub fn get_value_neg(
     negative: bool,
     arg: &str,
     hashmap: &HashMap<&'static str, &'static str>,
-) -> Option<String> {
+) -> Result<String, WarningType> {
     if let Some(arbitrary) = get_arbitrary_value(arg) {
         if negative {
             if arbitrary.starts_with('-') {
-                return Some(arbitrary[1..].to_string());
+                return Ok(arbitrary[1..].to_string());
             } else {
-                return Some(format!("-{}", arbitrary));
+                return Ok(format!("-{}", arbitrary));
             }
         } else {
-            return Some(arbitrary.to_string());
+            return Ok(arbitrary.to_string());
         }
     }
 
     if let Some(value) = hashmap.get(arg) {
         if negative {
             if value.starts_with('-') {
-                return Some(value[1..].to_string());
+                return Ok(value[1..].to_string());
             } else {
-                return Some(format!("-{}", value));
+                return Ok(format!("-{}", value));
             }
         }
 
-        return Some(value.to_string());
+        return Ok(value.to_string());
     }
 
-    None
+    Err(WarningType::ValueNotFound(arg.to_string()))
 }
 
 pub fn get_tuple_value<'a>(

@@ -10,6 +10,8 @@ pub use peer::Peer;
 pub use pseudo_class::PseudoClass;
 pub use pseudo_element::PseudoElement;
 
+use crate::warning::{Position, Warning, WarningType};
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum State {
     PseudoClass(PseudoClass),
@@ -20,28 +22,32 @@ pub enum State {
 }
 
 impl State {
-    pub fn new(value: &str) -> Option<Self> {
+    pub fn new(raw_class: &str, value: &str, position: &Position) -> Result<Self, Warning> {
         if let Some(mq) = MediaQuery::new(value) {
-            return Some(State::MediaQuery(mq));
+            return Ok(State::MediaQuery(mq));
         }
 
         if let Some(pc) = PseudoClass::new(value) {
-            return Some(State::PseudoClass(pc));
+            return Ok(State::PseudoClass(pc));
         }
 
         if let Some(pe) = PseudoElement::new(value) {
-            return Some(State::PseudoElement(pe));
+            return Ok(State::PseudoElement(pe));
         }
 
         if let Some(g) = Group::new(value) {
-            return Some(State::Group(g));
+            return Ok(State::Group(g));
         }
 
         if let Some(p) = Peer::new(value) {
-            return Some(State::Peer(p));
+            return Ok(State::Peer(p));
         }
 
-        None
+        Err(Warning::new(
+            raw_class,
+            &position,
+            WarningType::StateNotFound(value.to_string()),
+        ))
     }
 }
 

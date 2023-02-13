@@ -1,6 +1,7 @@
 use crate::class::utils::{get_value, get_value_neg};
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use super::{MARGIN, PADDING};
 
@@ -29,38 +30,38 @@ impl<'a> Padding<'a> {
         }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::All(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("padding: {}", value)))
+                Ok(Decl::Single(format!("padding: {}", value)))
             }
             Self::Top(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("padding-top: {}", value)))
+                Ok(Decl::Single(format!("padding-top: {}", value)))
             }
             Self::Right(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("padding-right: {}", value)))
+                Ok(Decl::Single(format!("padding-right: {}", value)))
             }
             Self::Bottom(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("padding-bottom: {}", value)))
+                Ok(Decl::Single(format!("padding-bottom: {}", value)))
             }
             Self::Left(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("padding-left: {}", value)))
+                Ok(Decl::Single(format!("padding-left: {}", value)))
             }
             Self::X(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("padding-left: {}", value),
                     format!("padding-right: {}", value),
                 ]))
             }
             Self::Y(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("padding-top: {}", value),
                     format!("padding-bottom: {}", value),
                 ]))
@@ -97,38 +98,38 @@ impl<'a> Margin<'a> {
         }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::All(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("margin: {}", value)))
+                Ok(Decl::Single(format!("margin: {}", value)))
             }
             Self::Top(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("margin-top: {}", value)))
+                Ok(Decl::Single(format!("margin-top: {}", value)))
             }
             Self::Right(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("margin-right: {}", value)))
+                Ok(Decl::Single(format!("margin-right: {}", value)))
             }
             Self::Bottom(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("margin-bottom: {}", value)))
+                Ok(Decl::Single(format!("margin-bottom: {}", value)))
             }
             Self::Left(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("margin-left: {}", value)))
+                Ok(Decl::Single(format!("margin-left: {}", value)))
             }
             Self::X(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("margin-left: {}", value),
                     format!("margin-right: {}", value),
                 ]))
             }
             Self::Y(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("margin-top: {}", value),
                     format!("margin-bottom: {}", value),
                 ]))
@@ -144,29 +145,29 @@ pub enum SpaceBetween<'a> {
 }
 
 impl<'a> SpaceBetween<'a> {
-    pub fn new(name: &'a str, arg: &'a str) -> Option<Self> {
+    pub fn new(name: &'a str, arg: &'a str) -> Result<Option<Self>, WarningType> {
         let negative = name.starts_with('-');
 
         if !name.ends_with("space") {
-            return None;
+            return Ok(None);
         }
 
         match get_class_name(arg) {
-            "x" => Some(Self::X(get_args(arg)?, negative)),
-            "y" => Some(Self::Y(get_args(arg)?, negative)),
-            _ => None,
+            "x" => Ok(Some(Self::X(get_args(arg)?, negative))),
+            "y" => Ok(Some(Self::Y(get_args(arg)?, negative))),
+            _ => return Ok(None),
         }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::X(s, n) => {
                 if s == "reverse" {
-                    return Some(Decl::Lit("--tw-space-x-reverse: 1"));
+                    return Ok(Decl::Lit("--tw-space-x-reverse: 1"));
                 }
 
                 let value = get_value_neg(n, s, &MARGIN)?;
-                Some(Decl::Triple([
+                Ok(Decl::Triple([
                     "--tw-space-x-reverse: 0".into(),
                     format!("margin-right: calc({} * var(--tw-space-x-reverse))", value),
                     format!(
@@ -177,11 +178,11 @@ impl<'a> SpaceBetween<'a> {
             }
             Self::Y(s, n) => {
                 if s == "reverse" {
-                    return Some(Decl::Lit("--tw-space-y-reverse: 1"));
+                    return Ok(Decl::Lit("--tw-space-y-reverse: 1"));
                 }
 
                 let value = get_value_neg(n, s, &MARGIN)?;
-                Some(Decl::Triple([
+                Ok(Decl::Triple([
                     "--tw-space-y-reverse: 0".into(),
                     format!(
                         "margin-top: calc({} * calc(1 - var(--tw-space-y-reverse)))",

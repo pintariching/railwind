@@ -19,6 +19,7 @@ pub use accessibility::*;
 pub use backgrounds::*;
 pub use borders::*;
 pub use effects::*;
+pub use filters::*;
 pub use flexbox_grid::*;
 pub use interactivity::*;
 pub use layout::*;
@@ -30,7 +31,7 @@ pub use transforms::*;
 pub use transitions_animation::*;
 pub use typography::*;
 
-use self::filters::Filter;
+use crate::warning::{Position, Warning, WarningType};
 
 #[derive(Debug)]
 pub enum Class<'a> {
@@ -52,14 +53,16 @@ pub enum Class<'a> {
 }
 
 impl<'a> Class<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(raw_class: &'a str, value: &'a str, position: &Position) -> Result<Self, Warning> {
         let class = if let Some(interactivity) = Interactivity::new(value) {
             Class::Interactivity(interactivity)
         } else if let Some(layout) = Layout::new(value) {
             Class::Layout(layout)
         } else if let Some(flexbox_grid) = FlexboxGrid::new(value) {
             Class::FlexboxGrid(flexbox_grid)
-        } else if let Some(spacing) = Spacing::new(value) {
+        } else if let Some(spacing) =
+            Spacing::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Spacing(spacing)
         } else if let Some(sizing) = Sizing::new(value) {
             Class::Sizing(sizing)
@@ -84,10 +87,14 @@ impl<'a> Class<'a> {
         } else if let Some(filter) = Filter::new(value) {
             Class::Filters(filter)
         } else {
-            return None;
+            return Err(Warning::new(
+                raw_class,
+                position,
+                WarningType::ClassNotFound,
+            ));
         };
 
-        Some(class)
+        Ok(class)
     }
 
     pub fn to_decl(self) -> Option<Decl> {
