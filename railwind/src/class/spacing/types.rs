@@ -155,7 +155,7 @@ impl<'a> SpaceBetween<'a> {
         match get_class_name(arg) {
             "x" => Ok(Some(Self::X(get_args(arg)?, negative))),
             "y" => Ok(Some(Self::Y(get_args(arg)?, negative))),
-            _ => return Ok(None),
+            _ => return Err(WarningType::InvalidArg(arg.to_string(), vec!["x", "y"])),
         }
     }
 

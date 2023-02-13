@@ -34,14 +34,12 @@ impl<'a> Spacing<'a> {
             Spacing::Padding(padding)
         } else if let Some(margin) = Margin::new(class_name, args) {
             Spacing::Margin(margin)
-        } else if let Ok(space_between) = SpaceBetween::new(class_name, args) {
-            if let Some(sb) = space_between {
+        } else {
+            if let Some(sb) = SpaceBetween::new(class_name, args)? {
                 Spacing::SpaceBetween(sb)
             } else {
                 return Ok(None);
             }
-        } else {
-            return Ok(None);
         };
 
         Ok(Some(spacing))

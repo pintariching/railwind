@@ -1,6 +1,7 @@
 use crate::class::utils::{get_value, get_value_neg};
 use crate::class::Decl;
 use crate::utils::{get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use super::{COLORS, CURSOR, MARGIN, PADDING};
 
@@ -11,9 +12,9 @@ const TOUCH_ACTION_STYLE: &str =
 pub struct AccentColor<'a>(pub &'a str);
 
 impl<'a> AccentColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Some(Decl::Single(format!("accent-color: {}", value)))
+        Ok(Decl::Single(format!("accent-color: {}", value)))
     }
 }
 
@@ -23,23 +24,20 @@ pub enum Appearance {
 }
 
 impl<'a> Appearance {
-    pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "none" => Self::None,
-            _ => return None,
-        };
-
-        Some(value)
+    pub fn new(arg: &'a str) -> Result<Self, WarningType> {
+        match arg {
+            "none" => Ok(Self::None),
+            _ => Err(WarningType::InvalidArg(arg.into(), vec!["none"])),
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::None => Decl::Double([
                 "-webkit-appearance: none".into(),
                 "        appearance: none".into(),
             ]),
-        };
-        Some(value)
+        }
     }
 }
 
@@ -47,9 +45,9 @@ impl<'a> Appearance {
 pub struct Cursor<'a>(pub &'a str);
 
 impl<'a> Cursor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &CURSOR)?;
-        Some(Decl::Single(format!("cursor: {}", value)))
+        Ok(Decl::Single(format!("cursor: {}", value)))
     }
 }
 
@@ -57,9 +55,9 @@ impl<'a> Cursor<'a> {
 pub struct CaretColor<'a>(pub &'a str);
 
 impl<'a> CaretColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Some(Decl::Single(format!("caret-color: {}", value)))
+        Ok(Decl::Single(format!("caret-color: {}", value)))
     }
 }
 
@@ -70,22 +68,19 @@ pub enum PointerEvents {
 }
 
 impl<'a> PointerEvents {
-    pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "none" => Self::None,
-            "auto" => Self::Auto,
-            _ => return None,
-        };
-
-        Some(value)
+    pub fn new(arg: &'a str) -> Result<Self, WarningType> {
+        match arg {
+            "none" => Ok(Self::None),
+            "auto" => Ok(Self::Auto),
+            _ => Err(WarningType::InvalidArg(arg.into(), vec!["none", "auto"])),
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::None => Decl::Single("pointer-events: none".into()),
             Self::Auto => Decl::Single("pointer-events: auto".into()),
-        };
-        Some(value)
+        }
     }
 }
 
@@ -98,26 +93,26 @@ pub enum Resize {
 }
 
 impl<'a> Resize {
-    pub fn new(value: &'a str) -> Option<Self> {
-        let value = match value {
-            "resize-none" => Self::None,
-            "resize-y" => Self::Y,
-            "resize-x" => Self::X,
-            "resize" => Self::Both,
-            _ => return None,
-        };
-
-        Some(value)
+    pub fn new(value: &'a str) -> Result<Self, WarningType> {
+        match value {
+            "resize-none" => Ok(Self::None),
+            "resize-y" => Ok(Self::Y),
+            "resize-x" => Ok(Self::X),
+            "resize" => Ok(Self::Both),
+            _ => Err(WarningType::InvalidArg(
+                value.into(),
+                vec!["resize-none", "resize-y", "resize-x", "resize"],
+            )),
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::None => Decl::Lit("resize: none"),
             Self::Y => Decl::Lit("resize: vertical"),
             Self::X => Decl::Lit("resize: horizontal"),
             Self::Both => Decl::Lit("resize: both"),
-        };
-        Some(value)
+        }
     }
 }
 
@@ -129,21 +124,18 @@ pub enum ScrollBehavior {
 
 impl<'a> ScrollBehavior {
     pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "auto" => Self::Auto,
-            "smooth" => Self::Smooth,
-            _ => return None,
-        };
-
-        Some(value)
+        match arg {
+            "auto" => Some(Self::Auto),
+            "smooth" => Some(Self::Smooth),
+            _ => None,
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::Auto => Decl::Lit("scroll-behavior: auto"),
             Self::Smooth => Decl::Lit("scroll-behavior: smooth"),
-        };
-        Some(value)
+        }
     }
 }
 
@@ -174,41 +166,41 @@ impl<'a> ScrollMargin<'a> {
         }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::All(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("scroll-margin: {}", value)))
+                Ok(Decl::Single(format!("scroll-margin: {}", value)))
             }
             Self::X(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("scroll-margin-left: {}", value),
                     format!("scroll-margin-right: {}", value),
                 ]))
             }
             Self::Y(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("scroll-margin-top: {}", value),
                     format!("scroll-margin-bottom: {}", value),
                 ]))
             }
             Self::Top(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("scroll-margin-top: {}", value)))
+                Ok(Decl::Single(format!("scroll-margin-top: {}", value)))
             }
             Self::Right(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("scroll-margin-right: {}", value)))
+                Ok(Decl::Single(format!("scroll-margin-right: {}", value)))
             }
             Self::Bottom(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("scroll-margin-bottom: {}", value)))
+                Ok(Decl::Single(format!("scroll-margin-bottom: {}", value)))
             }
             Self::Left(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Some(Decl::Single(format!("scroll-margin-left: {}", value)))
+                Ok(Decl::Single(format!("scroll-margin-left: {}", value)))
             }
         }
     }
@@ -230,6 +222,7 @@ impl<'a> ScrollPadding<'a> {
         if class_name == "-scroll" {
             return None;
         }
+
         match get_class_name(arg) {
             "p" => Some(Self::All(get_opt_args(arg))),
             "px" => Some(Self::X(get_opt_args(arg))),
@@ -242,41 +235,41 @@ impl<'a> ScrollPadding<'a> {
         }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::All(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("scroll-padding: {}", value)))
+                Ok(Decl::Single(format!("scroll-padding: {}", value)))
             }
             Self::X(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("scroll-padding-left: {}", value),
                     format!("scroll-padding-right: {}", value),
                 ]))
             }
             Self::Y(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("scroll-padding-top: {}", value),
                     format!("scroll-padding-bottom: {}", value),
                 ]))
             }
             Self::Top(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("scroll-padding-top: {}", value)))
+                Ok(Decl::Single(format!("scroll-padding-top: {}", value)))
             }
             Self::Right(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("scroll-padding-right: {}", value)))
+                Ok(Decl::Single(format!("scroll-padding-right: {}", value)))
             }
             Self::Bottom(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("scroll-padding-bottom: {}", value)))
+                Ok(Decl::Single(format!("scroll-padding-bottom: {}", value)))
             }
             Self::Left(p) => {
                 let value = get_value(p, &PADDING)?;
-                Some(Decl::Single(format!("scroll-padding-left: {}", value)))
+                Ok(Decl::Single(format!("scroll-padding-left: {}", value)))
             }
         }
     }
@@ -292,25 +285,22 @@ pub enum ScrollSnapAlign {
 
 impl<'a> ScrollSnapAlign {
     pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "start" => Self::Start,
-            "end" => Self::End,
-            "center" => Self::Center,
-            "align-none" => Self::None,
-            _ => return None,
-        };
-
-        Some(value)
+        match arg {
+            "start" => Some(Self::Start),
+            "end" => Some(Self::End),
+            "center" => Some(Self::Center),
+            "align-none" => Some(Self::None),
+            _ => None,
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::Start => Decl::Lit("scroll-snap-align: start"),
             Self::End => Decl::Lit("scroll-snap-align: end"),
             Self::Center => Decl::Lit("scroll-snap-align: center"),
             Self::None => Decl::Lit("scroll-snap-align: none"),
-        };
-        Some(value)
+        }
     }
 }
 
@@ -322,21 +312,18 @@ pub enum ScrollSnapStop {
 
 impl<'a> ScrollSnapStop {
     pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "normal" => Self::Normal,
-            "always" => Self::Always,
-            _ => return None,
-        };
-
-        Some(value)
+        match arg {
+            "normal" => Some(Self::Normal),
+            "always" => Some(Self::Always),
+            _ => None,
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::Normal => Decl::Lit("scroll-snap-stop: normal"),
             Self::Always => Decl::Lit("scroll-snap-stop: always"),
-        };
-        Some(value)
+        }
     }
 }
 
@@ -352,29 +339,26 @@ pub enum ScrollSnapType {
 
 impl<'a> ScrollSnapType {
     pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "none" => Self::None,
-            "x" => Self::X,
-            "y" => Self::Y,
-            "both" => Self::Both,
-            "mandatory" => Self::Mandatory,
-            "proximity" => Self::Proximity,
-            _ => return None,
-        };
-
-        Some(value)
+        match arg {
+            "none" => Some(Self::None),
+            "x" => Some(Self::X),
+            "y" => Some(Self::Y),
+            "both" => Some(Self::Both),
+            "mandatory" => Some(Self::Mandatory),
+            "proximity" => Some(Self::Proximity),
+            _ => None,
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::None => Decl::Lit("scroll-snap-type: none"),
             Self::X => Decl::Lit("scroll-snap-type: x var(--tw-scroll-snap-strictness)"),
             Self::Y => Decl::Lit("scroll-snap-type: y var(--tw-scroll-snap-strictness)"),
             Self::Both => Decl::Lit("scroll-snap-type: both var(--tw-scroll-snap-strictness)"),
             Self::Mandatory => Decl::Lit("--tw-scroll-snap-strictness: mandatory"),
             Self::Proximity => Decl::Lit("--tw-scroll-snap-strictness: proximity"),
-        };
-        Some(value)
+        }
     }
 }
 
@@ -393,26 +377,38 @@ pub enum TouchAction {
 }
 
 impl<'a> TouchAction {
-    pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "auto" => Self::Auto,
-            "none" => Self::None,
-            "pan-x" => Self::PanX,
-            "pan-left" => Self::PanLeft,
-            "pan-right" => Self::PanRight,
-            "pan-y" => Self::PanY,
-            "pan-up" => Self::PanUp,
-            "pan-down" => Self::PanDown,
-            "pinch-zoom" => Self::PinchZoom,
-            "manipulation" => Self::Manipulation,
-            _ => return None,
-        };
-
-        Some(value)
+    pub fn new(arg: &'a str) -> Result<Self, WarningType> {
+        match arg {
+            "auto" => Ok(Self::Auto),
+            "none" => Ok(Self::None),
+            "pan-x" => Ok(Self::PanX),
+            "pan-left" => Ok(Self::PanLeft),
+            "pan-right" => Ok(Self::PanRight),
+            "pan-y" => Ok(Self::PanY),
+            "pan-up" => Ok(Self::PanUp),
+            "pan-down" => Ok(Self::PanDown),
+            "pinch-zoom" => Ok(Self::PinchZoom),
+            "manipulation" => Ok(Self::Manipulation),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec![
+                    "auto",
+                    "none",
+                    "pan-x",
+                    "pan-left",
+                    "pan-right",
+                    "pan-y",
+                    "pan-up",
+                    "pan-down",
+                    "pinch-zoom",
+                    "manipulation",
+                ],
+            )),
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        let value = match self {
+    pub fn to_decl(self) -> Decl {
+        match self {
             Self::Auto => Decl::Lit("touch-action: auto"),
             Self::None => Decl::Lit("touch-action: none"),
             Self::PanX => Decl::Double(["--tw-pan-x: pan-x".into(), TOUCH_ACTION_STYLE.into()]),
@@ -432,52 +428,84 @@ impl<'a> TouchAction {
                 TOUCH_ACTION_STYLE.into(),
             ]),
             Self::Manipulation => Decl::Lit("touch-action: manipulation"),
-        };
-        Some(value)
+        }
     }
 }
 
 #[derive(Debug)]
-pub struct UserSelect<'a>(pub &'a str);
+pub enum UserSelect {
+    None,
+    Text,
+    All,
+    Auto,
+}
 
-impl<'a> UserSelect<'a> {
-    pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "none" => Self("none"),
-            "text" => Self("text"),
-            "all" => Self("all"),
-            "auto" => Self("auto"),
-            _ => return None,
-        };
-
-        Some(value)
+impl UserSelect {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "none" => Ok(Self::None),
+            "text" => Ok(Self::Text),
+            "all" => Ok(Self::All),
+            "auto" => Ok(Self::Auto),
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec!["none", "text", "all", "auto"],
+                ))
+            }
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        Some(Decl::Double([
-            format!("-webkit-user-select: {}", self.0),
-            format!("        user-select: {}", self.0),
-        ]))
+    pub fn to_decl(self) -> Decl {
+        let value = match self {
+            UserSelect::None => "none",
+            UserSelect::Text => "text",
+            UserSelect::All => "all",
+            UserSelect::Auto => "auto",
+        };
+
+        Decl::Double([
+            format!("-webkit-user-select: {}", value),
+            format!("        user-select: {}", value),
+        ])
     }
 }
 
 #[derive(Debug)]
-pub struct WillChange<'a>(pub &'a str);
+pub enum WillChange {
+    Auto,
+    Scroll,
+    Contents,
+    Transform,
+}
 
-impl<'a> WillChange<'a> {
-    pub fn new(arg: &'a str) -> Option<Self> {
-        let value = match arg {
-            "change-auto" => Self("auto"),
-            "change-scroll" => Self("scroll-position"),
-            "change-contents" => Self("contents"),
-            "change-transform" => Self("transform"),
-            _ => return None,
-        };
-
-        Some(value)
+impl WillChange {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "change-auto" => Ok(Self::Auto),
+            "change-scroll" => Ok(Self::Scroll),
+            "change-contents" => Ok(Self::Contents),
+            "change-transform" => Ok(Self::Transform),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec![
+                    "change-auto",
+                    "change-scroll",
+                    "change-contents",
+                    "change-transform",
+                ],
+            )),
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        Some(Decl::Single(format!("will-change: {}", self.0)))
+    pub fn to_decl(self) -> Decl {
+        let value = match self {
+            WillChange::Auto => "auto",
+            WillChange::Scroll => "scroll-position",
+            WillChange::Contents => "contents",
+            WillChange::Transform => "transform",
+        };
+
+        Decl::Single(format!("will-change: {}", value))
     }
 }

@@ -4,6 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -34,12 +35,12 @@ pub enum Interactivity<'a> {
     ScrollSnapStop(ScrollSnapStop),
     ScrollSnapType(ScrollSnapType),
     TouchAction(TouchAction),
-    UserSelect(UserSelect<'a>),
-    WillChange(WillChange<'a>),
+    UserSelect(UserSelect),
+    WillChange(WillChange),
 }
 
 impl<'a> Interactivity<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let class_name = get_class_name(value);
 
         let interactivity = match class_name {
@@ -53,7 +54,7 @@ impl<'a> Interactivity<'a> {
                     "events" => {
                         Interactivity::PointerEvents(PointerEvents::new(get_opt_args(args))?)
                     }
-                    _ => return None,
+                    _ => return Err(WarningType::InvalidArg(args.to_string(), vec!["events"])),
                 }
             }
             "resize" => Interactivity::Resize(Resize::new(value)?),
@@ -65,7 +66,13 @@ impl<'a> Interactivity<'a> {
                 } else if let Some(scroll) = ScrollPadding::new(class_name, get_args(value)?) {
                     Interactivity::ScrollPadding(scroll)
                 } else {
-                    return None;
+                    return Err(WarningType::InvalidArg(
+                        value.into(),
+                        vec![
+                            "auto", "smooth", "m", "mx", "my", "mt", "mr", "mb", "ml", "p", "px",
+                            "py", "pt", "pr", "pb", "pl",
+                        ],
+                    ));
                 }
             }
             "snap" => {
@@ -76,35 +83,51 @@ impl<'a> Interactivity<'a> {
                 } else if let Some(scroll) = ScrollSnapType::new(get_args(value)?) {
                     Interactivity::ScrollSnapType(scroll)
                 } else {
-                    return None;
+                    return Err(WarningType::InvalidArg(
+                        value.into(),
+                        vec![
+                            "start",
+                            "end",
+                            "center",
+                            "align-none",
+                            "normal",
+                            "always",
+                            "none",
+                            "x",
+                            "y",
+                            "both",
+                            "mandatory",
+                            "proximity",
+                        ],
+                    ));
                 }
             }
             "touch" => Interactivity::TouchAction(TouchAction::new(get_args(value)?)?),
             "select" => Interactivity::UserSelect(UserSelect::new(get_args(value)?)?),
             "will" => Interactivity::WillChange(WillChange::new(get_args(value)?)?),
-            _ => return None,
+            _ => return Ok(None),
         };
 
-        Some(interactivity)
+        Ok(Some(interactivity))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Interactivity::AccentColor(s) => s.to_decl(),
-            Interactivity::Appearance(s) => s.to_decl(),
+            Interactivity::Appearance(s) => Ok(s.to_decl()),
             Interactivity::Cursor(s) => s.to_decl(),
             Interactivity::CaretColor(s) => s.to_decl(),
-            Interactivity::PointerEvents(s) => s.to_decl(),
-            Interactivity::Resize(s) => s.to_decl(),
-            Interactivity::ScrollBehavior(s) => s.to_decl(),
+            Interactivity::PointerEvents(s) => Ok(s.to_decl()),
+            Interactivity::Resize(s) => Ok(s.to_decl()),
+            Interactivity::ScrollBehavior(s) => Ok(s.to_decl()),
             Interactivity::ScrollMargin(s) => s.to_decl(),
             Interactivity::ScrollPadding(s) => s.to_decl(),
-            Interactivity::ScrollSnapAlign(s) => s.to_decl(),
-            Interactivity::ScrollSnapStop(s) => s.to_decl(),
-            Interactivity::ScrollSnapType(s) => s.to_decl(),
-            Interactivity::TouchAction(s) => s.to_decl(),
-            Interactivity::UserSelect(s) => s.to_decl(),
-            Interactivity::WillChange(s) => s.to_decl(),
+            Interactivity::ScrollSnapAlign(s) => Ok(s.to_decl()),
+            Interactivity::ScrollSnapStop(s) => Ok(s.to_decl()),
+            Interactivity::ScrollSnapType(s) => Ok(s.to_decl()),
+            Interactivity::TouchAction(s) => Ok(s.to_decl()),
+            Interactivity::UserSelect(s) => Ok(s.to_decl()),
+            Interactivity::WillChange(s) => Ok(s.to_decl()),
         }
     }
 }
