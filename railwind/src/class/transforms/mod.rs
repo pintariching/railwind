@@ -43,14 +43,26 @@ impl<'a> Transform<'a> {
                 "x" => Transform::TranslateX(TranslateX::new(class_name, get_args(args)?)),
 
                 "y" => Transform::TranslateY(TranslateY::new(class_name, get_args(args)?)),
-                v => return Err(WarningType::InvalidArg(v.into(), vec!["x", "y"])),
+                v => {
+                    return Err(WarningType::InvalidArg(
+                        v.into(),
+                        "Translate X / Y".into(),
+                        vec!["x", "y"],
+                    ))
+                }
             },
             "rotate" | "-rotate" => Transform::Rotate(Rotate::new(class_name, args)),
             "skew" | "-skew" => match get_class_name(args) {
                 "x" => Transform::SkewX(SkewX::new(class_name, get_args(args)?)),
 
                 "y" => Transform::SkewY(SkewY::new(class_name, get_args(args)?)),
-                v => return Err(WarningType::InvalidArg(v.into(), vec!["x", "y"])),
+                v => {
+                    return Err(WarningType::InvalidArg(
+                        v.into(),
+                        "Skew X / Y".into(),
+                        vec!["x", "y"],
+                    ))
+                }
             },
             "scale" | "-scale" => Transform::Scale(Scale::new(value)?),
             "origin" => Transform::Origin(Origin(args)),

@@ -108,6 +108,7 @@ impl<'a> FlexboxGrid<'a> {
                     v => {
                         return Err(WarningType::InvalidArg(
                             v.into(),
+                            "Grid Template / Auto Flow".into(),
                             vec!["cols", "rows", "flow"],
                         ))
                     }
@@ -121,7 +122,13 @@ impl<'a> FlexboxGrid<'a> {
                 match get_class_name(args) {
                     "cols" => FlexboxGrid::GridAutoColumns(GridAutoColumns(get_args(args)?)),
                     "rows" => FlexboxGrid::GridAutoRows(GridAutoRows(get_args(args)?)),
-                    v => return Err(WarningType::InvalidArg(v.into(), vec!["cols", "rows"])),
+                    v => {
+                        return Err(WarningType::InvalidArg(
+                            v.into(),
+                            "Grid Auto Columns / Rows".into(),
+                            vec!["cols", "rows"],
+                        ))
+                    }
                 }
             }
             "gap" => FlexboxGrid::Gap(Gap(get_args(value)?)),
@@ -137,6 +144,7 @@ impl<'a> FlexboxGrid<'a> {
                         v => {
                             return Err(WarningType::InvalidArg(
                                 v.into(),
+                                "Justify Items / Self".into(),
                                 vec![
                                     "start", "end", "center", "between", "around", "evenly",
                                     "items", "self",
@@ -159,6 +167,7 @@ impl<'a> FlexboxGrid<'a> {
                     v => {
                         return Err(WarningType::InvalidArg(
                             v.into(),
+                            "Place Content / Items / Self".into(),
                             vec!["content", "items", "self"],
                         ))
                     }

@@ -53,6 +53,7 @@ impl BackgroundClip {
             "text" => Ok(Self::Text),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Background Clip".into(),
                 vec!["border", "padding", "content", "text"],
             )),
         }
@@ -111,6 +112,7 @@ impl BackgroundOrigin {
             "content" => Ok(Self::Content),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Background Origin".into(),
                 vec!["border", "padding", "content"],
             )),
         }
@@ -216,6 +218,7 @@ impl<'a> GradientColorStops<'a> {
             "via" => Ok(Self::Via(args)),
             _ => Err(WarningType::InvalidArg(
                 args.into(),
+                "Gradient Color Stops".into(),
                 vec!["from", "to", "via"],
             )),
         }

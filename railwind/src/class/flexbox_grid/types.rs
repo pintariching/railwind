@@ -156,6 +156,7 @@ impl<'a> GridColumn<'a> {
             "end" => Ok(Self::End(arg)),
             _ => Err(WarningType::InvalidArg(
                 args.into(),
+                "Grid Column".into(),
                 vec!["auto", "span", "start", "end"],
             )),
         }
@@ -256,6 +257,7 @@ impl GridAutoFlow {
             "col-dense" => Ok(Self::ColDense),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Grid Auto Flow".into(),
                 vec!["row", "col", "dense", "row-dense", "col-dense"],
             )),
         }
@@ -372,6 +374,7 @@ impl JustifyItems {
             "stretch" => Ok(Self::Stretch),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Justify Items".into(),
                 vec!["start", "end", "center", "stretch"],
             )),
         }
@@ -408,6 +411,7 @@ impl JustifySelf {
             "stretch" => Ok(Self::Stretch),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Justify Self".into(),
                 vec!["auto", "start", "end", "center", "stretch"],
             )),
         }
@@ -449,6 +453,7 @@ impl AlignContent {
             "baseline" => Ok(Self::Baseline),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Align Content".into(),
                 vec![
                     "center", "start", "end", "between", "around", "evenly", "baseline",
                 ],
@@ -490,6 +495,7 @@ impl AlignItems {
             "stretch" => Ok(Self::Stretch),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Align Items".into(),
                 vec!["start", "end", "center", "baseline", "stretch"],
             )),
         }
@@ -529,6 +535,7 @@ impl AlignSelf {
             "baseline" => Ok(Self::Baseline),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Align Self".into(),
                 vec!["auto", "start", "end", "center", "stretch", "baseline"],
             )),
         }
@@ -574,6 +581,7 @@ impl PlaceContent {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Place Content".into(),
                     vec![
                         "center", "start", "end", "between", "around", "evenly", "baseline",
                         "stretch",
@@ -620,6 +628,7 @@ impl PlaceItems {
             "stretch" => Ok(Self::Stretch),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Place Items".into(),
                 vec!["start", "end", "center", "baseline", "stretch"],
             )),
         }
@@ -657,6 +666,7 @@ impl PlaceSelf {
             "stretch" => Ok(Self::Stretch),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Place Self".into(),
                 vec!["auto", "start", "end", "center", "stretch"],
             )),
         }

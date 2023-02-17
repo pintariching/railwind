@@ -505,6 +505,7 @@ impl VerticalAlign {
                 } else {
                     return Err(WarningType::InvalidArg(
                         arg.into(),
+                        "Vertical Align".into(),
                         vec![
                             "baseline",
                             "top",
@@ -561,6 +562,7 @@ impl Whitespace {
             "pre-wrap" => Ok(Self::PreWrap),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Whitespace".into(),
                 vec!["normal", "nowrap", "pre", "pre-line", "pre-wrap"],
             )),
         }
@@ -596,6 +598,7 @@ impl WordBreak {
             "keep" => Ok(Self::Keep),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Word Break".into(),
                 vec!["normal", "words", "all", "keep"],
             )),
         }

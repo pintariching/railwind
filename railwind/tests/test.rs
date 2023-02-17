@@ -22,14 +22,21 @@ mod tests {
 
                             expected.set_file_name("expected.css");
 
+                            let mut warnings = vec![];
+
                             let css = parse_to_string(
                                 Source::File(SourceOptions {
                                     input: &input,
                                     option: CollectionOptions::Html,
                                 }),
                                 false,
-                                &mut vec![],
+                                &mut warnings,
                             );
+
+                            if !warnings.is_empty() {
+                                dbg!(warnings);
+                            }
+
                             let expected_string = read_to_string(&expected).unwrap();
 
                             let mut output = path.clone();

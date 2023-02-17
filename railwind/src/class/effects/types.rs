@@ -96,6 +96,7 @@ impl MixBlendMode {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Mix Blend Mode".into(),
                     vec![
                         "normal",
                         "multiply",
@@ -189,6 +190,7 @@ impl BackgroundBlendMode {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Background Blend Mode".into(),
                     vec![
                         "normal",
                         "multiply",

@@ -44,12 +44,24 @@ impl<'a> Sizing<'a> {
             "min" => match get_class_name(args) {
                 "w" => Sizing::MinWidth(MinWidth(get_args(args)?)),
                 "h" => Sizing::MinHeight(MinHeight(get_args(args)?)),
-                v => return Err(WarningType::InvalidArg(v.into(), vec!["w", "h"])),
+                v => {
+                    return Err(WarningType::InvalidArg(
+                        v.into(),
+                        "Min Width / Height".into(),
+                        vec!["w", "h"],
+                    ))
+                }
             },
             "max" => match get_class_name(args) {
                 "w" => Sizing::MaxWidth(MaxWidth(get_args(args)?)),
                 "h" => Sizing::MaxHeight(MaxHeight(get_args(args)?)),
-                v => return Err(WarningType::InvalidArg(v.into(), vec!["w", "h"])),
+                v => {
+                    return Err(WarningType::InvalidArg(
+                        v.into(),
+                        "Max Width / Height".into(),
+                        vec!["w", "h"],
+                    ))
+                }
             },
             _ => return Ok(None),
         };

@@ -70,6 +70,7 @@ impl<'a> Layout<'a> {
                     v => {
                         return Err(WarningType::InvalidArg(
                             v.into(),
+                            "Break After / Before / Inside".into(),
                             vec!["after", "before", "inside"],
                         ))
                     }

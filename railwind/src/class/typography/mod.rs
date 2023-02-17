@@ -124,7 +124,11 @@ impl<'a> Typography<'a> {
                     if get_class_name(args) == "offset" {
                         Typography::TextUnderlineOffset(TextUnderlineOffset(get_args(args)?))
                     } else {
-                        return Err(WarningType::InvalidArg(args.into(), vec!["offset"]));
+                        return Err(WarningType::InvalidArg(
+                            args.into(),
+                            "Text Underline Offset".into(),
+                            vec!["offset"],
+                        ));
                     }
                 } else {
                     Typography::TextDecoration(TextDecoration::Underline)

@@ -35,7 +35,7 @@ impl<'a> Svg<'a> {
                     Svg::Stroke(Stroke::new(args))
                 }
             }
-            v => return Err(WarningType::InvalidArg(v.into(), vec!["fill", "stroke"])),
+            _ => return Ok(None),
         };
 
         Ok(Some(svg))

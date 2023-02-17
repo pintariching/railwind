@@ -54,7 +54,13 @@ impl<'a> Interactivity<'a> {
                     "events" => {
                         Interactivity::PointerEvents(PointerEvents::new(get_opt_args(args))?)
                     }
-                    v => return Err(WarningType::InvalidArg(v.into(), vec!["events"])),
+                    v => {
+                        return Err(WarningType::InvalidArg(
+                            v.into(),
+                            "Pointer Events".into(),
+                            vec!["events"],
+                        ))
+                    }
                 }
             }
             "resize" => Interactivity::Resize(Resize::new(value)?),
@@ -68,6 +74,7 @@ impl<'a> Interactivity<'a> {
                 } else {
                     return Err(WarningType::InvalidArg(
                         value.into(),
+                        "Scroll Behavior / Margin / Padding".into(),
                         vec![
                             "auto", "smooth", "m", "mx", "my", "mt", "mr", "mb", "ml", "p", "px",
                             "py", "pt", "pr", "pb", "pl",
@@ -85,6 +92,7 @@ impl<'a> Interactivity<'a> {
                 } else {
                     return Err(WarningType::InvalidArg(
                         value.into(),
+                        "Scroll Snap Align / Stop / Type".into(),
                         vec![
                             "start",
                             "end",

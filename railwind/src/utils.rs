@@ -104,11 +104,14 @@ mod tests {
 
     #[test]
     fn test_get_args() {
-        assert_eq!(get_args("aspect-auto"), Some("auto"));
-        assert_eq!(get_args("flex"), None);
-        assert_eq!(get_args("space-x-5"), Some("x-5"));
-        assert_eq!(get_args("-space-x-5"), Some("x-5"));
-        assert_eq!(get_args("-mx-5"), Some("5"));
+        assert_eq!(get_args("aspect-auto"), Ok("auto"));
+        assert_eq!(
+            get_args("flex"),
+            Err(WarningType::InvalidArgCount("flex".into()))
+        );
+        assert_eq!(get_args("space-x-5"), Ok("x-5"));
+        assert_eq!(get_args("-space-x-5"), Ok("x-5"));
+        assert_eq!(get_args("-mx-5"), Ok("5"));
         let args = get_args("space-x-5").unwrap();
         let params = get_args(args).unwrap();
 

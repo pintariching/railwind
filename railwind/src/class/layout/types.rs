@@ -95,6 +95,7 @@ impl BreakAfter {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Break After".into(),
                     vec![
                         "auto",
                         "avoid",
@@ -154,6 +155,7 @@ impl BreakBefore {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Break Before".into(),
                     vec![
                         "auto",
                         "avoid",
@@ -205,6 +207,7 @@ impl BreakInside {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Break Inside".into(),
                     vec!["auto", "avoid", "avoid-page", "avoid-column"],
                 ))
             }
@@ -236,7 +239,11 @@ impl BoxDecoration {
         match arg {
             "clone" => Ok(Self::Clone),
             "slice" => Ok(Self::Slice),
-            _ => Err(WarningType::InvalidArg(arg.into(), vec!["clone", "slice"])),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                "Box Decoration".into(),
+                vec!["clone", "slice"],
+            )),
         }
     }
 
@@ -266,6 +273,7 @@ impl BoxSizing {
             "content" => Ok(Self::Content),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Box Sizing".into(),
                 vec!["border", "content"],
             )),
         }
@@ -380,6 +388,7 @@ impl Floats {
             "none" => Ok(Self::None),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Floats".into(),
                 vec!["right", "left", "none"],
             )),
         }
@@ -413,6 +422,7 @@ impl Clear {
             "none" => Ok(Self::None),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Clear".into(),
                 vec!["left", "right", "both", "none"],
             )),
         }
@@ -543,6 +553,7 @@ impl Overflow {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Overflow".into(),
                     vec![
                         "auto",
                         "hidden",
@@ -618,6 +629,7 @@ impl Overscroll {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "Overscroll".into(),
                     vec![
                         "auto",
                         "contain",

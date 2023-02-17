@@ -87,7 +87,11 @@ impl Layout {
         match arg {
             "auto" => Ok(Self::Auto),
             "fixed" => Ok(Self::Fixed),
-            _ => Err(WarningType::InvalidArg(arg.into(), vec!["auto", "fixed"])),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                "Layout".into(),
+                vec!["auto", "fixed"],
+            )),
         }
     }
 

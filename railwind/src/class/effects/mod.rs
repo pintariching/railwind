@@ -44,7 +44,13 @@ impl<'a> Effects<'a> {
                 let args = get_args(value)?;
                 match get_class_name(args) {
                     "blend" => Effects::MixBlendMode(MixBlendMode::new(get_args(args)?)?),
-                    v => return Err(WarningType::InvalidArg(v.into(), vec!["blend"])),
+                    v => {
+                        return Err(WarningType::InvalidArg(
+                            v.into(),
+                            "Mix Blend Mode".into(),
+                            vec!["blend"],
+                        ))
+                    }
                 }
             }
             "bg" => {
@@ -53,7 +59,13 @@ impl<'a> Effects<'a> {
                     "blend" => {
                         Effects::BackgroundBlendMode(BackgroundBlendMode::new(get_args(args)?)?)
                     }
-                    v => return Err(WarningType::InvalidArg(v.into(), vec!["blend"])),
+                    v => {
+                        return Err(WarningType::InvalidArg(
+                            v.into(),
+                            "Background Blend Mode".into(),
+                            vec!["blend"],
+                        ))
+                    }
                 }
             }
             _ => return Ok(None),

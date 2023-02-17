@@ -27,7 +27,11 @@ impl<'a> Appearance {
     pub fn new(arg: &'a str) -> Result<Self, WarningType> {
         match arg {
             "none" => Ok(Self::None),
-            _ => Err(WarningType::InvalidArg(arg.into(), vec!["none"])),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                "Appearance".into(),
+                vec!["none"],
+            )),
         }
     }
 
@@ -72,7 +76,11 @@ impl<'a> PointerEvents {
         match arg {
             "none" => Ok(Self::None),
             "auto" => Ok(Self::Auto),
-            _ => Err(WarningType::InvalidArg(arg.into(), vec!["none", "auto"])),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                "Pointer Events".into(),
+                vec!["none", "auto"],
+            )),
         }
     }
 
@@ -101,6 +109,7 @@ impl<'a> Resize {
             "resize" => Ok(Self::Both),
             _ => Err(WarningType::InvalidArg(
                 value.into(),
+                "Resize".into(),
                 vec!["resize-none", "resize-y", "resize-x", "resize"],
             )),
         }
@@ -391,6 +400,7 @@ impl<'a> TouchAction {
             "manipulation" => Ok(Self::Manipulation),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Touch Action".into(),
                 vec![
                     "auto",
                     "none",
@@ -450,6 +460,7 @@ impl UserSelect {
             _ => {
                 return Err(WarningType::InvalidArg(
                     arg.into(),
+                    "User Select".into(),
                     vec!["none", "text", "all", "auto"],
                 ))
             }
@@ -488,6 +499,7 @@ impl WillChange {
             "change-transform" => Ok(Self::Transform),
             _ => Err(WarningType::InvalidArg(
                 arg.into(),
+                "Will Change".into(),
                 vec![
                     "change-auto",
                     "change-scroll",

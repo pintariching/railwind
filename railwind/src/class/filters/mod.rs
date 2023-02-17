@@ -76,7 +76,13 @@ impl<'a> Filter<'a> {
                         Filter::DropShadow(DropShadow(""))
                     }
                 }
-                v => return Err(WarningType::InvalidArg(v.into(), vec!["shadow"])),
+                v => {
+                    return Err(WarningType::InvalidArg(
+                        v.into(),
+                        "Drop Shadow".into(),
+                        vec!["shadow"],
+                    ))
+                }
             },
             "grayscale" => {
                 if let Ok(args) = get_args(value) {
@@ -89,7 +95,13 @@ impl<'a> Filter<'a> {
                 "rotate" => {
                     Filter::HueRotate(HueRotate::new(class_name, get_args(get_args(value)?)?))
                 }
-                v => return Err(WarningType::InvalidArg(v.into(), vec!["rotate"])),
+                v => {
+                    return Err(WarningType::InvalidArg(
+                        v.into(),
+                        "Hue Rotate".into(),
+                        vec!["rotate"],
+                    ))
+                }
             },
             "invert" => {
                 if let Ok(args) = get_args(value) {
@@ -131,7 +143,13 @@ impl<'a> Filter<'a> {
                             class_name,
                             get_args(get_args(args)?)?,
                         )),
-                        v => return Err(WarningType::InvalidArg(v.into(), vec!["rotate"])),
+                        v => {
+                            return Err(WarningType::InvalidArg(
+                                v.into(),
+                                "Backdrop Hue Rotate".into(),
+                                vec!["rotate"],
+                            ))
+                        }
                     },
                     "invert" => {
                         if let Ok(args) = get_args(args) {
@@ -152,6 +170,7 @@ impl<'a> Filter<'a> {
                     v => {
                         return Err(WarningType::InvalidArg(
                             v.into(),
+                            "Backdrop".into(),
                             vec![
                                 "blur",
                                 "brightness",
