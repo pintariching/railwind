@@ -1,5 +1,6 @@
 use crate::class::utils::{get_value, get_value_neg};
 use crate::class::Decl;
+use crate::warning::WarningType;
 // use crate::utils::{get_args, get_class_name, get_opt_args};
 
 use super::{
@@ -15,9 +16,9 @@ const BACKDROP_FILTER_STYLE: &str = "        backdrop-filter: var(--tw-backdrop-
 pub struct Blur<'a>(pub &'a str);
 
 impl<'a> Blur<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BLUR)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-blur: blur({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -28,9 +29,9 @@ impl<'a> Blur<'a> {
 pub struct Brightness<'a>(pub &'a str);
 
 impl<'a> Brightness<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BRIGHTNESS)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-brightness: brightness({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -41,9 +42,9 @@ impl<'a> Brightness<'a> {
 pub struct Contrast<'a>(pub &'a str);
 
 impl<'a> Contrast<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &CONTRAST)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-contrast: contrast({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -54,9 +55,9 @@ impl<'a> Contrast<'a> {
 pub struct DropShadow<'a>(pub &'a str);
 
 impl<'a> DropShadow<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &DROP_SHADOW)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-drop-shadow: drop-shadow({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -67,9 +68,9 @@ impl<'a> DropShadow<'a> {
 pub struct Grayscale<'a>(pub &'a str);
 
 impl<'a> Grayscale<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRAYSCALE)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-grayscale: grayscale({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -85,9 +86,9 @@ impl<'a> HueRotate<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &HUE_ROTATE)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-hue-rotate: hue-rotate({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -98,9 +99,9 @@ impl<'a> HueRotate<'a> {
 pub struct Invert<'a>(pub &'a str);
 
 impl<'a> Invert<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &INVERT)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-invert: invert({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -111,9 +112,9 @@ impl<'a> Invert<'a> {
 pub struct Saturate<'a>(pub &'a str);
 
 impl<'a> Saturate<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &SATURATE)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-saturate: saturate({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -124,9 +125,9 @@ impl<'a> Saturate<'a> {
 pub struct Sepia<'a>(pub &'a str);
 
 impl<'a> Sepia<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &SEPIA)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-sepia: sepia({})", value),
             FILTER_STYLE.into(),
         ]))
@@ -137,9 +138,9 @@ impl<'a> Sepia<'a> {
 pub struct BackdropBlur<'a>(pub &'a str);
 
 impl<'a> BackdropBlur<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BLUR)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-blur: blur({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -151,9 +152,9 @@ impl<'a> BackdropBlur<'a> {
 pub struct BackdropBrightness<'a>(pub &'a str);
 
 impl<'a> BackdropBrightness<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BRIGHTNESS)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-brightness: brightness({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -165,9 +166,9 @@ impl<'a> BackdropBrightness<'a> {
 pub struct BackdropContrast<'a>(pub &'a str);
 
 impl<'a> BackdropContrast<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &CONTRAST)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-contrast: contrast({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -179,9 +180,9 @@ impl<'a> BackdropContrast<'a> {
 pub struct BackdropGrayscale<'a>(pub &'a str);
 
 impl<'a> BackdropGrayscale<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRAYSCALE)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-grayscale: grayscale({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -198,9 +199,9 @@ impl<'a> BackdropHueRotate<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &HUE_ROTATE)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-hue-rotate: hue-rotate({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -212,9 +213,9 @@ impl<'a> BackdropHueRotate<'a> {
 pub struct BackdropInvert<'a>(pub &'a str);
 
 impl<'a> BackdropInvert<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &INVERT)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-invert: invert({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -226,9 +227,9 @@ impl<'a> BackdropInvert<'a> {
 pub struct BackdropOpacity<'a>(pub &'a str);
 
 impl<'a> BackdropOpacity<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OPACITY)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-opacity: opacity({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -240,9 +241,9 @@ impl<'a> BackdropOpacity<'a> {
 pub struct BackdropSaturate<'a>(pub &'a str);
 
 impl<'a> BackdropSaturate<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &SATURATE)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-saturate: saturate({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),
@@ -254,9 +255,9 @@ impl<'a> BackdropSaturate<'a> {
 pub struct BackdropSepia<'a>(pub &'a str);
 
 impl<'a> BackdropSepia<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &SEPIA)?;
-        Some(Decl::Triple([
+        Ok(Decl::Triple([
             format!("--tw-backdrop-sepia: sepia({})", value),
             WEBKIT_BACKDROP_FILTER_STYLE.into(),
             BACKDROP_FILTER_STYLE.into(),

@@ -6,7 +6,10 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 use super::{utils::value_is_size, Decl};
-use crate::utils::{get_args, get_class_name};
+use crate::{
+    utils::{get_args, get_class_name},
+    warning::WarningType,
+};
 
 lazy_static! {
     pub static ref FONT_FAMILY: HashMap<&'static str, &'static str> =
@@ -64,11 +67,12 @@ pub enum Typography<'a> {
 }
 
 impl<'a> Typography<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let typography = match get_class_name(value) {
             "font" => {
                 let args = get_args(value)?;
-                if FONT_FAMILY.contains_key(args) || args.starts_with("['") && args.ends_with("']")
+                if FONT_FAMILY.contains_key(args)
+                    || (args.starts_with("['") && args.ends_with("']"))
                 {
                     Typography::FontFamily(FontFamily(get_args(value)?))
                 } else {
@@ -116,14 +120,14 @@ impl<'a> Typography<'a> {
                 }
             }
             "underline" => {
-                if let Some(args) = get_args(value) {
+                if let Ok(args) = get_args(value) {
                     if get_class_name(args) == "offset" {
                         Typography::TextUnderlineOffset(TextUnderlineOffset(get_args(args)?))
                     } else {
-                        return None;
+                        return Err(WarningType::InvalidArg(args.into(), vec!["offset"]));
                     }
                 } else {
-                    Typography::TextDecoration(TextDecoration::new(value)?)
+                    Typography::TextDecoration(TextDecoration::Underline)
                 }
             }
             "indent" => {
@@ -147,39 +151,39 @@ impl<'a> Typography<'a> {
                 } else if let Some(text_overflow) = TextOverflow::new(value) {
                     Typography::TextOverflow(text_overflow)
                 } else {
-                    return None;
+                    return Ok(None);
                 }
             }
         };
 
-        Some(typography)
+        Ok(Some(typography))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Typography::FontFamily(t) => t.to_decl(),
             Typography::FontSize(t) => t.to_decl(),
-            Typography::FontSmoothing(t) => Some(t.to_decl()),
-            Typography::FontStyle(t) => Some(t.to_decl()),
+            Typography::FontSmoothing(t) => Ok(t.to_decl()),
+            Typography::FontStyle(t) => Ok(t.to_decl()),
             Typography::FontWeight(t) => t.to_decl(),
-            Typography::FontVariantNumeric(t) => Some(t.to_decl()),
+            Typography::FontVariantNumeric(t) => Ok(t.to_decl()),
             Typography::LetterSpacing(t) => t.to_decl(),
             Typography::LineHeight(t) => t.to_decl(),
             Typography::LineStyleType(t) => t.to_decl(),
-            Typography::ListStylePosition(t) => Some(t.to_decl()),
-            Typography::TextAlign(t) => Some(t.to_decl()),
+            Typography::ListStylePosition(t) => Ok(t.to_decl()),
+            Typography::TextAlign(t) => Ok(t.to_decl()),
             Typography::TextColor(t) => t.to_decl(),
-            Typography::TextDecoration(t) => Some(t.to_decl()),
+            Typography::TextDecoration(t) => Ok(t.to_decl()),
             Typography::TextDecorationColor(t) => t.to_decl(),
-            Typography::TextDecorationStyle(t) => Some(t.to_decl()),
+            Typography::TextDecorationStyle(t) => Ok(t.to_decl()),
             Typography::TextDecorationThickness(t) => t.to_decl(),
             Typography::TextUnderlineOffset(t) => t.to_decl(),
-            Typography::TextTransform(t) => Some(t.to_decl()),
-            Typography::TextOverflow(t) => Some(t.to_decl()),
+            Typography::TextTransform(t) => Ok(t.to_decl()),
+            Typography::TextOverflow(t) => Ok(t.to_decl()),
             Typography::TextIndent(t) => t.to_decl(),
             Typography::VerticalAlign(t) => t.to_decl(),
-            Typography::Whitespace(t) => Some(t.to_decl()),
-            Typography::WordBreak(t) => Some(t.to_decl()),
+            Typography::Whitespace(t) => Ok(t.to_decl()),
+            Typography::WordBreak(t) => Ok(t.to_decl()),
             Typography::Content(t) => t.to_decl(),
         }
     }

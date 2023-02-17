@@ -1,6 +1,6 @@
-use crate::class::utils::get_value;
 use crate::class::Decl;
-use regex::{ Regex, Captures };
+use crate::{class::utils::get_value, warning::WarningType};
+use regex::{Captures, Regex};
 
 use super::{BOX_SHADOW, BOX_SHADOW_COLOR, OPACITY};
 
@@ -17,15 +17,13 @@ impl<'a> BoxShadow<'a> {
         }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let tw_shadow = get_value(self.0, &BOX_SHADOW)?;
         let re = Regex::new(r"rgb\(.*?\)").unwrap();
-        let tw_shadow_colored = re.replace_all(&tw_shadow,
-            |_: &Captures| {
-                String::from("var(--tw-shadow-color)")
-            }
-        );
-        Some(Decl::Triple([
+        let tw_shadow_colored = re.replace_all(&tw_shadow, |_: &Captures| {
+            String::from("var(--tw-shadow-color)")
+        });
+        Ok(Decl::Triple([
             format!("--tw-shadow: {}", tw_shadow),
             format!("--tw-shadow-colored: {}", tw_shadow_colored),
             BOX_SHADOW_STYLE.into(),
@@ -36,9 +34,9 @@ impl<'a> BoxShadow<'a> {
 #[derive(Debug)]
 pub struct BoxShadowColor<'a>(pub &'a str);
 impl<'a> BoxShadowColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BOX_SHADOW_COLOR)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-shadow-color: {}", value),
             "--tw-shadow: var(--tw-shadow-colored)".into(),
         ]))
@@ -48,9 +46,9 @@ impl<'a> BoxShadowColor<'a> {
 #[derive(Debug)]
 pub struct Opacity<'a>(pub &'a str);
 impl<'a> Opacity<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OPACITY)?;
-        Some(Decl::Single(format!("opacity: {}", value)))
+        Ok(Decl::Single(format!("opacity: {}", value)))
     }
 }
 
@@ -76,7 +74,7 @@ pub enum MixBlendMode {
 }
 
 impl MixBlendMode {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "normal" => Self::Normal,
             "multiply" => Self::Multiply,
@@ -95,10 +93,33 @@ impl MixBlendMode {
             "color" => Self::Color,
             "luminosity" => Self::Luminosity,
             "plus-lighter" => Self::PlusLighter,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec![
+                        "normal",
+                        "multiply",
+                        "screen",
+                        "overlay",
+                        "darken",
+                        "lighten",
+                        "color-dodge",
+                        "color-burn",
+                        "hard-light",
+                        "soft-light",
+                        "difference",
+                        "exclusion",
+                        "hue",
+                        "saturation",
+                        "color",
+                        "luminosity",
+                        "plus-lighter",
+                    ],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {
@@ -147,7 +168,7 @@ pub enum BackgroundBlendMode {
 }
 
 impl BackgroundBlendMode {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "normal" => Self::Normal,
             "multiply" => Self::Multiply,
@@ -165,10 +186,32 @@ impl BackgroundBlendMode {
             "saturation" => Self::Saturation,
             "color" => Self::Color,
             "luminosity" => Self::Luminosity,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec![
+                        "normal",
+                        "multiply",
+                        "screen",
+                        "overlay",
+                        "darken",
+                        "lighten",
+                        "color-dodge",
+                        "color-burn",
+                        "hard-light",
+                        "soft-light",
+                        "difference",
+                        "exclusion",
+                        "hue",
+                        "saturation",
+                        "color",
+                        "luminosity",
+                    ],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {

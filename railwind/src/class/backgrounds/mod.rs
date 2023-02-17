@@ -6,7 +6,10 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 use super::{utils::value_is_hex, Decl};
-use crate::utils::{get_args, get_class_name};
+use crate::{
+    utils::{get_args, get_class_name},
+    warning::WarningType,
+};
 
 lazy_static! {
     pub static ref BACKGROUND_COLOR: HashMap<&'static str, &'static str> =
@@ -35,7 +38,7 @@ pub enum Backgrounds<'a> {
 }
 
 impl<'a> Backgrounds<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let args = get_args(value)?;
 
         let backgrounds = match get_class_name(value) {
@@ -67,20 +70,20 @@ impl<'a> Backgrounds<'a> {
                 get_class_name(value),
                 args,
             )?),
-            _ => return None,
+            _ => return Ok(None),
         };
 
-        Some(backgrounds)
+        Ok(Some(backgrounds))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Backgrounds::BackgroundAttachment(b) => Some(b.to_decl()),
-            Backgrounds::BackgroundClip(b) => Some(b.to_decl()),
+            Backgrounds::BackgroundAttachment(b) => Ok(b.to_decl()),
+            Backgrounds::BackgroundClip(b) => Ok(b.to_decl()),
             Backgrounds::BackgroundColor(b) => b.to_decl(),
-            Backgrounds::BackgroundOrigin(b) => Some(b.to_decl()),
+            Backgrounds::BackgroundOrigin(b) => Ok(b.to_decl()),
             Backgrounds::BackgroundPosition(b) => b.to_decl(),
-            Backgrounds::BackgroundRepeat(b) => Some(b.to_decl()),
+            Backgrounds::BackgroundRepeat(b) => Ok(b.to_decl()),
             Backgrounds::BackgroundSize(b) => b.to_decl(),
             Backgrounds::BackgroundImage(b) => b.to_decl(),
             Backgrounds::GradientColorStops(b) => b.to_decl(),

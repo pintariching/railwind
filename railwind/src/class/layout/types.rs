@@ -1,6 +1,7 @@
 use crate::class::utils::{get_value, get_value_neg};
 use crate::class::{Decl, Z_INDEX};
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use super::{ASPECT_RATIO, BOTTOM, COLUMNS, INSET, LEFT, OBJECT_POSITION, RIGHT, TOP};
 
@@ -8,9 +9,9 @@ use super::{ASPECT_RATIO, BOTTOM, COLUMNS, INSET, LEFT, OBJECT_POSITION, RIGHT, 
 pub struct AspectRatio<'a>(pub &'a str);
 
 impl<'a> AspectRatio<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &ASPECT_RATIO)?;
-        Some(Decl::Single(format!("aspect-ratio: {}", value)))
+        Ok(Decl::Single(format!("aspect-ratio: {}", value)))
     }
 }
 
@@ -62,9 +63,9 @@ impl Container {
 pub struct Columns<'a>(pub &'a str);
 
 impl<'a> Columns<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLUMNS)?;
-        Some(Decl::Single(format!("columns: {}", value)))
+        Ok(Decl::Single(format!("columns: {}", value)))
     }
 }
 
@@ -81,7 +82,7 @@ pub enum BreakAfter {
 }
 
 impl BreakAfter {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "auto" => Self::Auto,
             "avoid" => Self::Avoid,
@@ -91,10 +92,24 @@ impl BreakAfter {
             "left" => Self::Left,
             "right" => Self::Right,
             "column" => Self::Column,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec![
+                        "auto",
+                        "avoid",
+                        "all",
+                        "avoid-page",
+                        "page",
+                        "left",
+                        "right",
+                        "column",
+                    ],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {
@@ -126,7 +141,7 @@ pub enum BreakBefore {
 }
 
 impl BreakBefore {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "auto" => Self::Auto,
             "avoid" => Self::Avoid,
@@ -136,10 +151,24 @@ impl BreakBefore {
             "left" => Self::Left,
             "right" => Self::Right,
             "column" => Self::Column,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec![
+                        "auto",
+                        "avoid",
+                        "all",
+                        "avoid-page",
+                        "page",
+                        "left",
+                        "right",
+                        "column",
+                    ],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {
@@ -167,16 +196,21 @@ pub enum BreakInside {
 }
 
 impl BreakInside {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "auto" => Self::Auto,
             "avoid" => Self::Avoid,
             "avoid-page" => Self::AvoidPage,
             "avoid-column" => Self::AvoidColumn,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec!["auto", "avoid", "avoid-page", "avoid-column"],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {
@@ -198,14 +232,12 @@ pub enum BoxDecoration {
 }
 
 impl BoxDecoration {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "clone" => Self::Clone,
-            "slice" => Self::Slice,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "clone" => Ok(Self::Clone),
+            "slice" => Ok(Self::Slice),
+            _ => Err(WarningType::InvalidArg(arg.into(), vec!["clone", "slice"])),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -228,14 +260,15 @@ pub enum BoxSizing {
 }
 
 impl BoxSizing {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "border" => Self::Border,
-            "content" => Self::Content,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "border" => Ok(Self::Border),
+            "content" => Ok(Self::Content),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["border", "content"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -340,15 +373,16 @@ pub enum Floats {
 }
 
 impl Floats {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "right" => Self::Right,
-            "left" => Self::Left,
-            "none" => Self::None,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "right" => Ok(Self::Right),
+            "left" => Ok(Self::Left),
+            "none" => Ok(Self::None),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["right", "left", "none"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -371,16 +405,17 @@ pub enum Clear {
 }
 
 impl Clear {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "left" => Self::Left,
-            "right" => Self::Right,
-            "both" => Self::Both,
-            "none" => Self::None,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "left" => Ok(Self::Left),
+            "right" => Ok(Self::Right),
+            "both" => Ok(Self::Both),
+            "none" => Ok(Self::None),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["left", "right", "both", "none"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -462,9 +497,9 @@ impl ObjectFit {
 pub struct ObjectPosition<'a>(pub &'a str);
 
 impl<'a> ObjectPosition<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OBJECT_POSITION)?;
-        Some(Decl::Single(format!("object-position: {}", value)))
+        Ok(Decl::Single(format!("object-position: {}", value)))
     }
 }
 
@@ -488,7 +523,7 @@ pub enum Overflow {
 }
 
 impl Overflow {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "auto" => Self::Auto,
             "hidden" => Self::Hidden,
@@ -505,10 +540,31 @@ impl Overflow {
             "y-visible" => Self::YVisible,
             "x-scroll" => Self::XScroll,
             "y-scroll" => Self::YScroll,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec![
+                        "auto",
+                        "hidden",
+                        "clip",
+                        "visible",
+                        "scroll",
+                        "x-auto",
+                        "y-auto",
+                        "x-hidden",
+                        "y-hidden",
+                        "x-clip",
+                        "y-clip",
+                        "x-visible",
+                        "y-visible",
+                        "x-scroll",
+                        "y-scroll",
+                    ],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {
@@ -548,7 +604,7 @@ pub enum Overscroll {
 }
 
 impl Overscroll {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "auto" => Self::Auto,
             "contain" => Self::Contain,
@@ -559,10 +615,25 @@ impl Overscroll {
             "x-auto" => Self::XAuto,
             "x-contain" => Self::XContain,
             "x-none" => Self::XNone,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec![
+                        "auto",
+                        "contain",
+                        "none",
+                        "y-auto",
+                        "y-contain",
+                        "y-none",
+                        "x-auto",
+                        "x-contain",
+                        "x-none",
+                    ],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {
@@ -644,27 +715,27 @@ impl<'a> TopRightBottomLeft<'a> {
         Some(val)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::Inset(arg, neg) => match get_class_name(arg) {
                 "x" => {
                     let val = get_value_neg(neg, get_args(arg)?, &INSET)?;
 
-                    Some(Decl::Double([
+                    Ok(Decl::Double([
                         format!("left: {}", val),
                         format!("right: {}", val),
                     ]))
                 }
                 "y" => {
                     let val = get_value_neg(neg, get_args(arg)?, &INSET)?;
-                    Some(Decl::Double([
+                    Ok(Decl::Double([
                         format!("top: {}", val),
                         format!("bottom: {}", val),
                     ]))
                 }
                 _ => {
                     let val = get_value_neg(neg, arg, &INSET)?;
-                    Some(Decl::Quad([
+                    Ok(Decl::Quad([
                         format!("top: {}", val),
                         format!("right: {}", val),
                         format!("bottom: {}", val),
@@ -674,19 +745,19 @@ impl<'a> TopRightBottomLeft<'a> {
             },
             Self::Top(arg, neg) => {
                 let val = get_value_neg(neg, arg, &TOP)?;
-                Some(Decl::Single(format!("top: {}", val)))
+                Ok(Decl::Single(format!("top: {}", val)))
             }
             Self::Right(arg, neg) => {
                 let val = get_value_neg(neg, arg, &RIGHT)?;
-                Some(Decl::Single(format!("right: {}", val)))
+                Ok(Decl::Single(format!("right: {}", val)))
             }
             Self::Bottom(arg, neg) => {
                 let val = get_value_neg(neg, arg, &BOTTOM)?;
-                Some(Decl::Single(format!("bottom: {}", val)))
+                Ok(Decl::Single(format!("bottom: {}", val)))
             }
             Self::Left(arg, neg) => {
                 let val = get_value_neg(neg, arg, &LEFT)?;
-                Some(Decl::Single(format!("left: {}", val)))
+                Ok(Decl::Single(format!("left: {}", val)))
             }
         }
     }
@@ -731,8 +802,8 @@ impl<'a> ZIndex<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &Z_INDEX)?;
-        Some(Decl::Single(format!("z-index: {}", value)))
+        Ok(Decl::Single(format!("z-index: {}", value)))
     }
 }

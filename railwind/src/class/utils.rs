@@ -52,16 +52,16 @@ pub fn get_value_neg(
 pub fn get_tuple_value<'a>(
     arg: &'a str,
     hashmap: &HashMap<&'static str, (&'static str, &'static str)>,
-) -> Option<(String, String)> {
+) -> Result<(String, String), WarningType> {
     if let Some(arbitrary) = get_arbitrary_value(arg) {
-        return Some((arbitrary.clone(), arbitrary));
+        return Ok((arbitrary.clone(), arbitrary));
     }
 
     if let Some(value) = hashmap.get(arg) {
-        return Some((value.0.into(), value.1.into()));
+        return Ok((value.0.into(), value.1.into()));
     }
 
-    None
+    Err(WarningType::ValueNotFound(arg.to_string()))
 }
 
 pub fn get_arbitrary_value(arg: &str) -> Option<String> {

@@ -54,7 +54,7 @@ impl<'a> Interactivity<'a> {
                     "events" => {
                         Interactivity::PointerEvents(PointerEvents::new(get_opt_args(args))?)
                     }
-                    _ => return Err(WarningType::InvalidArg(args.to_string(), vec!["events"])),
+                    v => return Err(WarningType::InvalidArg(v.into(), vec!["events"])),
                 }
             }
             "resize" => Interactivity::Resize(Resize::new(value)?),

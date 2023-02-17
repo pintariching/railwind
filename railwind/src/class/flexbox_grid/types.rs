@@ -1,6 +1,7 @@
 use crate::class::utils::{get_arbitrary_value, get_value, get_value_neg};
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use super::{
     BASIS, FLEX, GAP, GAP_X, GAP_Y, GRID_AUTO_COLUMNS, GRID_AUTO_ROWS, GRID_COLUMN_END,
@@ -12,9 +13,9 @@ use super::{
 pub struct Basis<'a>(pub &'a str);
 
 impl<'a> Basis<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BASIS)?;
-        Some(Decl::Single(format!("flex-basis: {}", value)))
+        Ok(Decl::Single(format!("flex-basis: {}", value)))
     }
 }
 
@@ -85,9 +86,9 @@ impl Wrap {
 pub struct Flex<'a>(pub &'a str);
 
 impl<'a> Flex<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &FLEX)?;
-        Some(Decl::Single(format!("flex: {}", value)))
+        Ok(Decl::Single(format!("flex: {}", value)))
     }
 }
 
@@ -95,9 +96,9 @@ impl<'a> Flex<'a> {
 pub struct Grow<'a>(pub &'a str);
 
 impl<'a> Grow<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GROW)?;
-        Some(Decl::Single(format!("flex-grow: {}", value)))
+        Ok(Decl::Single(format!("flex-grow: {}", value)))
     }
 }
 
@@ -105,9 +106,9 @@ impl<'a> Grow<'a> {
 pub struct Shrink<'a>(pub &'a str);
 
 impl<'a> Shrink<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &SHRINK)?;
-        Some(Decl::Single(format!("flex-shrink: {}", value)))
+        Ok(Decl::Single(format!("flex-shrink: {}", value)))
     }
 }
 
@@ -120,9 +121,9 @@ impl<'a> Order<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &ORDER)?;
-        Some(Decl::Single(format!("order: {}", value)))
+        Ok(Decl::Single(format!("order: {}", value)))
     }
 }
 
@@ -130,9 +131,9 @@ impl<'a> Order<'a> {
 pub struct GridTemplateColumns<'a>(pub &'a str);
 
 impl<'a> GridTemplateColumns<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_TEMPLATE_COLUMNS)?;
-        Some(Decl::Single(format!("grid-template-columns: {}", value)))
+        Ok(Decl::Single(format!("grid-template-columns: {}", value)))
     }
 }
 
@@ -145,34 +146,35 @@ pub enum GridColumn<'a> {
 }
 
 impl<'a> GridColumn<'a> {
-    pub fn new(args: &'a str) -> Option<Self> {
+    pub fn new(args: &'a str) -> Result<Self, WarningType> {
         let arg = get_args(args)?;
 
-        let val = match get_class_name(args) {
-            "auto" => Self::Auto,
-            "span" => Self::Span(arg),
-            "start" => Self::Start(arg),
-            "end" => Self::End(arg),
-            _ => return None,
-        };
-
-        Some(val)
+        match get_class_name(args) {
+            "auto" => Ok(Self::Auto),
+            "span" => Ok(Self::Span(arg)),
+            "start" => Ok(Self::Start(arg)),
+            "end" => Ok(Self::End(arg)),
+            _ => Err(WarningType::InvalidArg(
+                args.into(),
+                vec!["auto", "span", "start", "end"],
+            )),
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Self::Auto => Some(Decl::Lit("grid-column: auto")),
+            Self::Auto => Ok(Decl::Lit("grid-column: auto")),
             Self::Span(v) => {
                 let value = get_value(v, &GRID_COLUMN_SPAN)?;
-                Some(Decl::Single(format!("grid-column: {}", value)))
+                Ok(Decl::Single(format!("grid-column: {}", value)))
             }
             Self::Start(v) => {
                 let value = get_value(v, &GRID_COLUMN_START)?;
-                Some(Decl::Single(format!("grid-column-start: {}", value)))
+                Ok(Decl::Single(format!("grid-column-start: {}", value)))
             }
             Self::End(v) => {
                 let value = get_value(v, &GRID_COLUMN_END)?;
-                Some(Decl::Single(format!("grid-column-end: {}", value)))
+                Ok(Decl::Single(format!("grid-column-end: {}", value)))
             }
         }
     }
@@ -182,9 +184,9 @@ impl<'a> GridColumn<'a> {
 pub struct GridTepmlateRows<'a>(pub &'a str);
 
 impl<'a> GridTepmlateRows<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_TEMPLATE_ROWS)?;
-        Some(Decl::Single(format!("grid-template-rows: {}", value)))
+        Ok(Decl::Single(format!("grid-template-rows: {}", value)))
     }
 }
 
@@ -198,37 +200,38 @@ pub enum GridRow<'a> {
 }
 
 impl<'a> GridRow<'a> {
-    pub fn new(args: &'a str) -> Option<Self> {
+    pub fn new(args: &'a str) -> Self {
         let arg = get_opt_args(args);
-        let val = match get_class_name(args) {
+        match get_class_name(args) {
             "auto" => Self::Auto,
             "span" => Self::Span(arg),
             "start" => Self::Start(arg),
             "end" => Self::End(arg),
             _ => Self::Arbitrary(args),
-        };
-
-        Some(val)
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Self::Auto => Some(Decl::Lit("grid-row: auto")),
+            Self::Auto => Ok(Decl::Lit("grid-row: auto")),
             Self::Span(v) => {
                 let value = get_value(v, &GRID_ROW_SPAN)?;
-                Some(Decl::Single(format!("grid-row: {}", value)))
+                Ok(Decl::Single(format!("grid-row: {}", value)))
             }
             Self::Start(v) => {
                 let value = get_value(v, &GRID_ROW_START)?;
-                Some(Decl::Single(format!("grid-row-start: {}", value)))
+                Ok(Decl::Single(format!("grid-row-start: {}", value)))
             }
             Self::End(v) => {
                 let value = get_value(v, &GRID_ROW_END)?;
-                Some(Decl::Single(format!("grid-row-end: {}", value)))
+                Ok(Decl::Single(format!("grid-row-end: {}", value)))
             }
             Self::Arbitrary(v) => {
-                let value = get_arbitrary_value(v)?;
-                Some(Decl::Single(format!("grid-row: {}", value)))
+                if let Some(value) = get_arbitrary_value(v) {
+                    Ok(Decl::Single(format!("grid-row: {}", value)))
+                } else {
+                    Err(WarningType::InvalidArbitraryArg(v.into()))
+                }
             }
         }
     }
@@ -244,17 +247,18 @@ pub enum GridAutoFlow {
 }
 
 impl GridAutoFlow {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "row" => Self::Row,
-            "col" => Self::Col,
-            "dense" => Self::Dense,
-            "row-dense" => Self::RowDense,
-            "col-dense" => Self::ColDense,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "row" => Ok(Self::Row),
+            "col" => Ok(Self::Col),
+            "dense" => Ok(Self::Dense),
+            "row-dense" => Ok(Self::RowDense),
+            "col-dense" => Ok(Self::ColDense),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["row", "col", "dense", "row-dense", "col-dense"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -274,9 +278,9 @@ impl GridAutoFlow {
 pub struct GridAutoColumns<'a>(pub &'a str);
 
 impl<'a> GridAutoColumns<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_AUTO_COLUMNS)?;
-        Some(Decl::Single(format!("grid-auto-columns: {}", value)))
+        Ok(Decl::Single(format!("grid-auto-columns: {}", value)))
     }
 }
 
@@ -284,9 +288,9 @@ impl<'a> GridAutoColumns<'a> {
 pub struct GridAutoRows<'a>(pub &'a str);
 
 impl<'a> GridAutoRows<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_AUTO_ROWS)?;
-        Some(Decl::Single(format!("grid-auto-rows: {}", value)))
+        Ok(Decl::Single(format!("grid-auto-rows: {}", value)))
     }
 }
 
@@ -294,19 +298,19 @@ impl<'a> GridAutoRows<'a> {
 pub struct Gap<'a>(pub &'a str);
 
 impl<'a> Gap<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match get_class_name(self.0) {
             "x" => {
                 let val = get_value(get_args(self.0)?, &GAP_X)?;
-                Some(Decl::Single(format!("column-gap: {}", val)))
+                Ok(Decl::Single(format!("column-gap: {}", val)))
             }
             "y" => {
                 let val = get_value(get_args(self.0)?, &GAP_Y)?;
-                Some(Decl::Single(format!("row-gap: {}", val)))
+                Ok(Decl::Single(format!("row-gap: {}", val)))
             }
             _ => {
                 let val = get_value(self.0, &GAP)?;
-                Some(Decl::Single(format!("gap: {}", val)))
+                Ok(Decl::Single(format!("gap: {}", val)))
             }
         }
     }
@@ -360,16 +364,17 @@ pub enum JustifyItems {
 }
 
 impl JustifyItems {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "start" => Self::Start,
-            "end" => Self::End,
-            "center" => Self::Center,
-            "stretch" => Self::Stretch,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "start" => Ok(Self::Start),
+            "end" => Ok(Self::End),
+            "center" => Ok(Self::Center),
+            "stretch" => Ok(Self::Stretch),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["start", "end", "center", "stretch"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -394,17 +399,18 @@ pub enum JustifySelf {
 }
 
 impl JustifySelf {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "auto" => Self::Auto,
-            "start" => Self::Start,
-            "end" => Self::End,
-            "center" => Self::Center,
-            "stretch" => Self::Stretch,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "auto" => Ok(Self::Auto),
+            "start" => Ok(Self::Start),
+            "end" => Ok(Self::End),
+            "center" => Ok(Self::Center),
+            "stretch" => Ok(Self::Stretch),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["auto", "start", "end", "center", "stretch"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -432,19 +438,22 @@ pub enum AlignContent {
 }
 
 impl AlignContent {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "center" => Self::Center,
-            "start" => Self::Start,
-            "end" => Self::End,
-            "between" => Self::Between,
-            "around" => Self::Around,
-            "evenly" => Self::Evenly,
-            "baseline" => Self::Baseline,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "center" => Ok(Self::Center),
+            "start" => Ok(Self::Start),
+            "end" => Ok(Self::End),
+            "between" => Ok(Self::Between),
+            "around" => Ok(Self::Around),
+            "evenly" => Ok(Self::Evenly),
+            "baseline" => Ok(Self::Baseline),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec![
+                    "center", "start", "end", "between", "around", "evenly", "baseline",
+                ],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -472,17 +481,18 @@ pub enum AlignItems {
 }
 
 impl AlignItems {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "start" => Self::Start,
-            "end" => Self::End,
-            "center" => Self::Center,
-            "baseline" => Self::Baseline,
-            "stretch" => Self::Stretch,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "start" => Ok(Self::Start),
+            "end" => Ok(Self::End),
+            "center" => Ok(Self::Center),
+            "baseline" => Ok(Self::Baseline),
+            "stretch" => Ok(Self::Stretch),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["start", "end", "center", "baseline", "stretch"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -509,18 +519,19 @@ pub enum AlignSelf {
 }
 
 impl AlignSelf {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "auto" => Self::Auto,
-            "start" => Self::Start,
-            "end" => Self::End,
-            "center" => Self::Center,
-            "stretch" => Self::Stretch,
-            "baseline" => Self::Baseline,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "auto" => Ok(Self::Auto),
+            "start" => Ok(Self::Start),
+            "end" => Ok(Self::End),
+            "center" => Ok(Self::Center),
+            "stretch" => Ok(Self::Stretch),
+            "baseline" => Ok(Self::Baseline),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["auto", "start", "end", "center", "stretch", "baseline"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -550,7 +561,7 @@ pub enum PlaceContent {
 }
 
 impl PlaceContent {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let val = match arg {
             "center" => Self::Center,
             "start" => Self::Start,
@@ -560,10 +571,18 @@ impl PlaceContent {
             "evenly" => Self::Evenly,
             "baseline" => Self::Baseline,
             "stretch" => Self::Stretch,
-            _ => return None,
+            _ => {
+                return Err(WarningType::InvalidArg(
+                    arg.into(),
+                    vec![
+                        "center", "start", "end", "between", "around", "evenly", "baseline",
+                        "stretch",
+                    ],
+                ))
+            }
         };
 
-        Some(val)
+        Ok(val)
     }
 
     pub fn to_decl(self) -> Decl {
@@ -592,17 +611,18 @@ pub enum PlaceItems {
 }
 
 impl PlaceItems {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "start" => Self::Start,
-            "end" => Self::End,
-            "center" => Self::Center,
-            "baseline" => Self::Baseline,
-            "stretch" => Self::Stretch,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "start" => Ok(Self::Start),
+            "end" => Ok(Self::End),
+            "center" => Ok(Self::Center),
+            "baseline" => Ok(Self::Baseline),
+            "stretch" => Ok(Self::Stretch),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["start", "end", "center", "baseline", "stretch"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -628,17 +648,18 @@ pub enum PlaceSelf {
 }
 
 impl PlaceSelf {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "auto" => Self::Auto,
-            "start" => Self::Start,
-            "end" => Self::End,
-            "center" => Self::Center,
-            "stretch" => Self::Stretch,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "auto" => Ok(Self::Auto),
+            "start" => Ok(Self::Start),
+            "end" => Ok(Self::End),
+            "center" => Ok(Self::Center),
+            "stretch" => Ok(Self::Stretch),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["auto", "start", "end", "center", "stretch"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {

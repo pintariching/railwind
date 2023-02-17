@@ -1,7 +1,6 @@
-// use crate::class::utils::{get_value, get_value_neg};
 use crate::class::utils::get_value;
 use crate::class::Decl;
-// use crate::utils::{get_args, get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use super::COLORS;
 
@@ -9,9 +8,9 @@ use super::COLORS;
 pub struct Fill<'a>(pub &'a str);
 
 impl<'a> Fill<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Some(Decl::Single(format!("fill: {}", value)))
+        Ok(Decl::Single(format!("fill: {}", value)))
     }
 }
 
@@ -19,31 +18,41 @@ impl<'a> Fill<'a> {
 pub struct Stroke<'a>(pub &'a str);
 
 impl<'a> Stroke<'a> {
-    pub fn new(arg: &'a str) -> Option<Self> {
-        Some(Self(arg))
+    pub fn new(arg: &'a str) -> Self {
+        Self(arg)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Some(Decl::Single(format!("stroke: {}", value)))
+        Ok(Decl::Single(format!("stroke: {}", value)))
     }
 }
 
 #[derive(Debug)]
-pub struct StrokeWidth<'a>(pub &'a str);
+pub enum StrokeWidth {
+    Zero,
+    One,
+    Two,
+}
 
-impl<'a> StrokeWidth<'a> {
+impl StrokeWidth {
     pub fn new(arg: &str) -> Option<Self> {
         let value = match arg {
-            "0" => Self("0"),
-            "1" => Self("1"),
-            "2" => Self("2"),
+            "0" => Self::Zero,
+            "1" => Self::One,
+            "2" => Self::Two,
             _ => return None,
         };
         Some(value)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
-        Some(Decl::Single(format!("stroke-width: {}", self.0)))
+    pub fn to_decl(self) -> Decl {
+        let val = match self {
+            StrokeWidth::Zero => "0",
+            StrokeWidth::One => "1",
+            StrokeWidth::Two => "2",
+        };
+
+        Decl::Single(format!("stroke-width: {}", val))
     }
 }

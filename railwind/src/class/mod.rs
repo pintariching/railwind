@@ -54,37 +54,63 @@ pub enum Class<'a> {
 
 impl<'a> Class<'a> {
     pub fn new(raw_class: &'a str, value: &'a str, position: &Position) -> Result<Self, Warning> {
-        let class = if let Some(interactivity) = Interactivity::new(value) {
+        let class = if let Some(interactivity) =
+            Interactivity::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Interactivity(interactivity)
-        } else if let Some(layout) = Layout::new(value) {
+        } else if let Some(layout) =
+            Layout::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Layout(layout)
-        } else if let Some(flexbox_grid) = FlexboxGrid::new(value) {
+        } else if let Some(flexbox_grid) =
+            FlexboxGrid::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::FlexboxGrid(flexbox_grid)
         } else if let Some(spacing) =
             Spacing::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
             Class::Spacing(spacing)
-        } else if let Some(sizing) = Sizing::new(value) {
+        } else if let Some(sizing) =
+            Sizing::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Sizing(sizing)
-        } else if let Some(svg) = Svg::new(value) {
+        } else if let Some(svg) =
+            Svg::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Svg(svg)
-        } else if let Some(table) = Table::new(value) {
+        } else if let Some(table) =
+            Table::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Table(table)
-        } else if let Some(transitions_animation) = TransitionsAnimation::new(value) {
+        } else if let Some(transitions_animation) =
+            TransitionsAnimation::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::TransitionsAnimation(transitions_animation)
-        } else if let Some(transform) = Transform::new(value) {
+        } else if let Some(transform) =
+            Transform::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Transform(transform)
-        } else if let Some(typography) = Typography::new(value) {
+        } else if let Some(typography) =
+            Typography::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Typography(typography)
         } else if let Some(accessibility) = Accessibility::new(value) {
             Class::Accessibility(accessibility)
-        } else if let Some(effects) = Effects::new(value) {
+        } else if let Some(effects) =
+            Effects::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Effects(effects)
-        } else if let Some(backgrounds) = Backgrounds::new(value) {
+        } else if let Some(backgrounds) =
+            Backgrounds::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Backgrounds(backgrounds)
-        } else if let Some(borders) = Borders::new(value) {
+        } else if let Some(borders) =
+            Borders::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Borders(borders)
-        } else if let Some(filter) = Filter::new(value) {
+        } else if let Some(filter) =
+            Filter::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
             Class::Filters(filter)
         } else {
             return Err(Warning::new(
@@ -97,7 +123,7 @@ impl<'a> Class<'a> {
         Ok(class)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Class::Interactivity(c) => c.to_decl(),
             Class::Layout(c) => c.to_decl(),
@@ -109,7 +135,7 @@ impl<'a> Class<'a> {
             Class::TransitionsAnimation(c) => c.to_decl(),
             Class::Transform(c) => c.to_decl(),
             Class::Typography(c) => c.to_decl(),
-            Class::Accessibility(c) => c.to_decl(),
+            Class::Accessibility(c) => Ok(c.to_decl()),
             Class::Backgrounds(c) => c.to_decl(),
             Class::Borders(c) => c.to_decl(),
             Class::Effects(c) => c.to_decl(),

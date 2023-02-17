@@ -2,6 +2,7 @@ use crate::class::utils::{
     get_arbitrary_value, get_tuple_value, get_value, get_value_neg, hex_to_rgb_color,
 };
 use crate::class::Decl;
+use crate::warning::WarningType;
 
 use super::{
     CONTENT, FONT_FAMILY, FONT_SIZE, FONT_WEIGHT, LETTER_SPACING, LINE_HEIGHT, LINE_STYLE_TYPE,
@@ -13,9 +14,9 @@ use super::{
 pub struct FontFamily<'a>(pub &'a str);
 
 impl<'a> FontFamily<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &FONT_FAMILY)?;
-        Some(Decl::Single(format!("font-family: {}", value)))
+        Ok(Decl::Single(format!("font-family: {}", value)))
     }
 }
 
@@ -23,16 +24,16 @@ impl<'a> FontFamily<'a> {
 pub struct FontSize<'a>(pub &'a str);
 
 impl<'a> FontSize<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_tuple_value(self.0, &FONT_SIZE)?;
 
         if FONT_SIZE.contains_key(self.0) {
-            Some(Decl::Double([
+            Ok(Decl::Double([
                 format!("font-size: {}", value.0),
                 format!("line-height: {}", value.1),
             ]))
         } else {
-            Some(Decl::Single(format!("font-size: {}", value.0)))
+            Ok(Decl::Single(format!("font-size: {}", value.0)))
         }
     }
 }
@@ -99,9 +100,9 @@ impl FontStyle {
 pub struct FontWeight<'a>(pub &'a str);
 
 impl<'a> FontWeight<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &FONT_WEIGHT)?;
-        Some(Decl::Single(format!("font-weight: {}", value)))
+        Ok(Decl::Single(format!("font-weight: {}", value)))
     }
 }
 
@@ -168,9 +169,9 @@ impl<'a> LetterSpacing<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &LETTER_SPACING)?;
-        Some(Decl::Single(format!("letter-spacing: {}", value)))
+        Ok(Decl::Single(format!("letter-spacing: {}", value)))
     }
 }
 
@@ -178,9 +179,9 @@ impl<'a> LetterSpacing<'a> {
 pub struct LineHeight<'a>(pub &'a str);
 
 impl<'a> LineHeight<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &LINE_HEIGHT)?;
-        Some(Decl::Single(format!("line-height: {}", value)))
+        Ok(Decl::Single(format!("line-height: {}", value)))
     }
 }
 
@@ -188,9 +189,9 @@ impl<'a> LineHeight<'a> {
 pub struct LineStyleType<'a>(pub &'a str);
 
 impl<'a> LineStyleType<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &LINE_STYLE_TYPE)?;
-        Some(Decl::Single(format!("list-style-type: {}", value)))
+        Ok(Decl::Single(format!("list-style-type: {}", value)))
     }
 }
 
@@ -264,11 +265,11 @@ impl TextAlign {
 pub struct TextColor<'a>(pub &'a str);
 
 impl<'a> TextColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &TEXT_COLOR)?;
 
         if let Some(color) = hex_to_rgb_color(&value) {
-            Some(Decl::Double([
+            Ok(Decl::Double([
                 "--tw-text-opacity: 1".into(),
                 format!(
                     "color: rgb({} {} {} / var(--tw-text-opacity))",
@@ -276,7 +277,7 @@ impl<'a> TextColor<'a> {
                 ),
             ]))
         } else {
-            return Some(Decl::Single(format!("color: {}", value)));
+            return Ok(Decl::Single(format!("color: {}", value)));
         }
     }
 }
@@ -291,15 +292,13 @@ pub enum TextDecoration {
 
 impl TextDecoration {
     pub fn new(arg: &str) -> Option<Self> {
-        let value = match arg {
-            "underline" => Self::Underline,
-            "overline" => Self::Overline,
-            "line-through" => Self::LineThrough,
-            "no-underline" => Self::NoUnderline,
-            _ => return None,
-        };
-
-        Some(value)
+        match arg {
+            "underline" => Some(Self::Underline),
+            "overline" => Some(Self::Overline),
+            "line-through" => Some(Self::LineThrough),
+            "no-underline" => Some(Self::NoUnderline),
+            _ => None,
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -321,9 +320,9 @@ impl TextDecoration {
 pub struct TextDecorationColor<'a>(pub &'a str);
 
 impl<'a> TextDecorationColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &TEXT_DECORATION_COLOR)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("-webkit-text-decoration-color: {}", value),
             format!("text-decoration-color: {}", value),
         ]))
@@ -373,9 +372,9 @@ impl TextDecorationStyle {
 pub struct TextDecorationThickness<'a>(pub &'a str);
 
 impl<'a> TextDecorationThickness<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &TEXT_DECORATION_THICKNESS)?;
-        Some(Decl::Single(format!(
+        Ok(Decl::Single(format!(
             "text-decoration-thickness: {}",
             value
         )))
@@ -386,9 +385,9 @@ impl<'a> TextDecorationThickness<'a> {
 pub struct TextUnderlineOffset<'a>(pub &'a str);
 
 impl<'a> TextUnderlineOffset<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &TEXT_UNDERLINE_OFFSET)?;
-        Some(Decl::Single(format!("text-underline-offset: {}", value)))
+        Ok(Decl::Single(format!("text-underline-offset: {}", value)))
     }
 }
 
@@ -470,9 +469,9 @@ impl<'a> TextIndent<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &TEXT_INDENT)?;
-        Some(Decl::Single(format!("text-indent: {}", value)))
+        Ok(Decl::Single(format!("text-indent: {}", value)))
     }
 }
 
@@ -490,7 +489,7 @@ pub enum VerticalAlign {
 }
 
 impl VerticalAlign {
-    pub fn new(arg: &str) -> Option<Self> {
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
         let value = match arg {
             "baseline" => Self::Baseline,
             "top" => Self::Top,
@@ -504,15 +503,27 @@ impl VerticalAlign {
                 if let Some(arbitrary) = get_arbitrary_value(arg) {
                     Self::Arbitrary(arbitrary)
                 } else {
-                    return None;
+                    return Err(WarningType::InvalidArg(
+                        arg.into(),
+                        vec![
+                            "baseline",
+                            "top",
+                            "middle",
+                            "bottom",
+                            "text-top",
+                            "text-bottom",
+                            "sub",
+                            "super",
+                        ],
+                    ));
                 }
             }
         };
 
-        Some(value)
+        Ok(value)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = match self {
             VerticalAlign::Baseline => "baseline",
             VerticalAlign::Top => "top",
@@ -523,11 +534,11 @@ impl VerticalAlign {
             VerticalAlign::Sub => "sub",
             VerticalAlign::Super => "super",
             VerticalAlign::Arbitrary(a) => {
-                return Some(Decl::Single(format!("vertical-align: {}", a)))
+                return Ok(Decl::Single(format!("vertical-align: {}", a)))
             }
         };
 
-        Some(Decl::Single(format!("vertical-align: {}", value)))
+        Ok(Decl::Single(format!("vertical-align: {}", value)))
     }
 }
 
@@ -541,17 +552,18 @@ pub enum Whitespace {
 }
 
 impl Whitespace {
-    pub fn new(arg: &str) -> Option<Self> {
-        let value = match arg {
-            "normal" => Self::Normal,
-            "nowrap" => Self::NoWrap,
-            "pre" => Self::Pre,
-            "pre-line" => Self::PreLine,
-            "pre-wrap" => Self::PreWrap,
-            _ => return None,
-        };
-
-        Some(value)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "normal" => Ok(Self::Normal),
+            "nowrap" => Ok(Self::NoWrap),
+            "pre" => Ok(Self::Pre),
+            "pre-line" => Ok(Self::PreLine),
+            "pre-wrap" => Ok(Self::PreWrap),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["normal", "nowrap", "pre", "pre-line", "pre-wrap"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -576,16 +588,17 @@ pub enum WordBreak {
 }
 
 impl WordBreak {
-    pub fn new(arg: &str) -> Option<Self> {
-        let value = match arg {
-            "normal" => Self::Normal,
-            "words" => Self::Words,
-            "all" => Self::All,
-            "keep" => Self::Keep,
-            _ => return None,
-        };
-
-        Some(value)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "normal" => Ok(Self::Normal),
+            "words" => Ok(Self::Words),
+            "all" => Ok(Self::All),
+            "keep" => Ok(Self::Keep),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["normal", "words", "all", "keep"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -606,9 +619,9 @@ impl WordBreak {
 pub struct Content<'a>(pub &'a str);
 
 impl<'a> Content<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &CONTENT)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-content: {}", value),
             "content: var(--tw-content)".into(),
         ]))

@@ -1,5 +1,6 @@
 use crate::class::utils::{get_value, hex_to_rgb_color};
 use crate::class::Decl;
+use crate::warning::WarningType;
 
 use super::{
     BACKGROUND_COLOR, BACKGROUND_IMAGE, BACKGROUND_POSITION, BACKGROUND_SIZE, GRADIENT_COLOR_STOPS,
@@ -44,16 +45,17 @@ pub enum BackgroundClip {
 }
 
 impl BackgroundClip {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "border" => Self::Border,
-            "padding" => Self::Padding,
-            "content" => Self::Content,
-            "text" => Self::Text,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "border" => Ok(Self::Border),
+            "padding" => Ok(Self::Padding),
+            "content" => Ok(Self::Content),
+            "text" => Ok(Self::Text),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["border", "padding", "content", "text"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -77,11 +79,11 @@ impl BackgroundClip {
 pub struct BackgroundColor<'a>(pub &'a str);
 
 impl<'a> BackgroundColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BACKGROUND_COLOR)?;
 
         if let Some(color) = hex_to_rgb_color(&value) {
-            Some(Decl::Double([
+            Ok(Decl::Double([
                 "--tw-bg-opacity: 1".into(),
                 format!(
                     "background-color: rgb({} {} {} / var(--tw-bg-opacity))",
@@ -89,7 +91,7 @@ impl<'a> BackgroundColor<'a> {
                 ),
             ]))
         } else {
-            return Some(Decl::Single(format!("background-color: {}", value)));
+            return Ok(Decl::Single(format!("background-color: {}", value)));
         }
     }
 }
@@ -102,15 +104,16 @@ pub enum BackgroundOrigin {
 }
 
 impl BackgroundOrigin {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "border" => Self::Border,
-            "padding" => Self::Padding,
-            "content" => Self::Content,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "border" => Ok(Self::Border),
+            "padding" => Ok(Self::Padding),
+            "content" => Ok(Self::Content),
+            _ => Err(WarningType::InvalidArg(
+                arg.into(),
+                vec!["border", "padding", "content"],
+            )),
+        }
     }
 
     pub fn to_decl(self) -> Decl {
@@ -128,9 +131,9 @@ impl BackgroundOrigin {
 pub struct BackgroundPosition<'a>(pub &'a str);
 
 impl<'a> BackgroundPosition<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BACKGROUND_POSITION)?;
-        Some(Decl::Single(format!("background-position: {}", value)))
+        Ok(Decl::Single(format!("background-position: {}", value)))
     }
 }
 
@@ -177,14 +180,14 @@ impl BackgroundRepeat {
 pub struct BackgroundSize<'a>(pub &'a str);
 
 impl<'a> BackgroundSize<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let mut value = get_value(self.0, &BACKGROUND_SIZE)?;
 
         if value.starts_with("length:") {
             value = value[7..].into();
         }
 
-        Some(Decl::Single(format!("background-size: {}", value)))
+        Ok(Decl::Single(format!("background-size: {}", value)))
     }
 }
 
@@ -192,9 +195,9 @@ impl<'a> BackgroundSize<'a> {
 pub struct BackgroundImage<'a>(pub &'a str);
 
 impl<'a> BackgroundImage<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BACKGROUND_IMAGE)?;
-        Some(Decl::Single(format!("background-image: {}", value)))
+        Ok(Decl::Single(format!("background-image: {}", value)))
     }
 }
 
@@ -206,23 +209,24 @@ pub enum GradientColorStops<'a> {
 }
 
 impl<'a> GradientColorStops<'a> {
-    pub fn new(class_name: &str, args: &'a str) -> Option<Self> {
-        let value = match class_name {
-            "from" => Self::From(args),
-            "to" => Self::To(args),
-            "via" => Self::Via(args),
-            _ => return None,
-        };
-
-        Some(value)
+    pub fn new(class_name: &str, args: &'a str) -> Result<Self, WarningType> {
+        match class_name {
+            "from" => Ok(Self::From(args)),
+            "to" => Ok(Self::To(args)),
+            "via" => Ok(Self::Via(args)),
+            _ => Err(WarningType::InvalidArg(
+                args.into(),
+                vec!["from", "to", "via"],
+            )),
+        }
     }
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             GradientColorStops::From(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
 
                 if let Some(color) = hex_to_rgb_color(&value) {
-                    Some(Decl::Triple([
+                    Ok(Decl::Triple([
                         format!("--tw-gradient-from: {}", value),
                         format!(
                             "--tw-gradient-to: rgb({} {} {} / 0)",
@@ -236,10 +240,10 @@ impl<'a> GradientColorStops<'a> {
                         "inherit" => [255, 255, 255],
                         "currentColor" => [255, 255, 255],
                         "transparent" => [0, 0, 0],
-                        _ => return None,
+                        _ => return Err(WarningType::ValueNotFound(value)),
                     };
 
-                    Some(Decl::Triple([
+                    Ok(Decl::Triple([
                         format!("--tw-gradient-from: {}", value),
                         format!(
                             "--tw-gradient-to: rgb({} {} {} / 0)",
@@ -252,13 +256,13 @@ impl<'a> GradientColorStops<'a> {
             }
             GradientColorStops::To(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
-                Some(Decl::Single(format!("--tw-gradient-to: {}", value)))
+                Ok(Decl::Single(format!("--tw-gradient-to: {}", value)))
             }
             GradientColorStops::Via(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
 
                 if let Some(color) = hex_to_rgb_color(&value) {
-                    Some(Decl::Double([
+                    Ok(Decl::Double([
                         format!(
                             "--tw-gradient-to: rgb({} {} {} / 0)",
                             color[0], color[1], color[2]
@@ -270,10 +274,10 @@ impl<'a> GradientColorStops<'a> {
                         "inherit" => [255, 255, 255],
                         "currentColor" => [255, 255, 255],
                         "transparent" => [0, 0, 0],
-                        _ => return None,
+                        _ => return Err(WarningType::ValueNotFound(value)),
                     };
 
-                    Some(Decl::Double([
+                    Ok(Decl::Double([
                         format!(
                             "--tw-gradient-to: rgb({} {} {} / 0)",
                             color[0], color[1], color[2]

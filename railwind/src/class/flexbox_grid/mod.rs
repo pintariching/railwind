@@ -4,6 +4,7 @@ pub use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -76,20 +77,18 @@ pub enum FlexboxGrid<'a> {
 }
 
 impl<'a> FlexboxGrid<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let flexbox_grid = match get_class_name(value) {
             "basis" => FlexboxGrid::Basis(Basis(get_args(value)?)),
             "flex" => {
-                if let Some(args) = get_args(value) {
-                    if let Some(direction) = Direction::new(args) {
-                        FlexboxGrid::Direction(direction)
-                    } else if let Some(wrap) = Wrap::new(args) {
-                        FlexboxGrid::Wrap(wrap)
-                    } else {
-                        FlexboxGrid::Flex(Flex(args))
-                    }
+                let args = get_args(value)?;
+
+                if let Some(direction) = Direction::new(args) {
+                    FlexboxGrid::Direction(direction)
+                } else if let Some(wrap) = Wrap::new(args) {
+                    FlexboxGrid::Wrap(wrap)
                 } else {
-                    return None;
+                    FlexboxGrid::Flex(Flex(args))
                 }
             }
             "grow" => FlexboxGrid::Grow(Grow(get_opt_args(value))),
@@ -98,76 +97,84 @@ impl<'a> FlexboxGrid<'a> {
                 FlexboxGrid::Order(Order::new(get_class_name(value), get_args(value)?))
             }
             "grid" => {
-                if let Some(args) = get_args(value) {
-                    match get_class_name(args) {
-                        "cols" => {
-                            FlexboxGrid::GridTemplateColumns(GridTemplateColumns(get_args(args)?))
-                        }
-                        "rows" => FlexboxGrid::GridTepmlateRows(GridTepmlateRows(get_args(args)?)),
-                        "flow" => FlexboxGrid::GridAutoFlow(GridAutoFlow::new(get_args(args)?)?),
-                        _ => return None,
+                let args = get_args(value)?;
+
+                match get_class_name(args) {
+                    "cols" => {
+                        FlexboxGrid::GridTemplateColumns(GridTemplateColumns(get_args(args)?))
                     }
-                } else {
-                    return None;
+                    "rows" => FlexboxGrid::GridTepmlateRows(GridTepmlateRows(get_args(args)?)),
+                    "flow" => FlexboxGrid::GridAutoFlow(GridAutoFlow::new(get_args(args)?)?),
+                    v => {
+                        return Err(WarningType::InvalidArg(
+                            v.into(),
+                            vec!["cols", "rows", "flow"],
+                        ))
+                    }
                 }
             }
             "col" => FlexboxGrid::GridColumn(GridColumn::new(get_args(value)?)?),
-            "row" => FlexboxGrid::GridRow(GridRow::new(get_args(value)?)?),
+            "row" => FlexboxGrid::GridRow(GridRow::new(get_args(value)?)),
             "auto" => {
-                if let Some(args) = get_args(value) {
-                    match get_class_name(args) {
-                        "cols" => FlexboxGrid::GridAutoColumns(GridAutoColumns(get_args(args)?)),
-                        "rows" => FlexboxGrid::GridAutoRows(GridAutoRows(get_args(args)?)),
-                        _ => return None,
-                    }
-                } else {
-                    return None;
+                let args = get_args(value)?;
+
+                match get_class_name(args) {
+                    "cols" => FlexboxGrid::GridAutoColumns(GridAutoColumns(get_args(args)?)),
+                    "rows" => FlexboxGrid::GridAutoRows(GridAutoRows(get_args(args)?)),
+                    v => return Err(WarningType::InvalidArg(v.into(), vec!["cols", "rows"])),
                 }
             }
             "gap" => FlexboxGrid::Gap(Gap(get_args(value)?)),
             "justify" => {
-                if let Some(args) = get_args(value) {
-                    if let Some(content) = JustifyContent::new(args) {
-                        FlexboxGrid::JustifyContent(content)
-                    } else {
-                        match get_class_name(args) {
-                            "items" => {
-                                FlexboxGrid::JustifyItems(JustifyItems::new(get_args(args)?)?)
-                            }
-                            "self" => FlexboxGrid::JustifySelf(JustifySelf::new(get_args(args)?)?),
-                            _ => return None,
+                let args = get_args(value)?;
+
+                if let Some(content) = JustifyContent::new(args) {
+                    FlexboxGrid::JustifyContent(content)
+                } else {
+                    match get_class_name(args) {
+                        "items" => FlexboxGrid::JustifyItems(JustifyItems::new(get_args(args)?)?),
+                        "self" => FlexboxGrid::JustifySelf(JustifySelf::new(get_args(args)?)?),
+                        v => {
+                            return Err(WarningType::InvalidArg(
+                                v.into(),
+                                vec![
+                                    "start", "end", "center", "between", "around", "evenly",
+                                    "items", "self",
+                                ],
+                            ))
                         }
                     }
-                } else {
-                    return None;
                 }
             }
             "content" => FlexboxGrid::AlignContent(AlignContent::new(get_args(value)?)?),
             "items" => FlexboxGrid::AlignItems(AlignItems::new(get_args(value)?)?),
             "self" => FlexboxGrid::AlignSelf(AlignSelf::new(get_args(value)?)?),
             "place" => {
-                if let Some(args) = get_args(value) {
-                    match get_class_name(args) {
-                        "content" => FlexboxGrid::PlaceContent(PlaceContent::new(get_args(args)?)?),
-                        "items" => FlexboxGrid::PlaceItems(PlaceItems::new(get_args(args)?)?),
-                        "self" => FlexboxGrid::PlaceSelf(PlaceSelf::new(get_args(args)?)?),
-                        _ => return None,
+                let args = get_args(value)?;
+
+                match get_class_name(args) {
+                    "content" => FlexboxGrid::PlaceContent(PlaceContent::new(get_args(args)?)?),
+                    "items" => FlexboxGrid::PlaceItems(PlaceItems::new(get_args(args)?)?),
+                    "self" => FlexboxGrid::PlaceSelf(PlaceSelf::new(get_args(args)?)?),
+                    v => {
+                        return Err(WarningType::InvalidArg(
+                            v.into(),
+                            vec!["content", "items", "self"],
+                        ))
                     }
-                } else {
-                    return None;
                 }
             }
-            _ => return None,
+            _ => return Ok(None),
         };
 
-        Some(flexbox_grid)
+        Ok(Some(flexbox_grid))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             FlexboxGrid::Basis(fg) => fg.to_decl(),
-            FlexboxGrid::Direction(fg) => Some(fg.to_decl()),
-            FlexboxGrid::Wrap(fg) => Some(fg.to_decl()),
+            FlexboxGrid::Direction(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::Wrap(fg) => Ok(fg.to_decl()),
             FlexboxGrid::Flex(fg) => fg.to_decl(),
             FlexboxGrid::Grow(fg) => fg.to_decl(),
             FlexboxGrid::Shrink(fg) => fg.to_decl(),
@@ -176,19 +183,19 @@ impl<'a> FlexboxGrid<'a> {
             FlexboxGrid::GridColumn(fg) => fg.to_decl(),
             FlexboxGrid::GridTepmlateRows(fg) => fg.to_decl(),
             FlexboxGrid::GridRow(fg) => fg.to_decl(),
-            FlexboxGrid::GridAutoFlow(fg) => Some(fg.to_decl()),
+            FlexboxGrid::GridAutoFlow(fg) => Ok(fg.to_decl()),
             FlexboxGrid::GridAutoColumns(fg) => fg.to_decl(),
             FlexboxGrid::GridAutoRows(fg) => fg.to_decl(),
             FlexboxGrid::Gap(fg) => fg.to_decl(),
-            FlexboxGrid::JustifyContent(fg) => Some(fg.to_decl()),
-            FlexboxGrid::JustifyItems(fg) => Some(fg.to_decl()),
-            FlexboxGrid::JustifySelf(fg) => Some(fg.to_decl()),
-            FlexboxGrid::AlignContent(fg) => Some(fg.to_decl()),
-            FlexboxGrid::AlignItems(fg) => Some(fg.to_decl()),
-            FlexboxGrid::AlignSelf(fg) => Some(fg.to_decl()),
-            FlexboxGrid::PlaceContent(fg) => Some(fg.to_decl()),
-            FlexboxGrid::PlaceItems(fg) => Some(fg.to_decl()),
-            FlexboxGrid::PlaceSelf(fg) => Some(fg.to_decl()),
+            FlexboxGrid::JustifyContent(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::JustifyItems(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::JustifySelf(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::AlignContent(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::AlignItems(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::AlignSelf(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::PlaceContent(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::PlaceItems(fg) => Ok(fg.to_decl()),
+            FlexboxGrid::PlaceSelf(fg) => Ok(fg.to_decl()),
         }
     }
 }

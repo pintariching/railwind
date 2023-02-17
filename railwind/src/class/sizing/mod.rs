@@ -4,6 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -34,7 +35,7 @@ pub enum Sizing<'a> {
 }
 
 impl<'a> Sizing<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let args = get_args(value)?;
 
         let sizing = match get_class_name(value) {
@@ -43,20 +44,20 @@ impl<'a> Sizing<'a> {
             "min" => match get_class_name(args) {
                 "w" => Sizing::MinWidth(MinWidth(get_args(args)?)),
                 "h" => Sizing::MinHeight(MinHeight(get_args(args)?)),
-                _ => return None,
+                v => return Err(WarningType::InvalidArg(v.into(), vec!["w", "h"])),
             },
             "max" => match get_class_name(args) {
                 "w" => Sizing::MaxWidth(MaxWidth(get_args(args)?)),
                 "h" => Sizing::MaxHeight(MaxHeight(get_args(args)?)),
-                _ => return None,
+                v => return Err(WarningType::InvalidArg(v.into(), vec!["w", "h"])),
             },
-            _ => return None,
+            _ => return Ok(None),
         };
 
-        Some(sizing)
+        Ok(Some(sizing))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Sizing::Width(s) => s.to_decl(),
             Sizing::MinWidth(s) => s.to_decl(),

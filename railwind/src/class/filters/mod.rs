@@ -4,6 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -54,12 +55,12 @@ pub enum Filter<'a> {
 }
 
 impl<'a> Filter<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let class_name = get_class_name(value);
 
         let filter = match class_name {
             "blur" => {
-                if let Some(args) = get_args(value) {
+                if let Ok(args) = get_args(value) {
                     Filter::Blur(Blur(args))
                 } else {
                     Filter::Blur(Blur(""))
@@ -69,16 +70,16 @@ impl<'a> Filter<'a> {
             "contrast" => Filter::Contrast(Contrast(get_args(value)?)),
             "drop" => match get_class_name(get_args(value)?) {
                 "shadow" => {
-                    if let Some(args) = get_args(get_args(value)?) {
+                    if let Ok(args) = get_args(get_args(value)?) {
                         Filter::DropShadow(DropShadow(args))
                     } else {
                         Filter::DropShadow(DropShadow(""))
                     }
                 }
-                _ => return None,
+                v => return Err(WarningType::InvalidArg(v.into(), vec!["shadow"])),
             },
             "grayscale" => {
-                if let Some(args) = get_args(value) {
+                if let Ok(args) = get_args(value) {
                     Filter::Grayscale(Grayscale(args))
                 } else {
                     Filter::Grayscale(Grayscale(""))
@@ -88,10 +89,10 @@ impl<'a> Filter<'a> {
                 "rotate" => {
                     Filter::HueRotate(HueRotate::new(class_name, get_args(get_args(value)?)?))
                 }
-                _ => return None,
+                v => return Err(WarningType::InvalidArg(v.into(), vec!["rotate"])),
             },
             "invert" => {
-                if let Some(args) = get_args(value) {
+                if let Ok(args) = get_args(value) {
                     Filter::Invert(Invert(args))
                 } else {
                     Filter::Invert(Invert(""))
@@ -99,7 +100,7 @@ impl<'a> Filter<'a> {
             }
             "saturate" => Filter::Saturate(Saturate(get_args(value)?)),
             "sepia" => {
-                if let Some(args) = get_args(value) {
+                if let Ok(args) = get_args(value) {
                     Filter::Sepia(Sepia(args))
                 } else {
                     Filter::Sepia(Sepia(""))
@@ -110,7 +111,7 @@ impl<'a> Filter<'a> {
                 let sub_class_name = get_class_name(args);
                 match sub_class_name {
                     "blur" => {
-                        if let Some(args) = get_args(get_args(value)?) {
+                        if let Ok(args) = get_args(get_args(value)?) {
                             Filter::BackdropBlur(BackdropBlur(args))
                         } else {
                             Filter::BackdropBlur(BackdropBlur(""))
@@ -119,7 +120,7 @@ impl<'a> Filter<'a> {
                     "brightness" => Filter::BackdropBrightness(BackdropBrightness(get_args(args)?)),
                     "contrast" => Filter::BackdropContrast(BackdropContrast(get_args(args)?)),
                     "grayscale" => {
-                        if let Some(args) = get_args(args) {
+                        if let Ok(args) = get_args(args) {
                             Filter::BackdropGrayscale(BackdropGrayscale(args))
                         } else {
                             Filter::BackdropGrayscale(BackdropGrayscale(""))
@@ -130,10 +131,10 @@ impl<'a> Filter<'a> {
                             class_name,
                             get_args(get_args(args)?)?,
                         )),
-                        _ => return None,
+                        v => return Err(WarningType::InvalidArg(v.into(), vec!["rotate"])),
                     },
                     "invert" => {
-                        if let Some(args) = get_args(args) {
+                        if let Ok(args) = get_args(args) {
                             Filter::BackdropInvert(BackdropInvert(args))
                         } else {
                             Filter::BackdropInvert(BackdropInvert(""))
@@ -142,21 +143,37 @@ impl<'a> Filter<'a> {
                     "opacity" => Filter::BackdropOpacity(BackdropOpacity(get_args(args)?)),
                     "saturate" => Filter::BackdropSaturate(BackdropSaturate(get_args(args)?)),
                     "sepia" => {
-                        if let Some(args) = get_args(args) {
+                        if let Ok(args) = get_args(args) {
                             Filter::BackdropSepia(BackdropSepia(args))
                         } else {
                             Filter::BackdropSepia(BackdropSepia(""))
                         }
                     }
-                    _ => return None,
+                    v => {
+                        return Err(WarningType::InvalidArg(
+                            v.into(),
+                            vec![
+                                "blur",
+                                "brightness",
+                                "contrast",
+                                "grayscale",
+                                "hue",
+                                "invert",
+                                "opacity",
+                                "saturate",
+                                "sepia",
+                            ],
+                        ))
+                    }
                 }
             }
-            _ => return None,
+            _ => return Ok(None),
         };
-        Some(filter)
+
+        Ok(Some(filter))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Filter::Blur(s) => s.to_decl(),
             Filter::Brightness(s) => s.to_decl(),

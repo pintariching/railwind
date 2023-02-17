@@ -1,6 +1,7 @@
 use crate::class::utils::{get_value, hex_to_rgb_color, value_is_hex};
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use super::{
     BORDER_COLOR, BORDER_RADIUS, BORDER_WIDTH, DIVIDE_COLOR, DIVIDE_WIDTH, OUTLINE_OFFSET,
@@ -21,8 +22,8 @@ pub enum BorderRadius<'a> {
 }
 
 impl<'a> BorderRadius<'a> {
-    pub fn new(args: &'a str) -> Option<Self> {
-        let value = match get_class_name(args) {
+    pub fn new(args: &'a str) -> Self {
+        match get_class_name(args) {
             "t" => Self::Top(get_opt_args(args)),
             "r" => Self::Right(get_opt_args(args)),
             "b" => Self::Bottom(get_opt_args(args)),
@@ -33,12 +34,10 @@ impl<'a> BorderRadius<'a> {
             "bl" => Self::BottomLeft(get_opt_args(args)),
             "" => Self::Around(""),
             _ => Self::Around(args),
-        };
-
-        Some(value)
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = match self {
             Self::Around(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
@@ -90,7 +89,7 @@ impl<'a> BorderRadius<'a> {
             }
         };
 
-        Some(value)
+        Ok(value)
     }
 }
 
@@ -127,7 +126,7 @@ impl<'a> BorderWidth<'a> {
         Some(value)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = match self {
             Self::Around(b) => {
                 let value = get_value(b, &BORDER_WIDTH)?;
@@ -165,7 +164,7 @@ impl<'a> BorderWidth<'a> {
             }
         };
 
-        Some(value)
+        Ok(value)
     }
 }
 
@@ -203,7 +202,7 @@ impl<'a> BorderColor<'a> {
         Some(value)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let arg = match self {
             BorderColor::Around(arg) => arg,
             BorderColor::X(arg) => arg,
@@ -277,26 +276,24 @@ impl<'a> BorderColor<'a> {
                 ]),
             };
 
-            Some(decl)
+            Ok(decl)
         } else {
             match self {
-                BorderColor::Around(_) => Some(Decl::Single(format!("border-color: {}", value))),
-                BorderColor::X(_) => Some(Decl::Double([
+                BorderColor::Around(_) => Ok(Decl::Single(format!("border-color: {}", value))),
+                BorderColor::X(_) => Ok(Decl::Double([
                     format!("border-left-color: {}", value),
                     format!("border-right-color: {}", value),
                 ])),
-                BorderColor::Y(_) => Some(Decl::Double([
+                BorderColor::Y(_) => Ok(Decl::Double([
                     format!("border-top-color: {}", value),
                     format!("border-bottom-color: {}", value),
                 ])),
-                BorderColor::Top(_) => Some(Decl::Single(format!("border-top-color: {}", value))),
-                BorderColor::Right(_) => {
-                    Some(Decl::Single(format!("border-right-color: {}", value)))
-                }
+                BorderColor::Top(_) => Ok(Decl::Single(format!("border-top-color: {}", value))),
+                BorderColor::Right(_) => Ok(Decl::Single(format!("border-right-color: {}", value))),
                 BorderColor::Bottom(_) => {
-                    Some(Decl::Single(format!("border-bottom-color: {}", value)))
+                    Ok(Decl::Single(format!("border-bottom-color: {}", value)))
                 }
-                BorderColor::Left(_) => Some(Decl::Single(format!("border-left-color: {}", value))),
+                BorderColor::Left(_) => Ok(Decl::Single(format!("border-left-color: {}", value))),
             }
         }
     }
@@ -353,7 +350,7 @@ impl<'a> DivideWidth<'a> {
     pub fn new(arg: &'a str) -> Option<Self> {
         match get_class_name(arg) {
             "x" => {
-                if let Some(value) = get_args(arg) {
+                if let Ok(value) = get_args(arg) {
                     if value == "reverse" {
                         Some(Self::ReverseX)
                     } else {
@@ -364,7 +361,7 @@ impl<'a> DivideWidth<'a> {
                 }
             }
             "y" => {
-                if let Some(value) = get_args(arg) {
+                if let Ok(value) = get_args(arg) {
                     if value == "reverse" {
                         Some(Self::ReverseY)
                     } else {
@@ -378,7 +375,7 @@ impl<'a> DivideWidth<'a> {
         }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         dbg!(&self);
         let val = match self {
             Self::X(m) => {
@@ -413,7 +410,7 @@ impl<'a> DivideWidth<'a> {
             Self::ReverseY => Decl::Lit("--tw-divide-y-reverse: 1"),
         };
 
-        Some(val)
+        Ok(val)
     }
 }
 
@@ -421,9 +418,9 @@ impl<'a> DivideWidth<'a> {
 pub struct DivideColor<'a>(pub &'a str);
 
 impl<'a> DivideColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &DIVIDE_COLOR)?;
-        Some(Decl::Single(format!("border-color: {}", value)))
+        Ok(Decl::Single(format!("border-color: {}", value)))
     }
 }
 
@@ -467,9 +464,9 @@ impl DivideStyle {
 pub struct OutlineWidth<'a>(pub &'a str);
 
 impl<'a> OutlineWidth<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OUTLINE_WIDTH)?;
-        Some(Decl::Single(format!("outline-width: {}", value)))
+        Ok(Decl::Single(format!("outline-width: {}", value)))
     }
 }
 
@@ -477,9 +474,9 @@ impl<'a> OutlineWidth<'a> {
 pub struct OutlineColor<'a>(pub &'a str);
 
 impl<'a> OutlineColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &DIVIDE_COLOR)?;
-        Some(Decl::Single(format!("outline-color: {}", value)))
+        Ok(Decl::Single(format!("outline-color: {}", value)))
     }
 }
 
@@ -528,9 +525,9 @@ impl OutlineStyle {
 pub struct OutlineOffset<'a>(pub &'a str);
 
 impl<'a> OutlineOffset<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OUTLINE_OFFSET)?;
-        Some(Decl::Single(format!("outline-offset: {}", value)))
+        Ok(Decl::Single(format!("outline-offset: {}", value)))
     }
 }
 
@@ -557,7 +554,7 @@ impl<'a> RingWidth<'a> {
         Some(value)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let val = match self {
             Self::Value(r) => {
                 let value = get_value(r, &RING_WIDTH)?;
@@ -566,7 +563,7 @@ impl<'a> RingWidth<'a> {
             Self::Inset => Decl::Lit("--tw-ring-inset: inset"),
         };
 
-        Some(val)
+        Ok(val)
     }
 }
 
@@ -574,9 +571,9 @@ impl<'a> RingWidth<'a> {
 pub struct RingColor<'a>(pub &'a str);
 
 impl<'a> RingColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &RING_COLOR)?;
-        Some(Decl::Single(format!("--tw-ring-color: {}", value)))
+        Ok(Decl::Single(format!("--tw-ring-color: {}", value)))
     }
 }
 
@@ -584,9 +581,9 @@ impl<'a> RingColor<'a> {
 pub struct RingOffsetWidth<'a>(pub &'a str);
 
 impl<'a> RingOffsetWidth<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &RING_OFFSET_WIDTH)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-ring-offset-width: {}", value),
             "box-shadow: 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), var(--tw-ring-shadow)".into(),
         ]))
@@ -597,9 +594,9 @@ impl<'a> RingOffsetWidth<'a> {
 pub struct RingOffsetColor<'a>(pub &'a str);
 
 impl<'a> RingOffsetColor<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &RING_OFFSET_COLOR)?;
-        Some(Decl::Double([
+        Ok(Decl::Double([
             format!("--tw-ring-offset-color: {}", value),
             "box-shadow: 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), var(--tw-ring-shadow)".into(),
         ]))

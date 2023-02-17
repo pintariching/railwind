@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use super::Decl;
 use crate::utils::get_args;
 use crate::utils::{get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 lazy_static! {
     pub static ref BORDER_RADIUS: HashMap<&'static str, &'static str> =
@@ -54,11 +55,11 @@ pub enum Borders<'a> {
 }
 
 impl<'a> Borders<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let borders = match get_class_name(value) {
-            "rounded" => Borders::BorderRadius(BorderRadius::new(get_opt_args(value))?),
+            "rounded" => Borders::BorderRadius(BorderRadius::new(get_opt_args(value))),
             "border" => {
-                if let Some(args) = get_args(value) {
+                if let Ok(args) = get_args(value) {
                     if let Some(style) = BorderStyle::new(args) {
                         Borders::BorderStyle(style)
                     } else if let Some(border_color) = BorderColor::new(args) {
@@ -66,10 +67,11 @@ impl<'a> Borders<'a> {
                     } else if let Some(width) = BorderWidth::new(args) {
                         Borders::BorderWidth(width)
                     } else {
-                        return None;
+                        // TODO: Add warnings here
+                        return Ok(None);
                     }
                 } else {
-                    Borders::BorderWidth(BorderWidth::new("border")?)
+                    Borders::BorderWidth(BorderWidth::Around(""))
                 }
             }
             "divide" => {
@@ -79,7 +81,8 @@ impl<'a> Borders<'a> {
                 } else if let Some(width) = DivideWidth::new(args) {
                     Borders::DivideWidth(width)
                 } else {
-                    return None;
+                    // TODO: Add warnings here
+                    return Ok(None);
                 }
             }
             "outline" => match get_class_name(get_opt_args(value)) {
@@ -111,24 +114,24 @@ impl<'a> Borders<'a> {
                     }
                 }
             },
-            _ => return None,
+            _ => return Ok(None),
         };
 
-        Some(borders)
+        Ok(Some(borders))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Borders::BorderRadius(b) => b.to_decl(),
             Borders::BorderWidth(b) => b.to_decl(),
             Borders::BorderColor(b) => b.to_decl(),
-            Borders::BorderStyle(b) => Some(b.to_decl()),
+            Borders::BorderStyle(b) => Ok(b.to_decl()),
             Borders::DivideWidth(b) => b.to_decl(),
             Borders::DivideColor(b) => b.to_decl(),
-            Borders::DivideStyle(b) => Some(b.to_decl()),
+            Borders::DivideStyle(b) => Ok(b.to_decl()),
             Borders::OutlineWidth(b) => b.to_decl(),
             Borders::OutlineColor(b) => b.to_decl(),
-            Borders::OutlineStyle(b) => Some(b.to_decl()),
+            Borders::OutlineStyle(b) => Ok(b.to_decl()),
             Borders::OutlineOffset(b) => b.to_decl(),
             Borders::RingWidth(b) => b.to_decl(),
             Borders::RingColor(b) => b.to_decl(),

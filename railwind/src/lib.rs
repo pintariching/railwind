@@ -2,7 +2,7 @@ use class::{Borders, Class, Decl, Spacing};
 use indexmap::IndexMap;
 use modifiers::{generate_state_selector, MediaQuery, State};
 use utils::{indent_string, replace_invalid_chars};
-use warning::{Position, Warning};
+use warning::{Position, Warning, WarningType};
 
 use lazy_static::lazy_static;
 use line_col::LineColLookup;
@@ -28,26 +28,34 @@ pub struct ParsedClass<'a> {
     pub raw_class_name: &'a str,
     pub class: Class<'a>,
     pub states: Vec<State>,
+    pub position: Position,
 }
 
 impl<'a> ParsedClass<'a> {
-    pub fn new(raw_class_name: &'a str, class: Class<'a>, states: Vec<State>) -> Self {
+    pub fn new(
+        raw_class_name: &'a str,
+        class: Class<'a>,
+        states: Vec<State>,
+        position: Position,
+    ) -> Self {
         Self {
             raw_class_name,
             class,
             states,
+            position,
         }
     }
 
-    pub fn new_from_raw_class(raw_class: &'a str, position: &Position) -> Result<Self, Warning> {
+    pub fn new_from_raw_class(raw_class: &'a str, position: Position) -> Result<Self, Warning> {
         if let Some(colon_index) = raw_class.rfind(':') {
             // if an arbitrary value inside [...] contains a colon
             if let Some(left_bracket_index) = raw_class.rfind('[') {
                 if left_bracket_index < colon_index {
                     return Ok(Self::new(
                         raw_class,
-                        Class::new(raw_class, raw_class, position)?,
+                        Class::new(raw_class, raw_class, &position)?,
                         Vec::new(),
+                        position.clone(),
                     ));
                 }
             }
@@ -57,24 +65,26 @@ impl<'a> ParsedClass<'a> {
 
             let mut parsed_states = Vec::new();
             for state in states.split(':') {
-                parsed_states.push(State::new(raw_class, state, position)?)
+                parsed_states.push(State::new(raw_class, state, &position)?)
             }
 
             Ok(Self::new(
                 raw_class,
-                Class::new(raw_class, entire_class, position)?,
+                Class::new(raw_class, entire_class, &position)?,
                 parsed_states,
+                position.clone(),
             ))
         } else {
             Ok(Self::new(
                 raw_class,
-                Class::new(raw_class, raw_class, position)?,
+                Class::new(raw_class, raw_class, &position)?,
                 Vec::new(),
+                position.clone(),
             ))
         }
     }
 
-    pub fn try_to_string(self) -> Option<String> {
+    pub fn try_to_string(self) -> Result<String, WarningType> {
         let selector_to_append = match &self.class {
             Class::Spacing(spacing) => match spacing {
                 Spacing::SpaceBetween(_) => Some("> :not([hidden]) ~ :not([hidden])"),
@@ -150,7 +160,7 @@ impl<'a> ParsedClass<'a> {
             }
         }
 
-        Some(generated_class)
+        Ok(generated_class)
     }
 }
 
@@ -221,7 +231,7 @@ pub fn parse_to_string(
                 CollectionOptions::Regex(r) => collect_with_regex(&file_string, &r),
             };
             let parsed_classes = parse_classes(raw_classes, warnings);
-            let generated_classes = generate_strings(parsed_classes);
+            let generated_classes = generate_strings(parsed_classes, warnings);
 
             css.push_str(&generated_classes.join("\n\n"));
         }
@@ -246,7 +256,7 @@ pub fn parse_to_string(
             }
 
             let parsed_classes = parse_classes(raw_classes, warnings);
-            let generated_classes = generate_strings(parsed_classes);
+            let generated_classes = generate_strings(parsed_classes, warnings);
 
             css.push_str(&generated_classes.join("\n\n"));
         }
@@ -259,7 +269,7 @@ pub fn parse_to_string(
 
             let parsed_classes = parse_classes(raw_classes, warnings);
 
-            let generated_classes = generate_strings(parsed_classes);
+            let generated_classes = generate_strings(parsed_classes, warnings);
 
             css.push_str(&generated_classes.join("\n\n"));
         }
@@ -322,7 +332,7 @@ fn parse_classes<'a>(
     raw_classes
         .iter()
         .filter_map(|(raw_str, position)| {
-            match ParsedClass::new_from_raw_class(raw_str, &position) {
+            match ParsedClass::new_from_raw_class(raw_str, position.clone()) {
                 Ok(c) => Some(c),
                 Err(w) => {
                     warnings.push(w);
@@ -333,11 +343,23 @@ fn parse_classes<'a>(
         .collect()
 }
 
-fn generate_strings<'a>(parsed_classes: Vec<ParsedClass<'a>>) -> Vec<String> {
-    parsed_classes
-        .into_iter()
-        .filter_map(|c| c.try_to_string())
-        .collect()
+fn generate_strings<'a>(
+    parsed_classes: Vec<ParsedClass<'a>>,
+    warnings: &mut Vec<Warning>,
+) -> Vec<String> {
+    let mut out = Vec::new();
+
+    for class in parsed_classes {
+        let pos = class.position.clone();
+        let raw = class.raw_class_name;
+
+        match class.try_to_string() {
+            Ok(c) => out.push(c),
+            Err(w) => warnings.push(Warning::new(raw, &pos, w)),
+        }
+    }
+
+    out
 }
 
 #[cfg(test)]

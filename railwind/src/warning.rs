@@ -4,15 +4,10 @@ use core::fmt;
 pub enum WarningType {
     StateNotFound(String),
     ClassNotFound,
-
-    /// (recieved, required)
     InvalidArg(String, Vec<&'static str>),
-
-    /// (value)
     ValueNotFound(String),
-
-    ///
     InvalidArgCount(String),
+    InvalidArbitraryArg(String),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -45,6 +40,9 @@ impl Warning {
             }
             WarningType::InvalidArgCount(value) => {
                 format!("Could not match class '{class}', invalid argument count '{value}'")
+            }
+            WarningType::InvalidArbitraryArg(value) => {
+                format!("Could not extract arbitrary value from class '{class}', invalid argument '{value}'")
             }
         };
 

@@ -17,33 +17,29 @@ impl ScreenReaders {
         Some(value)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Decl {
         match self {
-            Self::SROnly => {
-                let mut strings = vec![];
-                strings.push(String::from("position: absolute"));
-                strings.push(String::from("width: 1px"));
-                strings.push(String::from("height: 1px"));
-                strings.push(String::from("padding: 0"));
-                strings.push(String::from("margin: -1px"));
-                strings.push(String::from("overflow: hidden"));
-                strings.push(String::from("clip: rect(0, 0, 0, 0)"));
-                strings.push(String::from("white-space: nowrap"));
-                strings.push(String::from("border-width: 0"));
-                Some(Decl::Multiple(strings))
-            }
-            Self::NotSROnly => {
-                let mut strings = vec![];
-                strings.push(String::from("position: static"));
-                strings.push(String::from("width: auto"));
-                strings.push(String::from("height: auto"));
-                strings.push(String::from("padding: 0"));
-                strings.push(String::from("margin: 0"));
-                strings.push(String::from("overflow: visible"));
-                strings.push(String::from("clip: auto"));
-                strings.push(String::from("white-space: normal"));
-                Some(Decl::Multiple(strings))
-            }
+            Self::SROnly => Decl::Multiple(vec![
+                "position: absolute".into(),
+                "width: 1px".into(),
+                "height: 1px".into(),
+                "padding: 0".into(),
+                "margin: -1px".into(),
+                "overflow: hidden".into(),
+                "clip: rect(0, 0, 0, 0)".into(),
+                "white-space: nowrap".into(),
+                "border-width: 0".into(),
+            ]),
+            Self::NotSROnly => Decl::Multiple(vec![
+                "position: static".into(),
+                "width: auto".into(),
+                "height: auto".into(),
+                "padding: 0".into(),
+                "margin: 0".into(),
+                "overflow: visible".into(),
+                "clip: auto".into(),
+                "white-space: normal".into(),
+            ]),
         }
     }
 }

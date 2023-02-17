@@ -4,6 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -21,28 +22,28 @@ pub enum Table<'a> {
 }
 
 impl<'a> Table<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let args = get_args(value)?;
         let class_name = get_class_name(value);
 
         let table = match class_name {
             "border" => match get_class_name(args) {
-                "collapse" | "separate" => {
-                    Table::BorderCollapse(BorderCollapse::new(get_class_name(args))?)
-                }
-                "spacing" => Table::BorderSpacing(BorderSpacing::new(get_args(args)?)?),
-                _ => return None,
+                "collapse" => Table::BorderCollapse(BorderCollapse::Collapse),
+                "separate" => Table::BorderCollapse(BorderCollapse::Separate),
+                "spacing" => Table::BorderSpacing(BorderSpacing::new(get_args(args)?)),
+                _ => return Ok(None),
             },
             "table" => Table::Layout(Layout::new(args)?),
-            _ => return None,
+            _ => return Ok(None),
         };
-        Some(table)
+
+        Ok(Some(table))
     }
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Table::BorderSpacing(t) => t.to_decl(),
-            Table::BorderCollapse(t) => Some(t.to_decl()),
-            Table::Layout(t) => Some(t.to_decl()),
+            Table::BorderCollapse(t) => Ok(t.to_decl()),
+            Table::Layout(t) => Ok(t.to_decl()),
         }
     }
 }

@@ -1,6 +1,7 @@
 use crate::class::utils::get_value;
 use crate::class::Decl;
 use crate::utils::{get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use super::BORDER_SPACING;
 
@@ -39,41 +40,33 @@ pub enum BorderSpacing<'a> {
 }
 
 impl<'a> BorderSpacing<'a> {
-    pub fn new(args: &'a str) -> Option<Self> {
-        let value = match get_class_name(args) {
+    pub fn new(args: &'a str) -> Self {
+        match get_class_name(args) {
             "x" => Self::X(get_opt_args(args)),
             "y" => Self::Y(get_opt_args(args)),
-            _ => {
-                if BORDER_SPACING.contains_key(get_opt_args(args)) {
-                    Self::All(args)
-                } else {
-                    return None;
-                }
-            }
-        };
-
-        Some(value)
+            _ => Self::All(args),
+        }
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::X(s) => {
                 let value = get_value(s, &BORDER_SPACING)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("--tw-border-spacing-x: {}", value),
                     "border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y)".into(),
                 ]))
             }
             Self::Y(s) => {
                 let value = get_value(s, &BORDER_SPACING)?;
-                Some(Decl::Double([
+                Ok(Decl::Double([
                     format!("--tw-border-spacing-y: {}", value),
                     "border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y)".into(),
                 ]))
             }
             Self::All(s) => {
                 let value = get_value(s, &BORDER_SPACING)?;
-                Some(Decl::Triple([
+                Ok(Decl::Triple([
                     format!("--tw-border-spacing-x: {}", value),
                     format!("--tw-border-spacing-y: {}", value),
                     "border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y)".into(),
@@ -90,14 +83,12 @@ pub enum Layout {
 }
 
 impl Layout {
-    pub fn new(arg: &str) -> Option<Self> {
-        let val = match arg {
-            "auto" => Self::Auto,
-            "fixed" => Self::Fixed,
-            _ => return None,
-        };
-
-        Some(val)
+    pub fn new(arg: &str) -> Result<Self, WarningType> {
+        match arg {
+            "auto" => Ok(Self::Auto),
+            "fixed" => Ok(Self::Fixed),
+            _ => Err(WarningType::InvalidArg(arg.into(), vec!["auto", "fixed"])),
+        }
     }
 
     pub fn to_decl(self) -> Decl {

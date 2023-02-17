@@ -20,7 +20,7 @@ impl Accessibility {
         Some(accessibility)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Decl {
         match self {
             Accessibility::ScreenReaders(s) => s.to_decl(),
         }

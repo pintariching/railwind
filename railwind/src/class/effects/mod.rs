@@ -6,7 +6,10 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 use super::Decl;
-use crate::utils::{get_args, get_class_name, get_opt_args};
+use crate::{
+    utils::{get_args, get_class_name, get_opt_args},
+    warning::WarningType,
+};
 
 lazy_static! {
     pub static ref BOX_SHADOW: HashMap<&'static str, &'static str> =
@@ -27,7 +30,7 @@ pub enum Effects<'a> {
 }
 
 impl<'a> Effects<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let effect = match get_class_name(value) {
             "shadow" => {
                 if BOX_SHADOW.contains_key(get_opt_args(value)) {
@@ -41,7 +44,7 @@ impl<'a> Effects<'a> {
                 let args = get_args(value)?;
                 match get_class_name(args) {
                     "blend" => Effects::MixBlendMode(MixBlendMode::new(get_args(args)?)?),
-                    _ => return None,
+                    v => return Err(WarningType::InvalidArg(v.into(), vec!["blend"])),
                 }
             }
             "bg" => {
@@ -50,22 +53,22 @@ impl<'a> Effects<'a> {
                     "blend" => {
                         Effects::BackgroundBlendMode(BackgroundBlendMode::new(get_args(args)?)?)
                     }
-                    _ => return None,
+                    v => return Err(WarningType::InvalidArg(v.into(), vec!["blend"])),
                 }
             }
-            _ => return None,
+            _ => return Ok(None),
         };
 
-        Some(effect)
+        Ok(Some(effect))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Effects::BoxShadow(e) => e.to_decl(),
             Effects::BoxShadowColor(e) => e.to_decl(),
             Effects::Opacity(e) => e.to_decl(),
-            Effects::MixBlendMode(e) => Some(e.to_decl()),
-            Effects::BackgroundBlendMode(e) => Some(e.to_decl()),
+            Effects::MixBlendMode(e) => Ok(e.to_decl()),
+            Effects::BackgroundBlendMode(e) => Ok(e.to_decl()),
         }
     }
 }

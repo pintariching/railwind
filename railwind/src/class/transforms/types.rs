@@ -1,6 +1,7 @@
 use crate::class::utils::{get_value, get_value_neg};
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name, get_opt_args};
+use crate::warning::WarningType;
 
 use super::{ORIGIN, ROTATE, SCALE, SKEW, TRANSLATE};
 
@@ -15,11 +16,11 @@ impl<'a> TranslateX<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &TRANSLATE)?;
-        Some(Decl::Double([
-                format!("--tw-translate-x: {}", value),
-                TRANSFORM_STYLE.into(),
+        Ok(Decl::Double([
+            format!("--tw-translate-x: {}", value),
+            TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -33,11 +34,11 @@ impl<'a> TranslateY<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &TRANSLATE)?;
-        Some(Decl::Double([
-                format!("--tw-translate-y: {}", value),
-                TRANSFORM_STYLE.into(),
+        Ok(Decl::Double([
+            format!("--tw-translate-y: {}", value),
+            TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -51,11 +52,11 @@ impl<'a> Rotate<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &ROTATE)?;
-        Some(Decl::Double([
-                format!("--tw-rotate: {}", value),
-                TRANSFORM_STYLE.into(),
+        Ok(Decl::Double([
+            format!("--tw-rotate: {}", value),
+            TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -69,11 +70,11 @@ impl<'a> SkewX<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &SKEW)?;
-        Some(Decl::Double([
-                format!("--tw-skew-x: {}", value),
-                TRANSFORM_STYLE.into(),
+        Ok(Decl::Double([
+            format!("--tw-skew-x: {}", value),
+            TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -87,11 +88,11 @@ impl<'a> SkewY<'a> {
         Self(arg, negative)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &SKEW)?;
-        Some(Decl::Double([
-                format!("--tw-skew-y: {}", value),
-                TRANSFORM_STYLE.into(),
+        Ok(Decl::Double([
+            format!("--tw-skew-y: {}", value),
+            TRANSFORM_STYLE.into(),
         ]))
     }
 }
@@ -104,7 +105,7 @@ pub enum Scale<'a> {
 }
 
 impl<'a> Scale<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Self, WarningType> {
         let negative = value.starts_with('-');
         let args = get_args(value)?;
         let value = match get_class_name(args) {
@@ -113,31 +114,31 @@ impl<'a> Scale<'a> {
             _ => Self::All(args, negative),
         };
 
-        Some(value)
+        Ok(value)
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Self::All(s, n) => {
                 let value = get_value_neg(n, s, &SCALE)?;
-                Some(Decl::Triple([
-                   format!("--tw-scale-x: {}", value),
-                   format!("--tw-scale-y: {}", value),
-                   TRANSFORM_STYLE.into(),
+                Ok(Decl::Triple([
+                    format!("--tw-scale-x: {}", value),
+                    format!("--tw-scale-y: {}", value),
+                    TRANSFORM_STYLE.into(),
                 ]))
             }
             Self::X(s, n) => {
                 let value = get_value_neg(n, s, &SCALE)?;
-                Some(Decl::Double([
-                   format!("--tw-scale-x: {}", value),
-                   TRANSFORM_STYLE.into(),
+                Ok(Decl::Double([
+                    format!("--tw-scale-x: {}", value),
+                    TRANSFORM_STYLE.into(),
                 ]))
             }
             Self::Y(s, n) => {
                 let value = get_value_neg(n, s, &SCALE)?;
-                Some(Decl::Double([
-                   format!("--tw-scale-y: {}", value),
-                   TRANSFORM_STYLE.into(),
+                Ok(Decl::Double([
+                    format!("--tw-scale-y: {}", value),
+                    TRANSFORM_STYLE.into(),
                 ]))
             }
         }
@@ -148,8 +149,8 @@ impl<'a> Scale<'a> {
 pub struct Origin<'a>(pub &'a str);
 
 impl<'a> Origin<'a> {
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &ORIGIN)?;
-        Some(Decl::Single(format!("transform-origin: {}", value)))
+        Ok(Decl::Single(format!("transform-origin: {}", value)))
     }
 }

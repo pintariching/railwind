@@ -4,6 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -33,7 +34,7 @@ pub enum Transform<'a> {
 }
 
 impl<'a> Transform<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let args = get_args(value)?;
         let class_name = get_class_name(value);
 
@@ -42,22 +43,23 @@ impl<'a> Transform<'a> {
                 "x" => Transform::TranslateX(TranslateX::new(class_name, get_args(args)?)),
 
                 "y" => Transform::TranslateY(TranslateY::new(class_name, get_args(args)?)),
-                _ => return None,
+                v => return Err(WarningType::InvalidArg(v.into(), vec!["x", "y"])),
             },
             "rotate" | "-rotate" => Transform::Rotate(Rotate::new(class_name, args)),
             "skew" | "-skew" => match get_class_name(args) {
                 "x" => Transform::SkewX(SkewX::new(class_name, get_args(args)?)),
 
                 "y" => Transform::SkewY(SkewY::new(class_name, get_args(args)?)),
-                _ => return None,
+                v => return Err(WarningType::InvalidArg(v.into(), vec!["x", "y"])),
             },
             "scale" | "-scale" => Transform::Scale(Scale::new(value)?),
             "origin" => Transform::Origin(Origin(args)),
-            _ => return None,
+            _ => return Ok(None),
         };
-        Some(transform)
+
+        Ok(Some(transform))
     }
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Transform::TranslateX(s) => s.to_decl(),
             Transform::TranslateY(s) => s.to_decl(),

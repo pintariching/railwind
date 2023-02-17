@@ -4,6 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 use crate::utils::{get_args, get_class_name};
+use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -17,11 +18,11 @@ lazy_static! {
 pub enum Svg<'a> {
     Fill(Fill<'a>),
     Stroke(Stroke<'a>),
-    StrokeWidth(StrokeWidth<'a>),
+    StrokeWidth(StrokeWidth),
 }
 
 impl<'a> Svg<'a> {
-    pub fn new(value: &'a str) -> Option<Self> {
+    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let args = get_args(value)?;
         let class_name = get_class_name(value);
 
@@ -30,22 +31,21 @@ impl<'a> Svg<'a> {
             "stroke" => {
                 if let Some(stroke) = StrokeWidth::new(args) {
                     Svg::StrokeWidth(stroke)
-                } else if let Some(stroke) = Stroke::new(args) {
-                    Svg::Stroke(stroke)
                 } else {
-                    return None;
+                    Svg::Stroke(Stroke::new(args))
                 }
             }
-            _ => return None,
+            v => return Err(WarningType::InvalidArg(v.into(), vec!["fill", "stroke"])),
         };
-        Some(svg)
+
+        Ok(Some(svg))
     }
 
-    pub fn to_decl(self) -> Option<Decl> {
+    pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
             Svg::Fill(s) => s.to_decl(),
             Svg::Stroke(s) => s.to_decl(),
-            Svg::StrokeWidth(s) => s.to_decl(),
+            Svg::StrokeWidth(s) => Ok(s.to_decl()),
         }
     }
 }
