@@ -3,15 +3,13 @@ mod types;
 use types::*;
 
 use crate::class::Decl;
-use crate::utils::{get_args, get_class_name};
+use crate::utils::{get_args, get_class_name, get_opt_args};
 use crate::warning::WarningType;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 lazy_static! {
-    pub static ref TRANSITION: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("transition.ron")).unwrap();
     pub static ref DELAY: HashMap<&'static str, &'static str> =
         ron::from_str(include_str!("delay.ron")).unwrap();
     pub static ref DURATION: HashMap<&'static str, &'static str> =
@@ -24,7 +22,7 @@ lazy_static! {
 
 #[derive(Debug)]
 pub enum TransitionsAnimation<'a> {
-    Transition(Transition<'a>),
+    Transition(Transition),
     Duration(Duration<'a>),
     TimingFunction(TimingFunction<'a>),
     Delay(Delay<'a>),
@@ -34,7 +32,7 @@ pub enum TransitionsAnimation<'a> {
 impl<'a> TransitionsAnimation<'a> {
     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let transitions_animation = match get_class_name(value) {
-            "transition" => TransitionsAnimation::Transition(Transition(get_args(value)?)),
+            "transition" => TransitionsAnimation::Transition(Transition::new(get_opt_args(value))?),
             "duration" => TransitionsAnimation::Duration(Duration(get_args(value)?)),
             "ease" => TransitionsAnimation::TimingFunction(TimingFunction(get_args(value)?)),
             "delay" => TransitionsAnimation::Delay(Delay(get_args(value)?)),
@@ -46,7 +44,7 @@ impl<'a> TransitionsAnimation<'a> {
     }
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            TransitionsAnimation::Transition(s) => s.to_decl(),
+            TransitionsAnimation::Transition(s) => Ok(s.to_decl()),
             TransitionsAnimation::Duration(s) => s.to_decl(),
             TransitionsAnimation::TimingFunction(s) => s.to_decl(),
             TransitionsAnimation::Delay(s) => s.to_decl(),

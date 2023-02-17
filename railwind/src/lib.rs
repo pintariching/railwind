@@ -383,6 +383,19 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_classes_fail() {
+        let text = "space-c-4";
+        let mut warnings = Vec::new();
+        let _ = parse_to_string(
+            Source::String(text.into(), CollectionOptions::String),
+            false,
+            &mut warnings,
+        );
+
+        assert!(!warnings.is_empty())
+    }
+
+    #[test]
     fn test_collect_classes_from_html() {
         let text = r#"class="px-5 justify-start container""#;
         let classes = collect_with_regex(text, &HTML_CLASS_REGEX);

@@ -152,6 +152,10 @@ impl<'a> SpaceBetween<'a> {
             return Ok(None);
         }
 
+        if name.starts_with("white") {
+            return Ok(None);
+        }
+
         match get_class_name(arg) {
             "x" => Ok(Some(Self::X(get_args(arg)?, negative))),
             "y" => Ok(Some(Self::Y(get_args(arg)?, negative))),

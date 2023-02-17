@@ -154,7 +154,13 @@ impl<'a> FlexboxGrid<'a> {
                     }
                 }
             }
-            "content" => FlexboxGrid::AlignContent(AlignContent::new(get_args(value)?)?),
+            "content" => {
+                if let Some(align_content) = AlignContent::new(get_args(value)?) {
+                    FlexboxGrid::AlignContent(align_content)
+                } else {
+                    return Ok(None);
+                }
+            }
             "items" => FlexboxGrid::AlignItems(AlignItems::new(get_args(value)?)?),
             "self" => FlexboxGrid::AlignSelf(AlignSelf::new(get_args(value)?)?),
             "place" => {

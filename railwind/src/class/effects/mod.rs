@@ -59,13 +59,7 @@ impl<'a> Effects<'a> {
                     "blend" => {
                         Effects::BackgroundBlendMode(BackgroundBlendMode::new(get_args(args)?)?)
                     }
-                    v => {
-                        return Err(WarningType::InvalidArg(
-                            v.into(),
-                            "Background Blend Mode".into(),
-                            vec!["blend"],
-                        ))
-                    }
+                    _ => return Ok(None),
                 }
             }
             _ => return Ok(None),

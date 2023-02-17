@@ -23,7 +23,12 @@ pub enum Table<'a> {
 
 impl<'a> Table<'a> {
     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
-        let args = get_args(value)?;
+        let args = if let Ok(str) = get_args(value) {
+            str
+        } else {
+            return Ok(None);
+        };
+
         let class_name = get_class_name(value);
 
         let table = match class_name {

@@ -1,23 +1,94 @@
+use crate::class::utils::get_arbitrary_value;
 use crate::class::Decl;
 use crate::{class::utils::get_value, warning::WarningType};
 
-use super::{ANIMATION, DELAY, DURATION, TIMING_FUNCTION, TRANSITION};
+use super::{ANIMATION, DELAY, DURATION, TIMING_FUNCTION};
 
 #[derive(Debug)]
-pub struct Transition<'a>(pub &'a str);
+pub enum Transition {
+    None,
+    All,
+    Transition,
+    Colors,
+    Opacity,
+    Shadow,
+    Transform,
+    Arbitrary(String),
+}
 
-impl<'a> Transition<'a> {
-    pub fn to_decl(self) -> Result<Decl, WarningType> {
-        let value = get_value(self.0, &TRANSITION)?;
-
-        if value.as_str() == "none" {
-            Ok(Decl::Single(format!("transition-property: {value}")))
-        } else {
-            Ok(Decl::Triple([
-                format!("transition-property: {value}"),
+impl Transition {
+    pub fn new(value: &str) -> Result<Self, WarningType> {
+        match value {
+            "none" => Ok(Self::None),
+            "all" => Ok(Self::All),
+            "" => Ok(Self::Transition),
+            "colors" => Ok(Self::Colors),
+            "opacity" => Ok(Self::Opacity),
+            "shadow" => Ok(Self::Shadow),
+            "transform" => Ok(Self::Transform),
+            _ => {
+                if let Some(arbitrary) = get_arbitrary_value(value) {
+                    Ok(Self::Arbitrary(arbitrary))
+                } else {
+                    Err(WarningType::InvalidArg(
+                        value.into(),
+                        "Transition".into(),
+                        vec![
+                            "none",
+                            "all",
+                            "",
+                            "colors",
+                            "opacity",
+                            "shadow",
+                            "transform",
+                        ],
+                    ))
+                }
+            }
+        }
+    }
+    pub fn to_decl(self) -> Decl {
+        match self {
+            Transition::None => Decl::Single("transition-property: none".into()),
+            Transition::All => Decl::Triple([
+                "transition-property: all".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
-            ]))
+            ]),
+            Transition::Transition => Decl::Multiple(vec![
+                "transition-property: color, background-color, border-color, outline-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter".into(),
+                "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter".into(),
+                "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter".into(),
+                "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                "transition-duration: 150ms".into(),
+            ]),
+            Transition::Colors => Decl::Multiple(vec![
+                "transition-property: color, background-color, border-color, outline-color, fill, stroke, -webkit-text-decoration-color".into(),
+                "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke".into(),
+                "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color".into(),
+                "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                "transition-duration: 150ms".into(),
+            ]),
+            Transition::Opacity => Decl::Triple([
+                "transition-property: opacity".into(),
+                "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                "transition-duration: 150ms".into(),
+            ]),
+            Transition::Shadow => Decl::Triple([
+                "transition-property: box-shadow".into(),
+                "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                "transition-duration: 150ms".into(),
+            ]),
+            Transition::Transform => Decl::Triple([
+                "transition-property: transform".into(),
+                "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                "transition-duration: 150ms".into(),
+            ]),
+            Transition::Arbitrary(v) => Decl::Triple([
+                format!("transition-property: {v}"),
+                "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
+                "transition-duration: 150ms".into(),
+            ]),
         }
     }
 }

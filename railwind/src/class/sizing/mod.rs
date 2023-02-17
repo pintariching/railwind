@@ -36,7 +36,11 @@ pub enum Sizing<'a> {
 
 impl<'a> Sizing<'a> {
     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
-        let args = get_args(value)?;
+        let args = if let Ok(str) = get_args(value) {
+            str
+        } else {
+            return Ok(None);
+        };
 
         let sizing = match get_class_name(value) {
             "w" => Sizing::Width(Width(args)),

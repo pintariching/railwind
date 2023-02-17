@@ -442,22 +442,16 @@ pub enum AlignContent {
 }
 
 impl AlignContent {
-    pub fn new(arg: &str) -> Result<Self, WarningType> {
+    pub fn new(arg: &str) -> Option<Self> {
         match arg {
-            "center" => Ok(Self::Center),
-            "start" => Ok(Self::Start),
-            "end" => Ok(Self::End),
-            "between" => Ok(Self::Between),
-            "around" => Ok(Self::Around),
-            "evenly" => Ok(Self::Evenly),
-            "baseline" => Ok(Self::Baseline),
-            _ => Err(WarningType::InvalidArg(
-                arg.into(),
-                "Align Content".into(),
-                vec![
-                    "center", "start", "end", "between", "around", "evenly", "baseline",
-                ],
-            )),
+            "center" => Some(Self::Center),
+            "start" => Some(Self::Start),
+            "end" => Some(Self::End),
+            "between" => Some(Self::Between),
+            "around" => Some(Self::Around),
+            "evenly" => Some(Self::Evenly),
+            "baseline" => Some(Self::Baseline),
+            _ => None,
         }
     }
 

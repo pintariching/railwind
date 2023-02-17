@@ -28,7 +28,11 @@ pub enum Spacing<'a> {
 impl<'a> Spacing<'a> {
     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let class_name = get_class_name(value);
-        let args = get_args(value)?;
+        let args = if let Ok(str) = get_args(value) {
+            str
+        } else {
+            return Ok(None);
+        };
 
         let spacing = if let Some(padding) = Padding::new(class_name, args) {
             Spacing::Padding(padding)

@@ -67,13 +67,7 @@ impl<'a> Layout<'a> {
                     "after" => Layout::BreakAfter(BreakAfter::new(get_args(args)?)?),
                     "before" => Layout::BreakBefore(BreakBefore::new(get_args(args)?)?),
                     "inside" => Layout::BreakInside(BreakInside::new(get_args(args)?)?),
-                    v => {
-                        return Err(WarningType::InvalidArg(
-                            v.into(),
-                            "Break After / Before / Inside".into(),
-                            vec!["after", "before", "inside"],
-                        ))
-                    }
+                    _ => return Ok(None),
                 }
             }
 
