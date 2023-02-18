@@ -10,7 +10,7 @@ The main goal, is to decouple the original Tailwind project from Node and NPM an
 
 ### Installation
 
-To install with cargo, run `cargo install railwind` to install the CLI.
+To install with cargo, run `cargo install railwind_cli` to install the CLI.
 
 ### Using railwind
 
