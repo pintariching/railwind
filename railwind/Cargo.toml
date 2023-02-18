@@ -1,6 +1,6 @@
 [package]
 name = "railwind"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["pintariching"]
 license = "MIT"
 description = "Tailwind compiler for utility classes written in Rust"
@@ -15,10 +15,12 @@ edition = "2021"
 [dependencies]
 lazy_static = "1.4.0"
 regex = "1.7.1"
+serde_regex = "1.1.0"
 ron = { version = "0.8.0", features = ["indexmap"] }
 hex = "0.4.3"
 line-col = "0.2.1"
 indexmap = "1.9.2"
+serde = { version = "1.0.152", features = ["derive"] }
 
 [dev-dependencies]
 walkdir = "2.3.2"

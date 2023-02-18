@@ -53,9 +53,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clap"
-version = "4.1.4"
+version = "4.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f13b9c79b5d1dd500d20ef541215a6423c75829ef43117e1b4d17fd8af0b5d76"
+checksum = "ec0b0588d44d4d63a87dbd75c136c166bbfd9a86a31cb89e09906521c7d3f5e3"
 dependencies = [
  "bitflags",
  "clap_derive",
@@ -421,9 +421,7 @@ dependencies = [
 
 [[package]]
 name = "railwind"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "afdef686c74558b6202bb64fdb4e43c2026d4fdbf16b386c81f72ed34bc62085"
+version = "0.1.5"
 dependencies = [
  "hex",
  "indexmap",
@@ -431,18 +429,8 @@ dependencies = [
  "line-col",
  "regex",
  "ron",
-]
-
-[[package]]
-name = "railwind"
-version = "0.1.4"
-dependencies = [
- "hex",
- "indexmap",
- "lazy_static",
- "line-col",
- "regex",
- "ron",
+ "serde",
+ "serde_regex",
  "walkdir",
 ]
 
@@ -453,7 +441,7 @@ dependencies = [
  "clap",
  "globwalk",
  "notify",
- "railwind 0.1.2",
+ "railwind",
  "ron",
  "serde",
 ]
@@ -537,6 +525,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "serde_regex"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8136f1a4ea815d7eac4101cfd0b16dc0cb5e1fe1b8609dfd728058656b7badf"
+dependencies = [
+ "regex",
+ "serde",
 ]
 
 [[package]]

@@ -10,20 +10,33 @@ The main goal, is to decouple the original Tailwind project from Node and NPM an
 
 ### Installation
 
-To install with cargo, run `cargo install railwind_cli` to install the CLI.
+To install with cargo, run `cargo install railwind` to install the CLI.
 
-### Using railwind_cli
+### Using railwind
 
-Run `railwind_cli -i index.html` to generate a `railwind.css` file. You can optionally specify a different output file with the `-o` flag.
+To first start, generate a default `railwind.config.ron` file using `railwind -g` or `railwind --generate`. At the moment, the config supports only two values:
 
-# Features
+#### **content**
+Similar to `tailwind`s option, configure a path to all your HTML templates, Rust or JS files.
+#### **extend_collection_options**
+The compiler reads the file extension and selects an apropriate `regex` or way to parse that file. For example, files ending with `.html` will be parsed with a `regex`: `(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]"` to extract the class names. Similarly, you can specify your own `regex` to parse custom files:
 
-### Warning messages
+```
+extend_collection_options: Some({
+    "rs": Regex(r#"(?:class)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]"#)
+})
+```
+or give hints to the compiler, for example to parse a `rs` file as a `html` file:
 
-The CLI can write helpfull warning messages if you didn't pass the right value to a class or if you passed not enough or too many arguments. 
+```
+extend_collection_options: Some({
+    "rs": Html
+})
+```
 
-All Tailwind classes are now supported.
+To check out what other options are available, check out the documentation or the `railwind::CollectionOptions` enum which can be expaned.
 
+After setting up the config file, you can run `tailwind` to read the `railwind.config.ron` and generate a `railwind.css` file in the same directory. You can optionally specify a different config file with the `-c` flag and a different output file using the `-o` flag. 
 
 ## Authors
 

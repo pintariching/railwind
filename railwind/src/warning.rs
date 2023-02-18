@@ -54,8 +54,8 @@ impl Warning {
 impl fmt::Display for Warning {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_fmt(format_args!(
-            "Warning on Line: {}, Col: {}; {}",
-            self.position.line, self.position.column, self.message
+            "Warning on Line: {}, Col: {} in file: '{}'; {}",
+            self.position.line, self.position.column, self.position.file, self.message
         ))
     }
 }

@@ -15,7 +15,11 @@ edition = "2021"
 [dependencies]
 ron = { version = "0.8.0" }
 serde = { version = "1.0.152", features = ["derive"] }
-clap = { version = "4.1.4", features = ["derive"] }
+clap = { version = "4.1.6", features = ["derive"] }
 globwalk = "0.8.1"
-railwind = "0.1.2"
+railwind = { path = "../railwind" }
 notify = "5.1.0"
+
+[[bin]]
+name = "railwind"
+path = "src/main.rs"

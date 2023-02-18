@@ -14,7 +14,7 @@
 //     html! {
 //         <div>
 //             <div class="p-16">
-//                 <button class="p-2 m-5 bg-green-600" {onclick}>{ "+1" }</button>
+//                 <button class=" p-2 m-5 bg-green-600 " {onclick}>{ "+1" }</button>
 //                 <p class="text-xl">{ *counter }</p>
 //             </div>
 //         </div>

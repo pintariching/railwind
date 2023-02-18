@@ -1,6 +1,7 @@
 use class::{Borders, Class, Decl, Spacing};
 use indexmap::IndexMap;
 use modifiers::{generate_state_selector, MediaQuery, State};
+use serde::{Deserialize, Serialize};
 use utils::{indent_string, replace_invalid_chars};
 use warning::{Position, Warning, WarningType};
 
@@ -175,15 +176,16 @@ pub enum Source<'a> {
     String(String, CollectionOptions),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CollectionOptions {
     Html,
     String,
+    #[serde(with = "serde_regex")]
     Regex(Regex),
 }
 
 impl CollectionOptions {
-    pub fn new(value: &str, expand: Option<HashMap<&str, CollectionOptions>>) -> Self {
+    pub fn new(value: &str, expand: Option<HashMap<String, CollectionOptions>>) -> Self {
         if let Some(exp) = expand {
             if let Some(opt) = exp.get(value) {
                 return opt.clone();

@@ -3,6 +3,7 @@ use config::Config;
 use notify::event::ModifyKind;
 use notify::{Error, Event, EventKind, RecursiveMode, Watcher};
 use railwind::{parse_to_string, CollectionOptions, Source, SourceOptions};
+use ron::ser::PrettyConfig;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -28,11 +29,25 @@ struct Args {
     /// Watch files for changes and automaticaly run the parser
     #[arg(short = 'w', long, default_value = "false")]
     watch: bool,
+
+    /// Generate a default config file at the current directory
+    #[arg(short = 'g', long, default_value = "false")]
+    generate: bool,
 }
 
 fn main() {
     let args = Args::parse();
-    let input: Vec<PathBuf> = parse_config_to_paths(&args.config);
+
+    if args.generate {
+        let pretty = PrettyConfig::new().depth_limit(4);
+        let config = ron::ser::to_string_pretty(&Config::default(), pretty).unwrap();
+        let mut file = File::create("railwind.config.ron").unwrap();
+        file.write_all(config.as_bytes()).unwrap();
+        return;
+    }
+
+    let config = parse_config(&args.config);
+    let input: Vec<PathBuf> = get_paths_from_config(&config);
     let output = Path::new(&args.output);
 
     if args.watch {
@@ -44,10 +59,11 @@ fn main() {
                         let start = Instant::now();
 
                         let args = Args::parse();
-                        let input: Vec<PathBuf> = parse_config_to_paths(&args.config.clone());
+                        let config = parse_config(&args.config);
+                        let input: Vec<PathBuf> = get_paths_from_config(&config);
                         let output = Path::new(&args.output);
 
-                        run_parsing(&args, input, output);
+                        run_parsing(&args, input, output, &config);
 
                         let duration = start.elapsed();
                         println!("Parsing took: {:?}", duration);
@@ -66,21 +82,33 @@ fn main() {
                 .unwrap();
         }
 
-        run_parsing(&args, input, output);
+        run_parsing(&args, input, output, &config);
 
         loop {}
     } else {
-        run_parsing(&args, input, output);
+        run_parsing(&args, input, output, &config);
     }
 }
 
-fn parse_config_to_paths(config: &str) -> Vec<PathBuf> {
+fn parse_config(config_path: &str) -> Config {
+    let config_file = fs::read_to_string(config_path).unwrap();
+
+    match ron::from_str::<Config>(&config_file) {
+        Ok(c) => c,
+        Err(e) => {
+            println!("Failed to parse config: {e}. Running with default config");
+            Config {
+                content: vec!["index.html".to_string()],
+                extend_collection_options: None,
+            }
+        }
+    }
+}
+
+fn get_paths_from_config(config: &Config) -> Vec<PathBuf> {
     let mut out_paths: Vec<PathBuf> = Vec::new();
 
-    let config_file = fs::read_to_string(config).unwrap();
-    let config = ron::from_str::<Config>(&config_file).unwrap();
-
-    for c in config.content {
+    for c in config.content.clone() {
         if Path::new(&c).is_dir() {
             let dir = Path::new(&c);
             let paths = fs::read_dir(dir).unwrap();
@@ -100,7 +128,7 @@ fn parse_config_to_paths(config: &str) -> Vec<PathBuf> {
     out_paths
 }
 
-fn run_parsing(args: &Args, input: Vec<PathBuf>, output: &Path) {
+fn run_parsing(args: &Args, input: Vec<PathBuf>, output: &Path, config: &Config) {
     let mut warnings = Vec::new();
 
     let source_options: Vec<SourceOptions> = input
@@ -108,7 +136,11 @@ fn run_parsing(args: &Args, input: Vec<PathBuf>, output: &Path) {
         .map(|i| SourceOptions {
             input: &i,
             option: if let Some(extension) = i.extension() {
-                extension.into()
+                if let Some(str) = extension.to_str() {
+                    CollectionOptions::new(str, config.extend_collection_options.clone())
+                } else {
+                    CollectionOptions::String
+                }
             } else {
                 CollectionOptions::String
             },
