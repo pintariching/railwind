@@ -417,19 +417,13 @@ mod tests {
     fn test_collection_options() {
         let opts = CollectionOptions::new("html", None);
 
-        match opts {
-            CollectionOptions::Html => assert!(true),
-            CollectionOptions::String => assert!(false),
-            CollectionOptions::Regex(_) => assert!(false),
-        }
+        assert!(matches!(opts, CollectionOptions::Html));
 
-        let opts =
-            CollectionOptions::new("rs", Some(HashMap::from([("rs", CollectionOptions::Html)])));
+        let opts = CollectionOptions::new(
+            "rs",
+            Some(HashMap::from([("rs".to_string(), CollectionOptions::Html)])),
+        );
 
-        match opts {
-            CollectionOptions::Html => assert!(true),
-            CollectionOptions::String => assert!(false),
-            CollectionOptions::Regex(_) => assert!(false),
-        }
+        assert!(matches!(opts, CollectionOptions::Html));
     }
 }
