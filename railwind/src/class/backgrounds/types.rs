@@ -27,9 +27,9 @@ impl BackgroundAttachment {
 
     pub fn to_decl(self) -> Decl {
         let val = match self {
-            BackgroundAttachment::Fixed => "fixed",
-            BackgroundAttachment::Local => "local",
-            BackgroundAttachment::Scroll => "scroll",
+            Self::Fixed => "fixed",
+            Self::Local => "local",
+            Self::Scroll => "scroll",
         };
 
         Decl::Single(format!("background-attachment: {}", val))
@@ -61,10 +61,10 @@ impl BackgroundClip {
 
     pub fn to_decl(self) -> Decl {
         let val = match self {
-            BackgroundClip::Border => "border-box",
-            BackgroundClip::Padding => "padding-box",
-            BackgroundClip::Content => "content-box",
-            BackgroundClip::Text => {
+            Self::Border => "border-box",
+            Self::Padding => "padding-box",
+            Self::Content => "content-box",
+            Self::Text => {
                 return Decl::Double([
                     "-webkit-background-clip: text".into(),
                     "background-clip: text".into(),
@@ -120,9 +120,9 @@ impl BackgroundOrigin {
 
     pub fn to_decl(self) -> Decl {
         let val = match self {
-            BackgroundOrigin::Border => "border-box",
-            BackgroundOrigin::Padding => "padding-box",
-            BackgroundOrigin::Content => "content-box",
+            Self::Border => "border-box",
+            Self::Padding => "padding-box",
+            Self::Content => "content-box",
         };
 
         Decl::Single(format!("background-origin: {}", val))
@@ -225,7 +225,7 @@ impl<'a> GradientColorStops<'a> {
     }
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            GradientColorStops::From(g) => {
+            Self::From(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
 
                 if let Some(color) = hex_to_rgb_color(&value) {
@@ -257,11 +257,11 @@ impl<'a> GradientColorStops<'a> {
                     ]))
                 }
             }
-            GradientColorStops::To(g) => {
+            Self::To(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
                 Ok(Decl::Single(format!("--tw-gradient-to: {}", value)))
             }
-            GradientColorStops::Via(g) => {
+            Self::Via(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
 
                 if let Some(color) = hex_to_rgb_color(&value) {
