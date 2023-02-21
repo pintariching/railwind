@@ -290,9 +290,7 @@ impl<'a> BorderColor<'a> {
                 ])),
                 Self::Top(_) => Ok(Decl::Single(format!("border-top-color: {}", value))),
                 Self::Right(_) => Ok(Decl::Single(format!("border-right-color: {}", value))),
-                Self::Bottom(_) => {
-                    Ok(Decl::Single(format!("border-bottom-color: {}", value)))
-                }
+                Self::Bottom(_) => Ok(Decl::Single(format!("border-bottom-color: {}", value))),
                 Self::Left(_) => Ok(Decl::Single(format!("border-left-color: {}", value))),
             }
         }

@@ -92,10 +92,9 @@ impl<'a> Typography<'a> {
                     Self::TextColor(TextColor(get_args(value)?))
                 }
             }
-            "tracking" => Self::LetterSpacing(LetterSpacing::new(
-                get_class_name(value),
-                get_args(value)?,
-            )),
+            "tracking" => {
+                Self::LetterSpacing(LetterSpacing::new(get_class_name(value), get_args(value)?))
+            }
             "leading" => Self::LineHeight(LineHeight(get_args(value)?)),
             "list" => {
                 if let Some(list_style_position) = ListStylePosition::new(get_args(value)?) {
@@ -134,9 +133,7 @@ impl<'a> Typography<'a> {
                     Self::TextDecoration(TextDecoration::Underline)
                 }
             }
-            "indent" => {
-                Self::TextIndent(TextIndent::new(get_class_name(value), get_args(value)?))
-            }
+            "indent" => Self::TextIndent(TextIndent::new(get_class_name(value), get_args(value)?)),
             "align" => Self::VerticalAlign(VerticalAlign::new(get_args(value)?)?),
             "whitespace" => Self::Whitespace(Whitespace::new(get_args(value)?)?),
             "break" => Self::WordBreak(WordBreak::new(get_args(value)?)?),

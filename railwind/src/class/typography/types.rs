@@ -534,9 +534,7 @@ impl VerticalAlign {
             Self::TextBottom => "text-bottom",
             Self::Sub => "sub",
             Self::Super => "super",
-            Self::Arbitrary(a) => {
-                return Ok(Decl::Single(format!("vertical-align: {}", a)))
-            }
+            Self::Arbitrary(a) => return Ok(Decl::Single(format!("vertical-align: {}", a))),
         };
 
         Ok(Decl::Single(format!("vertical-align: {}", value)))

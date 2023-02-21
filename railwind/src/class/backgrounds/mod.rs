@@ -70,10 +70,9 @@ impl<'a> Backgrounds<'a> {
                     }
                 }
             },
-            "from" | "via" | "to" => Self::GradientColorStops(GradientColorStops::new(
-                get_class_name(value),
-                args,
-            )?),
+            "from" | "via" | "to" => {
+                Self::GradientColorStops(GradientColorStops::new(get_class_name(value), args)?)
+            }
             _ => return Ok(None),
         };
 

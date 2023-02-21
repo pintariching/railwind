@@ -93,16 +93,12 @@ impl<'a> FlexboxGrid<'a> {
             }
             "grow" => Self::Grow(Grow(get_opt_args(value))),
             "shrink" => Self::Shrink(Shrink(get_opt_args(value))),
-            "order" | "-order" => {
-                Self::Order(Order::new(get_class_name(value), get_args(value)?))
-            }
+            "order" | "-order" => Self::Order(Order::new(get_class_name(value), get_args(value)?)),
             "grid" => {
                 let args = get_args(value)?;
 
                 match get_class_name(args) {
-                    "cols" => {
-                        Self::GridTemplateColumns(GridTemplateColumns(get_args(args)?))
-                    }
+                    "cols" => Self::GridTemplateColumns(GridTemplateColumns(get_args(args)?)),
                     "rows" => Self::GridTepmlateRows(GridTepmlateRows(get_args(args)?)),
                     "flow" => Self::GridAutoFlow(GridAutoFlow::new(get_args(args)?)?),
                     v => {

@@ -51,9 +51,7 @@ impl<'a> Interactivity<'a> {
             "pointer" => {
                 let args = get_args(value)?;
                 match get_class_name(args) {
-                    "events" => {
-                        Self::PointerEvents(PointerEvents::new(get_opt_args(args))?)
-                    }
+                    "events" => Self::PointerEvents(PointerEvents::new(get_opt_args(args))?),
                     v => {
                         return Err(WarningType::InvalidArg(
                             v.into(),
