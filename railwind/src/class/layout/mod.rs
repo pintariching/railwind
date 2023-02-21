@@ -57,16 +57,16 @@ pub enum Layout<'a> {
 impl<'a> Layout<'a> {
     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let layout = match get_class_name(value) {
-            "aspect" => Layout::AspectRatio(AspectRatio(get_args(value)?)),
-            "container" => Layout::Container(Container),
-            "columns" => Layout::Columns(Columns(get_args(value)?)),
+            "aspect" => Self::AspectRatio(AspectRatio(get_args(value)?)),
+            "container" => Self::Container(Container),
+            "columns" => Self::Columns(Columns(get_args(value)?)),
             "break" => {
                 let args = get_args(value)?;
 
                 match get_class_name(args) {
-                    "after" => Layout::BreakAfter(BreakAfter::new(get_args(args)?)?),
-                    "before" => Layout::BreakBefore(BreakBefore::new(get_args(args)?)?),
-                    "inside" => Layout::BreakInside(BreakInside::new(get_args(args)?)?),
+                    "after" => Self::BreakAfter(BreakAfter::new(get_args(args)?)?),
+                    "before" => Self::BreakBefore(BreakBefore::new(get_args(args)?)?),
+                    "inside" => Self::BreakInside(BreakInside::new(get_args(args)?)?),
                     _ => return Ok(None),
                 }
             }
@@ -74,35 +74,35 @@ impl<'a> Layout<'a> {
             "box" => {
                 let args = get_args(value)?;
                 match get_class_name(args) {
-                    "decoration" => Layout::BoxDecoration(BoxDecoration::new(get_args(args)?)?),
-                    _ => Layout::BoxSizing(BoxSizing::new(args)?),
+                    "decoration" => Self::BoxDecoration(BoxDecoration::new(get_args(args)?)?),
+                    _ => Self::BoxSizing(BoxSizing::new(args)?),
                 }
             }
-            "float" => Layout::Floats(Floats::new(get_args(value)?)?),
-            "clear" => Layout::Clear(Clear::new(get_args(value)?)?),
+            "float" => Self::Floats(Floats::new(get_args(value)?)?),
+            "clear" => Self::Clear(Clear::new(get_args(value)?)?),
             "object" => {
                 if let Some(object_fit) = ObjectFit::new(get_args(value)?) {
-                    Layout::ObjectFit(object_fit)
+                    Self::ObjectFit(object_fit)
                 } else {
-                    Layout::ObjectPosition(ObjectPosition(get_args(value)?))
+                    Self::ObjectPosition(ObjectPosition(get_args(value)?))
                 }
             }
-            "overflow" => Layout::Overflow(Overflow::new(get_args(value)?)?),
-            "overscroll" => Layout::Overscroll(Overscroll::new(get_args(value)?)?),
-            "z" | "-z" => Layout::ZIndex(ZIndex::new(get_class_name(value), get_args(value)?)),
+            "overflow" => Self::Overflow(Overflow::new(get_args(value)?)?),
+            "overscroll" => Self::Overscroll(Overscroll::new(get_args(value)?)?),
+            "z" | "-z" => Self::ZIndex(ZIndex::new(get_class_name(value), get_args(value)?)),
             _ => {
                 if let Some(display) = Display::new(value) {
-                    Layout::Display(display)
+                    Self::Display(display)
                 } else if let Some(isolation) = Isolation::new(value) {
-                    Layout::Isolation(isolation)
+                    Self::Isolation(isolation)
                 } else if let Some(position) = Position::new(value) {
-                    Layout::Position(position)
+                    Self::Position(position)
                 } else if let Some(top_right_bottom_left) =
                     TopRightBottomLeft::new(get_class_name(value), get_opt_args(value))
                 {
-                    Layout::TopRightBottomLeft(top_right_bottom_left)
+                    Self::TopRightBottomLeft(top_right_bottom_left)
                 } else if let Some(visibility) = Visibility::new(value) {
-                    Layout::Visibility(visibility)
+                    Self::Visibility(visibility)
                 } else {
                     return Ok(None);
                 }
@@ -114,26 +114,26 @@ impl<'a> Layout<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Layout::AspectRatio(l) => l.to_decl(),
-            Layout::Container(l) => Ok(l.to_decl()),
-            Layout::Columns(l) => l.to_decl(),
-            Layout::BreakAfter(l) => Ok(l.to_decl()),
-            Layout::BreakBefore(l) => Ok(l.to_decl()),
-            Layout::BreakInside(l) => Ok(l.to_decl()),
-            Layout::BoxDecoration(l) => Ok(l.to_decl()),
-            Layout::BoxSizing(l) => Ok(l.to_decl()),
-            Layout::Display(l) => Ok(l.to_decl()),
-            Layout::Floats(l) => Ok(l.to_decl()),
-            Layout::Clear(l) => Ok(l.to_decl()),
-            Layout::Isolation(l) => Ok(l.to_decl()),
-            Layout::ObjectFit(l) => Ok(l.to_decl()),
-            Layout::ObjectPosition(l) => l.to_decl(),
-            Layout::Overflow(l) => Ok(l.to_decl()),
-            Layout::Overscroll(l) => Ok(l.to_decl()),
-            Layout::Position(l) => Ok(l.to_decl()),
-            Layout::TopRightBottomLeft(l) => l.to_decl(),
-            Layout::Visibility(l) => Ok(l.to_decl()),
-            Layout::ZIndex(l) => l.to_decl(),
+            Self::AspectRatio(l) => l.to_decl(),
+            Self::Container(l) => Ok(l.to_decl()),
+            Self::Columns(l) => l.to_decl(),
+            Self::BreakAfter(l) => Ok(l.to_decl()),
+            Self::BreakBefore(l) => Ok(l.to_decl()),
+            Self::BreakInside(l) => Ok(l.to_decl()),
+            Self::BoxDecoration(l) => Ok(l.to_decl()),
+            Self::BoxSizing(l) => Ok(l.to_decl()),
+            Self::Display(l) => Ok(l.to_decl()),
+            Self::Floats(l) => Ok(l.to_decl()),
+            Self::Clear(l) => Ok(l.to_decl()),
+            Self::Isolation(l) => Ok(l.to_decl()),
+            Self::ObjectFit(l) => Ok(l.to_decl()),
+            Self::ObjectPosition(l) => l.to_decl(),
+            Self::Overflow(l) => Ok(l.to_decl()),
+            Self::Overscroll(l) => Ok(l.to_decl()),
+            Self::Position(l) => Ok(l.to_decl()),
+            Self::TopRightBottomLeft(l) => l.to_decl(),
+            Self::Visibility(l) => Ok(l.to_decl()),
+            Self::ZIndex(l) => l.to_decl(),
         }
     }
 }
