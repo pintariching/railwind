@@ -45,9 +45,9 @@ impl<'a> Transform<'a> {
 
         let transform = match class_name {
             "translate" | "-translate" => match get_class_name(args) {
-                "x" => Transform::TranslateX(TranslateX::new(class_name, get_args(args)?)),
+                "x" => Self::TranslateX(TranslateX::new(class_name, get_args(args)?)),
 
-                "y" => Transform::TranslateY(TranslateY::new(class_name, get_args(args)?)),
+                "y" => Self::TranslateY(TranslateY::new(class_name, get_args(args)?)),
                 v => {
                     return Err(WarningType::InvalidArg(
                         v.into(),
@@ -56,11 +56,11 @@ impl<'a> Transform<'a> {
                     ))
                 }
             },
-            "rotate" | "-rotate" => Transform::Rotate(Rotate::new(class_name, args)),
+            "rotate" | "-rotate" => Self::Rotate(Rotate::new(class_name, args)),
             "skew" | "-skew" => match get_class_name(args) {
-                "x" => Transform::SkewX(SkewX::new(class_name, get_args(args)?)),
+                "x" => Self::SkewX(SkewX::new(class_name, get_args(args)?)),
 
-                "y" => Transform::SkewY(SkewY::new(class_name, get_args(args)?)),
+                "y" => Self::SkewY(SkewY::new(class_name, get_args(args)?)),
                 v => {
                     return Err(WarningType::InvalidArg(
                         v.into(),
@@ -69,8 +69,8 @@ impl<'a> Transform<'a> {
                     ))
                 }
             },
-            "scale" | "-scale" => Transform::Scale(Scale::new(value)?),
-            "origin" => Transform::Origin(Origin(args)),
+            "scale" | "-scale" => Self::Scale(Scale::new(value)?),
+            "origin" => Self::Origin(Origin(args)),
             _ => return Ok(None),
         };
 
@@ -78,13 +78,13 @@ impl<'a> Transform<'a> {
     }
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Transform::TranslateX(s) => s.to_decl(),
-            Transform::TranslateY(s) => s.to_decl(),
-            Transform::Rotate(s) => s.to_decl(),
-            Transform::SkewX(s) => s.to_decl(),
-            Transform::SkewY(s) => s.to_decl(),
-            Transform::Scale(s) => s.to_decl(),
-            Transform::Origin(s) => s.to_decl(),
+            Self::TranslateX(s) => s.to_decl(),
+            Self::TranslateY(s) => s.to_decl(),
+            Self::Rotate(s) => s.to_decl(),
+            Self::SkewX(s) => s.to_decl(),
+            Self::SkewY(s) => s.to_decl(),
+            Self::Scale(s) => s.to_decl(),
+            Self::Origin(s) => s.to_decl(),
         }
     }
 }
