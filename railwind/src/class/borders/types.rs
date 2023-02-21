@@ -204,27 +204,27 @@ impl<'a> BorderColor<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let arg = match self {
-            BorderColor::Around(arg) => arg,
-            BorderColor::X(arg) => arg,
-            BorderColor::Y(arg) => arg,
-            BorderColor::Top(arg) => arg,
-            BorderColor::Right(arg) => arg,
-            BorderColor::Bottom(arg) => arg,
-            BorderColor::Left(arg) => arg,
+            Self::Around(arg) => arg,
+            Self::X(arg) => arg,
+            Self::Y(arg) => arg,
+            Self::Top(arg) => arg,
+            Self::Right(arg) => arg,
+            Self::Bottom(arg) => arg,
+            Self::Left(arg) => arg,
         };
 
         let value = get_value(arg, &BORDER_COLOR)?;
 
         if let Some(color) = hex_to_rgb_color(&value) {
             let decl = match self {
-                BorderColor::Around(_) => Decl::Double([
+                Self::Around(_) => Decl::Double([
                     "--tw-border-opacity: 1".into(),
                     format!(
                         "border-color: rgb({} {} {} / var(--tw-border-opacity))",
                         color[0], color[1], color[2]
                     ),
                 ]),
-                BorderColor::X(_) => Decl::Triple([
+                Self::X(_) => Decl::Triple([
                     "--tw-border-opacity: 1".into(),
                     format!(
                         "border-left-color: rgb({} {} {} / var(--tw-border-opacity))",
@@ -235,7 +235,7 @@ impl<'a> BorderColor<'a> {
                         color[0], color[1], color[2]
                     ),
                 ]),
-                BorderColor::Y(_) => Decl::Triple([
+                Self::Y(_) => Decl::Triple([
                     "--tw-border-opacity: 1".into(),
                     format!(
                         "border-top-color: rgb({} {} {} / var(--tw-border-opacity))",
@@ -246,28 +246,28 @@ impl<'a> BorderColor<'a> {
                         color[0], color[1], color[2]
                     ),
                 ]),
-                BorderColor::Top(_) => Decl::Double([
+                Self::Top(_) => Decl::Double([
                     "--tw-border-opacity: 1".into(),
                     format!(
                         "border-top-color: rgb({} {} {} / var(--tw-border-opacity))",
                         color[0], color[1], color[2]
                     ),
                 ]),
-                BorderColor::Right(_) => Decl::Double([
+                Self::Right(_) => Decl::Double([
                     "--tw-border-opacity: 1".into(),
                     format!(
                         "border-right-color: rgb({} {} {} / var(--tw-border-opacity))",
                         color[0], color[1], color[2]
                     ),
                 ]),
-                BorderColor::Bottom(_) => Decl::Double([
+                Self::Bottom(_) => Decl::Double([
                     "--tw-border-opacity: 1".into(),
                     format!(
                         "border-bottom-color: rgb({} {} {} / var(--tw-border-opacity))",
                         color[0], color[1], color[2]
                     ),
                 ]),
-                BorderColor::Left(_) => Decl::Double([
+                Self::Left(_) => Decl::Double([
                     "--tw-border-opacity: 1".into(),
                     format!(
                         "border-left-color: rgb({} {} {} / var(--tw-border-opacity))",
@@ -279,21 +279,21 @@ impl<'a> BorderColor<'a> {
             Ok(decl)
         } else {
             match self {
-                BorderColor::Around(_) => Ok(Decl::Single(format!("border-color: {}", value))),
-                BorderColor::X(_) => Ok(Decl::Double([
+                Self::Around(_) => Ok(Decl::Single(format!("border-color: {}", value))),
+                Self::X(_) => Ok(Decl::Double([
                     format!("border-left-color: {}", value),
                     format!("border-right-color: {}", value),
                 ])),
-                BorderColor::Y(_) => Ok(Decl::Double([
+                Self::Y(_) => Ok(Decl::Double([
                     format!("border-top-color: {}", value),
                     format!("border-bottom-color: {}", value),
                 ])),
-                BorderColor::Top(_) => Ok(Decl::Single(format!("border-top-color: {}", value))),
-                BorderColor::Right(_) => Ok(Decl::Single(format!("border-right-color: {}", value))),
-                BorderColor::Bottom(_) => {
+                Self::Top(_) => Ok(Decl::Single(format!("border-top-color: {}", value))),
+                Self::Right(_) => Ok(Decl::Single(format!("border-right-color: {}", value))),
+                Self::Bottom(_) => {
                     Ok(Decl::Single(format!("border-bottom-color: {}", value)))
                 }
-                BorderColor::Left(_) => Ok(Decl::Single(format!("border-left-color: {}", value))),
+                Self::Left(_) => Ok(Decl::Single(format!("border-left-color: {}", value))),
             }
         }
     }

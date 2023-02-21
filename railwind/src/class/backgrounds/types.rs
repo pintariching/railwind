@@ -166,12 +166,12 @@ impl BackgroundRepeat {
 
     pub fn to_decl(self) -> Decl {
         let val = match self {
-            BackgroundRepeat::Repeat => "repeat",
-            BackgroundRepeat::NoRepeat => "no-repeat",
-            BackgroundRepeat::RepeatX => "repeat-x",
-            BackgroundRepeat::RepeatY => "repeat-y",
-            BackgroundRepeat::RepeatRound => "round",
-            BackgroundRepeat::RepeatSpace => "space",
+            Self::Repeat => "repeat",
+            Self::NoRepeat => "no-repeat",
+            Self::RepeatX => "repeat-x",
+            Self::RepeatY => "repeat-y",
+            Self::RepeatRound => "round",
+            Self::RepeatSpace => "space",
         };
 
         Decl::Single(format!("background-repeat: {}", val))
