@@ -11,7 +11,7 @@ pub fn replace_invalid_chars(selector: impl Into<String>) -> String {
     let mut val: String = selector.into();
 
     if val.contains(invalid_chars) {
-        let mut to_escape = Vec::new();
+        let mut to_escape = vec![];
         for (index, c) in val.chars().enumerate() {
             if invalid_chars.contains(&c) {
                 to_escape.push(index);

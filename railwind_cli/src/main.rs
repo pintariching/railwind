@@ -106,7 +106,7 @@ fn parse_config(config_path: &str) -> Config {
 }
 
 fn get_paths_from_config(config: &Config) -> Vec<PathBuf> {
-    let mut out_paths: Vec<PathBuf> = Vec::new();
+    let mut out_paths: Vec<PathBuf> = vec![];
 
     for c in config.content.clone() {
         if Path::new(&c).is_dir() {
@@ -129,7 +129,7 @@ fn get_paths_from_config(config: &Config) -> Vec<PathBuf> {
 }
 
 fn run_parsing(args: &Args, input: Vec<PathBuf>, output: &Path, config: &Config) {
-    let mut warnings = Vec::new();
+    let mut warnings = vec![];
 
     let source_options: Vec<SourceOptions> = input
         .iter()

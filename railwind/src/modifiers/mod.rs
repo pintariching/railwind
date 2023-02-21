@@ -52,8 +52,8 @@ impl State {
 }
 
 pub fn generate_state_selector(states: Vec<State>) -> String {
-    let mut pseudo_classes = Vec::new();
-    let mut pseudo_elements = Vec::new();
+    let mut pseudo_classes = vec![];
+    let mut pseudo_elements = vec![];
 
     for state in states {
         match state {
