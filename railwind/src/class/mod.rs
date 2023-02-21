@@ -95,7 +95,7 @@ impl<'a> Class<'a> {
         {
             Self::Typography(typography)
         } else if let Some(accessibility) = Accessibility::new(value) {
-            Class::Accessibility(accessibility)
+            Self::Accessibility(accessibility)
         } else if let Some(effects) =
             Effects::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
@@ -125,21 +125,21 @@ impl<'a> Class<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Class::Interactivity(c) => c.to_decl(),
-            Class::Layout(c) => c.to_decl(),
-            Class::FlexboxGrid(c) => c.to_decl(),
-            Class::Spacing(c) => c.to_decl(),
-            Class::Sizing(c) => c.to_decl(),
-            Class::Svg(c) => c.to_decl(),
-            Class::Table(c) => c.to_decl(),
-            Class::TransitionsAnimation(c) => c.to_decl(),
-            Class::Transform(c) => c.to_decl(),
-            Class::Typography(c) => c.to_decl(),
-            Class::Accessibility(c) => Ok(c.to_decl()),
-            Class::Backgrounds(c) => c.to_decl(),
-            Class::Borders(c) => c.to_decl(),
-            Class::Effects(c) => c.to_decl(),
-            Class::Filters(c) => c.to_decl(),
+            Self::Interactivity(c) => c.to_decl(),
+            Self::Layout(c) => c.to_decl(),
+            Self::FlexboxGrid(c) => c.to_decl(),
+            Self::Spacing(c) => c.to_decl(),
+            Self::Sizing(c) => c.to_decl(),
+            Self::Svg(c) => c.to_decl(),
+            Self::Table(c) => c.to_decl(),
+            Self::TransitionsAnimation(c) => c.to_decl(),
+            Self::Transform(c) => c.to_decl(),
+            Self::Typography(c) => c.to_decl(),
+            Self::Accessibility(c) => Ok(c.to_decl()),
+            Self::Backgrounds(c) => c.to_decl(),
+            Self::Borders(c) => c.to_decl(),
+            Self::Effects(c) => c.to_decl(),
+            Self::Filters(c) => c.to_decl(),
         }
     }
 }
