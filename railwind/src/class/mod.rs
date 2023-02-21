@@ -158,13 +158,13 @@ pub enum Decl {
 impl Decl {
     pub fn to_string(self) -> String {
         match self {
-            Decl::Lit(lit) => lit.to_string(),
-            Decl::Single(s) => s,
-            Decl::Triple(t) => t.join(";\n    "),
-            Decl::Double(d) => d.join(";\n    "),
-            Decl::Quad(q) => q.join(";\n    "),
-            Decl::Multiple(m) => m.join(";\n    "),
-            Decl::FullClass(fc) => fc,
+            Self::Lit(lit) => lit.to_string(),
+            Self::Single(s) => s,
+            Self::Triple(t) => t.join(";\n    "),
+            Self::Double(d) => d.join(";\n    "),
+            Self::Quad(q) => q.join(";\n    "),
+            Self::Multiple(m) => m.join(";\n    "),
+            Self::FullClass(fc) => fc,
         }
     }
 }
