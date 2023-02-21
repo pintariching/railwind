@@ -35,12 +35,12 @@ impl<'a> Spacing<'a> {
         };
 
         let spacing = if let Some(padding) = Padding::new(class_name, args) {
-            Spacing::Padding(padding)
+            Self::Padding(padding)
         } else if let Some(margin) = Margin::new(class_name, args) {
-            Spacing::Margin(margin)
+            Self::Margin(margin)
         } else {
             if let Some(sb) = SpaceBetween::new(class_name, args)? {
-                Spacing::SpaceBetween(sb)
+                Self::SpaceBetween(sb)
             } else {
                 return Ok(None);
             }
@@ -51,9 +51,9 @@ impl<'a> Spacing<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Spacing::Padding(s) => s.to_decl(),
-            Spacing::Margin(s) => s.to_decl(),
-            Spacing::SpaceBetween(s) => s.to_decl(),
+            Self::Padding(s) => s.to_decl(),
+            Self::Margin(s) => s.to_decl(),
+            Self::SpaceBetween(s) => s.to_decl(),
         }
     }
 }

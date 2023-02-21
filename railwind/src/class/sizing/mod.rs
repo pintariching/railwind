@@ -43,11 +43,11 @@ impl<'a> Sizing<'a> {
         };
 
         let sizing = match get_class_name(value) {
-            "w" => Sizing::Width(Width(args)),
-            "h" => Sizing::Height(Height(args)),
+            "w" => Self::Width(Width(args)),
+            "h" => Self::Height(Height(args)),
             "min" => match get_class_name(args) {
-                "w" => Sizing::MinWidth(MinWidth(get_args(args)?)),
-                "h" => Sizing::MinHeight(MinHeight(get_args(args)?)),
+                "w" => Self::MinWidth(MinWidth(get_args(args)?)),
+                "h" => Self::MinHeight(MinHeight(get_args(args)?)),
                 v => {
                     return Err(WarningType::InvalidArg(
                         v.into(),
@@ -57,8 +57,8 @@ impl<'a> Sizing<'a> {
                 }
             },
             "max" => match get_class_name(args) {
-                "w" => Sizing::MaxWidth(MaxWidth(get_args(args)?)),
-                "h" => Sizing::MaxHeight(MaxHeight(get_args(args)?)),
+                "w" => Self::MaxWidth(MaxWidth(get_args(args)?)),
+                "h" => Self::MaxHeight(MaxHeight(get_args(args)?)),
                 v => {
                     return Err(WarningType::InvalidArg(
                         v.into(),
@@ -75,12 +75,12 @@ impl<'a> Sizing<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Sizing::Width(s) => s.to_decl(),
-            Sizing::MinWidth(s) => s.to_decl(),
-            Sizing::MaxWidth(s) => s.to_decl(),
-            Sizing::Height(s) => s.to_decl(),
-            Sizing::MinHeight(s) => s.to_decl(),
-            Sizing::MaxHeight(s) => s.to_decl(),
+            Self::Width(s) => s.to_decl(),
+            Self::MinWidth(s) => s.to_decl(),
+            Self::MaxWidth(s) => s.to_decl(),
+            Self::Height(s) => s.to_decl(),
+            Self::MinHeight(s) => s.to_decl(),
+            Self::MaxHeight(s) => s.to_decl(),
         }
     }
 }

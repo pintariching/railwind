@@ -12,7 +12,7 @@ pub enum Accessibility {
 impl Accessibility {
     pub fn new(value: &str) -> Option<Self> {
         let accessibility = if let Some(padding) = ScreenReaders::new(value) {
-            Accessibility::ScreenReaders(padding)
+            Self::ScreenReaders(padding)
         } else {
             return None;
         };
@@ -22,7 +22,7 @@ impl Accessibility {
 
     pub fn to_decl(self) -> Decl {
         match self {
-            Accessibility::ScreenReaders(s) => s.to_decl(),
+            Self::ScreenReaders(s) => s.to_decl(),
         }
     }
 }

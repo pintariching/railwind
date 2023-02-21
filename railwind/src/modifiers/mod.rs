@@ -24,23 +24,23 @@ pub enum State {
 impl State {
     pub fn new(raw_class: &str, value: &str, position: &Position) -> Result<Self, Warning> {
         if let Some(mq) = MediaQuery::new(value) {
-            return Ok(State::MediaQuery(mq));
+            return Ok(Self::MediaQuery(mq));
         }
 
         if let Some(pc) = PseudoClass::new(value) {
-            return Ok(State::PseudoClass(pc));
+            return Ok(Self::PseudoClass(pc));
         }
 
         if let Some(pe) = PseudoElement::new(value) {
-            return Ok(State::PseudoElement(pe));
+            return Ok(Self::PseudoElement(pe));
         }
 
         if let Some(g) = Group::new(value) {
-            return Ok(State::Group(g));
+            return Ok(Self::Group(g));
         }
 
         if let Some(p) = Peer::new(value) {
-            return Ok(State::Peer(p));
+            return Ok(Self::Peer(p));
         }
 
         Err(Warning::new(
@@ -52,8 +52,8 @@ impl State {
 }
 
 pub fn generate_state_selector(states: Vec<State>) -> String {
-    let mut pseudo_classes = Vec::new();
-    let mut pseudo_elements = Vec::new();
+    let mut pseudo_classes = vec![];
+    let mut pseudo_elements = vec![];
 
     for state in states {
         match state {

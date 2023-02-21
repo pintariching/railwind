@@ -48,9 +48,9 @@ impl StrokeWidth {
 
     pub fn to_decl(self) -> Decl {
         let val = match self {
-            StrokeWidth::Zero => "0",
-            StrokeWidth::One => "1",
-            StrokeWidth::Two => "2",
+            Self::Zero => "0",
+            Self::One => "1",
+            Self::Two => "2",
         };
 
         Decl::Single(format!("stroke-width: {}", val))

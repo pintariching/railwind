@@ -61,19 +61,19 @@ impl<'a> Filter<'a> {
         let filter = match class_name {
             "blur" => {
                 if let Ok(args) = get_args(value) {
-                    Filter::Blur(Blur(args))
+                    Self::Blur(Blur(args))
                 } else {
-                    Filter::Blur(Blur(""))
+                    Self::Blur(Blur(""))
                 }
             }
-            "brightness" => Filter::Brightness(Brightness(get_args(value)?)),
-            "contrast" => Filter::Contrast(Contrast(get_args(value)?)),
+            "brightness" => Self::Brightness(Brightness(get_args(value)?)),
+            "contrast" => Self::Contrast(Contrast(get_args(value)?)),
             "drop" => match get_class_name(get_args(value)?) {
                 "shadow" => {
                     if let Ok(args) = get_args(get_args(value)?) {
-                        Filter::DropShadow(DropShadow(args))
+                        Self::DropShadow(DropShadow(args))
                     } else {
-                        Filter::DropShadow(DropShadow(""))
+                        Self::DropShadow(DropShadow(""))
                     }
                 }
                 v => {
@@ -86,14 +86,14 @@ impl<'a> Filter<'a> {
             },
             "grayscale" => {
                 if let Ok(args) = get_args(value) {
-                    Filter::Grayscale(Grayscale(args))
+                    Self::Grayscale(Grayscale(args))
                 } else {
-                    Filter::Grayscale(Grayscale(""))
+                    Self::Grayscale(Grayscale(""))
                 }
             }
             "hue" | "-hue" => match get_class_name(get_args(value)?) {
                 "rotate" => {
-                    Filter::HueRotate(HueRotate::new(class_name, get_args(get_args(value)?)?))
+                    Self::HueRotate(HueRotate::new(class_name, get_args(get_args(value)?)?))
                 }
                 v => {
                     return Err(WarningType::InvalidArg(
@@ -105,17 +105,17 @@ impl<'a> Filter<'a> {
             },
             "invert" => {
                 if let Ok(args) = get_args(value) {
-                    Filter::Invert(Invert(args))
+                    Self::Invert(Invert(args))
                 } else {
-                    Filter::Invert(Invert(""))
+                    Self::Invert(Invert(""))
                 }
             }
-            "saturate" => Filter::Saturate(Saturate(get_args(value)?)),
+            "saturate" => Self::Saturate(Saturate(get_args(value)?)),
             "sepia" => {
                 if let Ok(args) = get_args(value) {
-                    Filter::Sepia(Sepia(args))
+                    Self::Sepia(Sepia(args))
                 } else {
-                    Filter::Sepia(Sepia(""))
+                    Self::Sepia(Sepia(""))
                 }
             }
             "backdrop" | "-backdrop" => {
@@ -124,22 +124,22 @@ impl<'a> Filter<'a> {
                 match sub_class_name {
                     "blur" => {
                         if let Ok(args) = get_args(get_args(value)?) {
-                            Filter::BackdropBlur(BackdropBlur(args))
+                            Self::BackdropBlur(BackdropBlur(args))
                         } else {
-                            Filter::BackdropBlur(BackdropBlur(""))
+                            Self::BackdropBlur(BackdropBlur(""))
                         }
                     }
-                    "brightness" => Filter::BackdropBrightness(BackdropBrightness(get_args(args)?)),
-                    "contrast" => Filter::BackdropContrast(BackdropContrast(get_args(args)?)),
+                    "brightness" => Self::BackdropBrightness(BackdropBrightness(get_args(args)?)),
+                    "contrast" => Self::BackdropContrast(BackdropContrast(get_args(args)?)),
                     "grayscale" => {
                         if let Ok(args) = get_args(args) {
-                            Filter::BackdropGrayscale(BackdropGrayscale(args))
+                            Self::BackdropGrayscale(BackdropGrayscale(args))
                         } else {
-                            Filter::BackdropGrayscale(BackdropGrayscale(""))
+                            Self::BackdropGrayscale(BackdropGrayscale(""))
                         }
                     }
                     "hue" => match get_class_name(get_args(get_args(value)?)?) {
-                        "rotate" => Filter::BackdropHueRotate(BackdropHueRotate::new(
+                        "rotate" => Self::BackdropHueRotate(BackdropHueRotate::new(
                             class_name,
                             get_args(get_args(args)?)?,
                         )),
@@ -153,18 +153,18 @@ impl<'a> Filter<'a> {
                     },
                     "invert" => {
                         if let Ok(args) = get_args(args) {
-                            Filter::BackdropInvert(BackdropInvert(args))
+                            Self::BackdropInvert(BackdropInvert(args))
                         } else {
-                            Filter::BackdropInvert(BackdropInvert(""))
+                            Self::BackdropInvert(BackdropInvert(""))
                         }
                     }
-                    "opacity" => Filter::BackdropOpacity(BackdropOpacity(get_args(args)?)),
-                    "saturate" => Filter::BackdropSaturate(BackdropSaturate(get_args(args)?)),
+                    "opacity" => Self::BackdropOpacity(BackdropOpacity(get_args(args)?)),
+                    "saturate" => Self::BackdropSaturate(BackdropSaturate(get_args(args)?)),
                     "sepia" => {
                         if let Ok(args) = get_args(args) {
-                            Filter::BackdropSepia(BackdropSepia(args))
+                            Self::BackdropSepia(BackdropSepia(args))
                         } else {
-                            Filter::BackdropSepia(BackdropSepia(""))
+                            Self::BackdropSepia(BackdropSepia(""))
                         }
                     }
                     v => {
@@ -194,24 +194,24 @@ impl<'a> Filter<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Filter::Blur(s) => s.to_decl(),
-            Filter::Brightness(s) => s.to_decl(),
-            Filter::Contrast(s) => s.to_decl(),
-            Filter::DropShadow(s) => s.to_decl(),
-            Filter::Grayscale(s) => s.to_decl(),
-            Filter::HueRotate(s) => s.to_decl(),
-            Filter::Invert(s) => s.to_decl(),
-            Filter::Saturate(s) => s.to_decl(),
-            Filter::Sepia(s) => s.to_decl(),
-            Filter::BackdropBlur(s) => s.to_decl(),
-            Filter::BackdropBrightness(s) => s.to_decl(),
-            Filter::BackdropContrast(s) => s.to_decl(),
-            Filter::BackdropGrayscale(s) => s.to_decl(),
-            Filter::BackdropHueRotate(s) => s.to_decl(),
-            Filter::BackdropInvert(s) => s.to_decl(),
-            Filter::BackdropOpacity(s) => s.to_decl(),
-            Filter::BackdropSaturate(s) => s.to_decl(),
-            Filter::BackdropSepia(s) => s.to_decl(),
+            Self::Blur(s) => s.to_decl(),
+            Self::Brightness(s) => s.to_decl(),
+            Self::Contrast(s) => s.to_decl(),
+            Self::DropShadow(s) => s.to_decl(),
+            Self::Grayscale(s) => s.to_decl(),
+            Self::HueRotate(s) => s.to_decl(),
+            Self::Invert(s) => s.to_decl(),
+            Self::Saturate(s) => s.to_decl(),
+            Self::Sepia(s) => s.to_decl(),
+            Self::BackdropBlur(s) => s.to_decl(),
+            Self::BackdropBrightness(s) => s.to_decl(),
+            Self::BackdropContrast(s) => s.to_decl(),
+            Self::BackdropGrayscale(s) => s.to_decl(),
+            Self::BackdropHueRotate(s) => s.to_decl(),
+            Self::BackdropInvert(s) => s.to_decl(),
+            Self::BackdropOpacity(s) => s.to_decl(),
+            Self::BackdropSaturate(s) => s.to_decl(),
+            Self::BackdropSepia(s) => s.to_decl(),
         }
     }
 }

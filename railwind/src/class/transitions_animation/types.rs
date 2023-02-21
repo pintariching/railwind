@@ -49,42 +49,42 @@ impl Transition {
     }
     pub fn to_decl(self) -> Decl {
         match self {
-            Transition::None => Decl::Single("transition-property: none".into()),
-            Transition::All => Decl::Triple([
+            Self::None => Decl::Single("transition-property: none".into()),
+            Self::All => Decl::Triple([
                 "transition-property: all".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Transition::Transition => Decl::Multiple(vec![
+            Self::Transition => Decl::Multiple(vec![
                 "transition-property: color, background-color, border-color, outline-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Transition::Colors => Decl::Multiple(vec![
+            Self::Colors => Decl::Multiple(vec![
                 "transition-property: color, background-color, border-color, outline-color, fill, stroke, -webkit-text-decoration-color".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Transition::Opacity => Decl::Triple([
+            Self::Opacity => Decl::Triple([
                 "transition-property: opacity".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Transition::Shadow => Decl::Triple([
+            Self::Shadow => Decl::Triple([
                 "transition-property: box-shadow".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Transition::Transform => Decl::Triple([
+            Self::Transform => Decl::Triple([
                 "transition-property: transform".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Transition::Arbitrary(v) => Decl::Triple([
+            Self::Arbitrary(v) => Decl::Triple([
                 format!("transition-property: {v}"),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),

@@ -32,12 +32,12 @@ impl<'a> Svg<'a> {
         let class_name = get_class_name(value);
 
         let svg = match class_name {
-            "fill" => Svg::Fill(Fill(args)),
+            "fill" => Self::Fill(Fill(args)),
             "stroke" => {
                 if let Some(stroke) = StrokeWidth::new(args) {
-                    Svg::StrokeWidth(stroke)
+                    Self::StrokeWidth(stroke)
                 } else {
-                    Svg::Stroke(Stroke::new(args))
+                    Self::Stroke(Stroke::new(args))
                 }
             }
             _ => return Ok(None),
@@ -48,9 +48,9 @@ impl<'a> Svg<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Svg::Fill(s) => s.to_decl(),
-            Svg::Stroke(s) => s.to_decl(),
-            Svg::StrokeWidth(s) => Ok(s.to_decl()),
+            Self::Fill(s) => s.to_decl(),
+            Self::Stroke(s) => s.to_decl(),
+            Self::StrokeWidth(s) => Ok(s.to_decl()),
         }
     }
 }

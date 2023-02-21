@@ -44,16 +44,14 @@ impl<'a> Interactivity<'a> {
         let class_name = get_class_name(value);
 
         let interactivity = match class_name {
-            "accent" => Interactivity::AccentColor(AccentColor(get_args(value)?)),
-            "appearance" => Interactivity::Appearance(Appearance::new(get_args(value)?)?),
-            "cursor" => Interactivity::Cursor(Cursor(get_args(value)?)),
-            "caret" => Interactivity::CaretColor(CaretColor(get_args(value)?)),
+            "accent" => Self::AccentColor(AccentColor(get_args(value)?)),
+            "appearance" => Self::Appearance(Appearance::new(get_args(value)?)?),
+            "cursor" => Self::Cursor(Cursor(get_args(value)?)),
+            "caret" => Self::CaretColor(CaretColor(get_args(value)?)),
             "pointer" => {
                 let args = get_args(value)?;
                 match get_class_name(args) {
-                    "events" => {
-                        Interactivity::PointerEvents(PointerEvents::new(get_opt_args(args))?)
-                    }
+                    "events" => Self::PointerEvents(PointerEvents::new(get_opt_args(args))?),
                     v => {
                         return Err(WarningType::InvalidArg(
                             v.into(),
@@ -63,14 +61,14 @@ impl<'a> Interactivity<'a> {
                     }
                 }
             }
-            "resize" => Interactivity::Resize(Resize::new(value)?),
+            "resize" => Self::Resize(Resize::new(value)?),
             "scroll" | "-scroll" => {
                 if let Some(scroll) = ScrollBehavior::new(get_args(value)?) {
-                    Interactivity::ScrollBehavior(scroll)
+                    Self::ScrollBehavior(scroll)
                 } else if let Some(scroll) = ScrollMargin::new(class_name, get_args(value)?) {
-                    Interactivity::ScrollMargin(scroll)
+                    Self::ScrollMargin(scroll)
                 } else if let Some(scroll) = ScrollPadding::new(class_name, get_args(value)?) {
-                    Interactivity::ScrollPadding(scroll)
+                    Self::ScrollPadding(scroll)
                 } else {
                     return Err(WarningType::InvalidArg(
                         value.into(),
@@ -84,11 +82,11 @@ impl<'a> Interactivity<'a> {
             }
             "snap" => {
                 if let Some(snap) = ScrollSnapAlign::new(get_args(value)?) {
-                    Interactivity::ScrollSnapAlign(snap)
+                    Self::ScrollSnapAlign(snap)
                 } else if let Some(scroll) = ScrollSnapStop::new(get_args(value)?) {
-                    Interactivity::ScrollSnapStop(scroll)
+                    Self::ScrollSnapStop(scroll)
                 } else if let Some(scroll) = ScrollSnapType::new(get_args(value)?) {
-                    Interactivity::ScrollSnapType(scroll)
+                    Self::ScrollSnapType(scroll)
                 } else {
                     return Err(WarningType::InvalidArg(
                         value.into(),
@@ -110,9 +108,9 @@ impl<'a> Interactivity<'a> {
                     ));
                 }
             }
-            "touch" => Interactivity::TouchAction(TouchAction::new(get_args(value)?)?),
-            "select" => Interactivity::UserSelect(UserSelect::new(get_args(value)?)?),
-            "will" => Interactivity::WillChange(WillChange::new(get_args(value)?)?),
+            "touch" => Self::TouchAction(TouchAction::new(get_args(value)?)?),
+            "select" => Self::UserSelect(UserSelect::new(get_args(value)?)?),
+            "will" => Self::WillChange(WillChange::new(get_args(value)?)?),
             _ => return Ok(None),
         };
 
@@ -121,21 +119,21 @@ impl<'a> Interactivity<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Interactivity::AccentColor(s) => s.to_decl(),
-            Interactivity::Appearance(s) => Ok(s.to_decl()),
-            Interactivity::Cursor(s) => s.to_decl(),
-            Interactivity::CaretColor(s) => s.to_decl(),
-            Interactivity::PointerEvents(s) => Ok(s.to_decl()),
-            Interactivity::Resize(s) => Ok(s.to_decl()),
-            Interactivity::ScrollBehavior(s) => Ok(s.to_decl()),
-            Interactivity::ScrollMargin(s) => s.to_decl(),
-            Interactivity::ScrollPadding(s) => s.to_decl(),
-            Interactivity::ScrollSnapAlign(s) => Ok(s.to_decl()),
-            Interactivity::ScrollSnapStop(s) => Ok(s.to_decl()),
-            Interactivity::ScrollSnapType(s) => Ok(s.to_decl()),
-            Interactivity::TouchAction(s) => Ok(s.to_decl()),
-            Interactivity::UserSelect(s) => Ok(s.to_decl()),
-            Interactivity::WillChange(s) => Ok(s.to_decl()),
+            Self::AccentColor(s) => s.to_decl(),
+            Self::Appearance(s) => Ok(s.to_decl()),
+            Self::Cursor(s) => s.to_decl(),
+            Self::CaretColor(s) => s.to_decl(),
+            Self::PointerEvents(s) => Ok(s.to_decl()),
+            Self::Resize(s) => Ok(s.to_decl()),
+            Self::ScrollBehavior(s) => Ok(s.to_decl()),
+            Self::ScrollMargin(s) => s.to_decl(),
+            Self::ScrollPadding(s) => s.to_decl(),
+            Self::ScrollSnapAlign(s) => Ok(s.to_decl()),
+            Self::ScrollSnapStop(s) => Ok(s.to_decl()),
+            Self::ScrollSnapType(s) => Ok(s.to_decl()),
+            Self::TouchAction(s) => Ok(s.to_decl()),
+            Self::UserSelect(s) => Ok(s.to_decl()),
+            Self::WillChange(s) => Ok(s.to_decl()),
         }
     }
 }

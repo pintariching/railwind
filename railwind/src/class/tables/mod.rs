@@ -33,12 +33,12 @@ impl<'a> Table<'a> {
 
         let table = match class_name {
             "border" => match get_class_name(args) {
-                "collapse" => Table::BorderCollapse(BorderCollapse::Collapse),
-                "separate" => Table::BorderCollapse(BorderCollapse::Separate),
-                "spacing" => Table::BorderSpacing(BorderSpacing::new(get_args(args)?)),
+                "collapse" => Self::BorderCollapse(BorderCollapse::Collapse),
+                "separate" => Self::BorderCollapse(BorderCollapse::Separate),
+                "spacing" => Self::BorderSpacing(BorderSpacing::new(get_args(args)?)),
                 _ => return Ok(None),
             },
-            "table" => Table::Layout(Layout::new(args)?),
+            "table" => Self::Layout(Layout::new(args)?),
             _ => return Ok(None),
         };
 
@@ -46,9 +46,9 @@ impl<'a> Table<'a> {
     }
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Table::BorderSpacing(t) => t.to_decl(),
-            Table::BorderCollapse(t) => Ok(t.to_decl()),
-            Table::Layout(t) => Ok(t.to_decl()),
+            Self::BorderSpacing(t) => t.to_decl(),
+            Self::BorderCollapse(t) => Ok(t.to_decl()),
+            Self::Layout(t) => Ok(t.to_decl()),
         }
     }
 }

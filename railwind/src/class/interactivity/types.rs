@@ -469,10 +469,10 @@ impl UserSelect {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            UserSelect::None => "none",
-            UserSelect::Text => "text",
-            UserSelect::All => "all",
-            UserSelect::Auto => "auto",
+            Self::None => "none",
+            Self::Text => "text",
+            Self::All => "all",
+            Self::Auto => "auto",
         };
 
         Decl::Double([
@@ -512,10 +512,10 @@ impl WillChange {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            WillChange::Auto => "auto",
-            WillChange::Scroll => "scroll-position",
-            WillChange::Contents => "contents",
-            WillChange::Transform => "transform",
+            Self::Auto => "auto",
+            Self::Scroll => "scroll-position",
+            Self::Contents => "contents",
+            Self::Transform => "transform",
         };
 
         Decl::Single(format!("will-change: {}", value))

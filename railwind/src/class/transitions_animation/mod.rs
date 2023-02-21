@@ -32,11 +32,11 @@ pub enum TransitionsAnimation<'a> {
 impl<'a> TransitionsAnimation<'a> {
     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
         let transitions_animation = match get_class_name(value) {
-            "transition" => TransitionsAnimation::Transition(Transition::new(get_opt_args(value))?),
-            "duration" => TransitionsAnimation::Duration(Duration(get_args(value)?)),
-            "ease" => TransitionsAnimation::TimingFunction(TimingFunction(get_args(value)?)),
-            "delay" => TransitionsAnimation::Delay(Delay(get_args(value)?)),
-            "animate" => TransitionsAnimation::Animation(Animation(get_args(value)?)),
+            "transition" => Self::Transition(Transition::new(get_opt_args(value))?),
+            "duration" => Self::Duration(Duration(get_args(value)?)),
+            "ease" => Self::TimingFunction(TimingFunction(get_args(value)?)),
+            "delay" => Self::Delay(Delay(get_args(value)?)),
+            "animate" => Self::Animation(Animation(get_args(value)?)),
             _ => return Ok(None),
         };
 
@@ -44,11 +44,11 @@ impl<'a> TransitionsAnimation<'a> {
     }
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            TransitionsAnimation::Transition(s) => Ok(s.to_decl()),
-            TransitionsAnimation::Duration(s) => s.to_decl(),
-            TransitionsAnimation::TimingFunction(s) => s.to_decl(),
-            TransitionsAnimation::Delay(s) => s.to_decl(),
-            TransitionsAnimation::Animation(s) => s.to_decl(),
+            Self::Transition(s) => Ok(s.to_decl()),
+            Self::Duration(s) => s.to_decl(),
+            Self::TimingFunction(s) => s.to_decl(),
+            Self::Delay(s) => s.to_decl(),
+            Self::Animation(s) => s.to_decl(),
         }
     }
 }

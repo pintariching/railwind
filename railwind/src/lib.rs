@@ -55,7 +55,7 @@ impl<'a> ParsedClass<'a> {
                     return Ok(Self::new(
                         raw_class,
                         Class::new(raw_class, raw_class, &position)?,
-                        Vec::new(),
+                        vec![],
                         position.clone(),
                     ));
                 }
@@ -64,7 +64,7 @@ impl<'a> ParsedClass<'a> {
             let states = &raw_class[..colon_index];
             let entire_class = &raw_class[colon_index + 1..];
 
-            let mut parsed_states = Vec::new();
+            let mut parsed_states = vec![];
             for state in states.split(':') {
                 parsed_states.push(State::new(raw_class, state, &position)?)
             }
@@ -79,7 +79,7 @@ impl<'a> ParsedClass<'a> {
             Ok(Self::new(
                 raw_class,
                 Class::new(raw_class, raw_class, &position)?,
-                Vec::new(),
+                vec![],
                 position.clone(),
             ))
         }
@@ -349,7 +349,7 @@ fn generate_strings<'a>(
     parsed_classes: Vec<ParsedClass<'a>>,
     warnings: &mut Vec<Warning>,
 ) -> Vec<String> {
-    let mut out = Vec::new();
+    let mut out = vec![];
 
     for class in parsed_classes {
         let pos = class.position.clone();
@@ -387,7 +387,7 @@ mod tests {
     #[test]
     fn test_parse_classes_fail() {
         let text = "space-c-4";
-        let mut warnings = Vec::new();
+        let mut warnings = vec![];
         let _ = parse_to_string(
             Source::String(text.into(), CollectionOptions::String),
             false,
