@@ -57,11 +57,11 @@ impl FontSmoothing {
 
     pub fn to_decl(self) -> Decl {
         match self {
-            FontSmoothing::Antialiased => Decl::Double([
+            Self::Antialiased => Decl::Double([
                 "-webkit-font-smoothing: antialiased".into(),
                 "-moz-osx-font-smoothing: grayscale".into(),
             ]),
-            FontSmoothing::SubpixelAntialiased => Decl::Double([
+            Self::SubpixelAntialiased => Decl::Double([
                 "-webkit-font-smoothing: auto".into(),
                 "-moz-osx-font-smoothing: auto".into(),
             ]),
