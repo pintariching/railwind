@@ -88,8 +88,8 @@ impl FontStyle {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            FontStyle::Italic => "italic",
-            FontStyle::NonItalic => "normal",
+            Self::Italic => "italic",
+            Self::NonItalic => "normal",
         };
 
         Decl::Single(format!("font-style: {}", value))
@@ -139,15 +139,15 @@ impl FontVariantNumeric {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            FontVariantNumeric::NormalNums => return Decl::Lit("font-variant-numeric: normal"),
-            FontVariantNumeric::Ordinal => "--tw-ordinal: ordinal",
-            FontVariantNumeric::SlashedZero => "--tw-slashed-zero: slashed-zero",
-            FontVariantNumeric::LiningNums => "--tw-numeric-figure: lining-nums",
-            FontVariantNumeric::OldstyleNums => "--tw-numeric-figure: oldstyle-nums",
-            FontVariantNumeric::ProportialNums => "--tw-numeric-spacing: proportional-nums",
-            FontVariantNumeric::TabularNums => "--tw-numeric-spacing: tabular-nums",
-            FontVariantNumeric::DiagonalFractions => "--tw-numeric-fraction: diagonal-fractions",
-            FontVariantNumeric::StackedFractions => "--tw-numeric-fraction: stacked-fractions",
+            Self::NormalNums => return Decl::Lit("font-variant-numeric: normal"),
+            Self::Ordinal => "--tw-ordinal: ordinal",
+            Self::SlashedZero => "--tw-slashed-zero: slashed-zero",
+            Self::LiningNums => "--tw-numeric-figure: lining-nums",
+            Self::OldstyleNums => "--tw-numeric-figure: oldstyle-nums",
+            Self::ProportialNums => "--tw-numeric-spacing: proportional-nums",
+            Self::TabularNums => "--tw-numeric-spacing: tabular-nums",
+            Self::DiagonalFractions => "--tw-numeric-fraction: diagonal-fractions",
+            Self::StackedFractions => "--tw-numeric-fraction: stacked-fractions",
         };
 
         Decl::Double([
@@ -214,8 +214,8 @@ impl ListStylePosition {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            ListStylePosition::Inside => "inside",
-            ListStylePosition::Outside => "outside",
+            Self::Inside => "inside",
+            Self::Outside => "outside",
         };
 
         Decl::Single(format!("list-style-position: {}", value))
@@ -249,12 +249,12 @@ impl TextAlign {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            TextAlign::Left => "left",
-            TextAlign::Center => "center",
-            TextAlign::Right => "right",
-            TextAlign::Justify => "justify",
-            TextAlign::Start => "start",
-            TextAlign::End => "end",
+            Self::Left => "left",
+            Self::Center => "center",
+            Self::Right => "right",
+            Self::Justify => "justify",
+            Self::Start => "start",
+            Self::End => "end",
         };
 
         Decl::Single(format!("text-align: {}", value))
@@ -303,10 +303,10 @@ impl TextDecoration {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            TextDecoration::Underline => "underline",
-            TextDecoration::Overline => "overline",
-            TextDecoration::LineThrough => "line-through",
-            TextDecoration::NoUnderline => "none",
+            Self::Underline => "underline",
+            Self::Overline => "overline",
+            Self::LineThrough => "line-through",
+            Self::NoUnderline => "none",
         };
 
         Decl::Double([
@@ -354,11 +354,11 @@ impl TextDecorationStyle {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            TextDecorationStyle::Solid => "solid",
-            TextDecorationStyle::Double => "double",
-            TextDecorationStyle::Dotted => "dotted",
-            TextDecorationStyle::Dashed => "dashed",
-            TextDecorationStyle::Wavy => "wavy",
+            Self::Solid => "solid",
+            Self::Double => "double",
+            Self::Dotted => "dotted",
+            Self::Dashed => "dashed",
+            Self::Wavy => "wavy",
         };
 
         Decl::Double([
@@ -414,10 +414,10 @@ impl TextTransform {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            TextTransform::Uppercase => "uppercase",
-            TextTransform::Lowercase => "lowercase",
-            TextTransform::Capitalize => "capitalize",
-            TextTransform::NormalCase => "none",
+            Self::Uppercase => "uppercase",
+            Self::Lowercase => "lowercase",
+            Self::Capitalize => "capitalize",
+            Self::NormalCase => "none",
         };
 
         Decl::Single(format!("text-transform: {}", value))
@@ -445,15 +445,15 @@ impl TextOverflow {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            TextOverflow::Truncate => {
+            Self::Truncate => {
                 return Decl::Triple([
                     "overflow: hidden".into(),
                     "text-overflow: ellipsis".into(),
                     "white-space: nowrap".into(),
                 ])
             }
-            TextOverflow::TextEllipsis => "ellipsis",
-            TextOverflow::TextClip => "clip",
+            Self::TextEllipsis => "ellipsis",
+            Self::TextClip => "clip",
         };
 
         Decl::Single(format!("text-overflow: {}", value))
@@ -526,15 +526,15 @@ impl VerticalAlign {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = match self {
-            VerticalAlign::Baseline => "baseline",
-            VerticalAlign::Top => "top",
-            VerticalAlign::Middle => "middle",
-            VerticalAlign::Bottom => "bottom",
-            VerticalAlign::TextTop => "text-top",
-            VerticalAlign::TextBottom => "text-bottom",
-            VerticalAlign::Sub => "sub",
-            VerticalAlign::Super => "super",
-            VerticalAlign::Arbitrary(a) => {
+            Self::Baseline => "baseline",
+            Self::Top => "top",
+            Self::Middle => "middle",
+            Self::Bottom => "bottom",
+            Self::TextTop => "text-top",
+            Self::TextBottom => "text-bottom",
+            Self::Sub => "sub",
+            Self::Super => "super",
+            Self::Arbitrary(a) => {
                 return Ok(Decl::Single(format!("vertical-align: {}", a)))
             }
         };
@@ -570,11 +570,11 @@ impl Whitespace {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            Whitespace::Normal => "normal",
-            Whitespace::NoWrap => "nowrap",
-            Whitespace::Pre => "pre",
-            Whitespace::PreLine => "pre-line",
-            Whitespace::PreWrap => "pre-wrap",
+            Self::Normal => "normal",
+            Self::NoWrap => "nowrap",
+            Self::Pre => "pre",
+            Self::PreLine => "pre-line",
+            Self::PreWrap => "pre-wrap",
         };
 
         Decl::Single(format!("white-space: {}", value))
@@ -606,12 +606,12 @@ impl WordBreak {
 
     pub fn to_decl(self) -> Decl {
         let value = match self {
-            WordBreak::Normal => {
+            Self::Normal => {
                 return Decl::Double(["overflow-wrap: normal".into(), "word-break: normal".into()])
             }
-            WordBreak::Words => return Decl::Lit("overflow-wrap: break-word"),
-            WordBreak::All => "break-all",
-            WordBreak::Keep => "keep-all",
+            Self::Words => return Decl::Lit("overflow-wrap: break-word"),
+            Self::All => "break-all",
+            Self::Keep => "keep-all",
         };
 
         Decl::Single(format!("word-break: {}", value))
