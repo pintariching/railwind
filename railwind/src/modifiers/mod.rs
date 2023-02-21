@@ -85,21 +85,21 @@ mod tests {
 
     #[test]
     fn test_generate_state_selector() {
-        let states = vec![Self::PseudoClass(PseudoClass::Active)];
+        let states = vec![State::PseudoClass(PseudoClass::Active)];
         assert_eq!(generate_state_selector(states), "active".to_string());
 
         let states = vec![
-            Self::PseudoClass(PseudoClass::Active),
-            Self::PseudoClass(PseudoClass::Hover),
+            State::PseudoClass(PseudoClass::Active),
+            State::PseudoClass(PseudoClass::Hover),
         ];
         assert_eq!(generate_state_selector(states), "active:hover".to_string());
 
-        let states = vec![Self::PseudoElement(PseudoElement::Before)];
+        let states = vec![State::PseudoElement(PseudoElement::Before)];
         assert_eq!(generate_state_selector(states), ":before".to_string());
 
         let states = vec![
-            Self::PseudoElement(PseudoElement::Before),
-            Self::PseudoElement(PseudoElement::After),
+            State::PseudoElement(PseudoElement::Before),
+            State::PseudoElement(PseudoElement::After),
         ];
         assert_eq!(
             generate_state_selector(states),
@@ -107,10 +107,10 @@ mod tests {
         );
 
         let states = vec![
-            Self::PseudoClass(PseudoClass::Active),
-            Self::PseudoElement(PseudoElement::Before),
-            Self::PseudoClass(PseudoClass::Hover),
-            Self::PseudoElement(PseudoElement::After),
+            State::PseudoClass(PseudoClass::Active),
+            State::PseudoElement(PseudoElement::Before),
+            State::PseudoClass(PseudoClass::Hover),
+            State::PseudoElement(PseudoElement::After),
         ];
         assert_eq!(
             generate_state_selector(states),
