@@ -34,16 +34,16 @@ impl<'a> Effects<'a> {
         let effect = match get_class_name(value) {
             "shadow" => {
                 if BOX_SHADOW.contains_key(get_opt_args(value)) {
-                    Effects::BoxShadow(BoxShadow(get_opt_args(value)))
+                    Self::BoxShadow(BoxShadow(get_opt_args(value)))
                 } else {
-                    Effects::BoxShadowColor(BoxShadowColor(get_args(value)?))
+                    Self::BoxShadowColor(BoxShadowColor(get_args(value)?))
                 }
             }
-            "opacity" => Effects::Opacity(Opacity(get_args(value)?)),
+            "opacity" => Self::Opacity(Opacity(get_args(value)?)),
             "mix" => {
                 let args = get_args(value)?;
                 match get_class_name(args) {
-                    "blend" => Effects::MixBlendMode(MixBlendMode::new(get_args(args)?)?),
+                    "blend" => Self::MixBlendMode(MixBlendMode::new(get_args(args)?)?),
                     v => {
                         return Err(WarningType::InvalidArg(
                             v.into(),
@@ -57,7 +57,7 @@ impl<'a> Effects<'a> {
                 let args = get_args(value)?;
                 match get_class_name(args) {
                     "blend" => {
-                        Effects::BackgroundBlendMode(BackgroundBlendMode::new(get_args(args)?)?)
+                        Self::BackgroundBlendMode(BackgroundBlendMode::new(get_args(args)?)?)
                     }
                     _ => return Ok(None),
                 }
@@ -70,11 +70,11 @@ impl<'a> Effects<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         match self {
-            Effects::BoxShadow(e) => e.to_decl(),
-            Effects::BoxShadowColor(e) => e.to_decl(),
-            Effects::Opacity(e) => e.to_decl(),
-            Effects::MixBlendMode(e) => Ok(e.to_decl()),
-            Effects::BackgroundBlendMode(e) => Ok(e.to_decl()),
+            Self::BoxShadow(e) => e.to_decl(),
+            Self::BoxShadowColor(e) => e.to_decl(),
+            Self::Opacity(e) => e.to_decl(),
+            Self::MixBlendMode(e) => Ok(e.to_decl()),
+            Self::BackgroundBlendMode(e) => Ok(e.to_decl()),
         }
     }
 }
