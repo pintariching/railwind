@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Peer {
     Hover,
     Focus,

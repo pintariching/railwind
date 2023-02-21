@@ -15,16 +15,16 @@ pub enum PseudoElement {
 impl PseudoElement {
     pub fn new(value: &str) -> Option<Self> {
         let pe = match value {
-            "before" => PseudoElement::Before,
-            "after" => PseudoElement::After,
-            "placeholder" => PseudoElement::Placeholder,
-            "file" => PseudoElement::File,
-            "marker" => PseudoElement::Marker,
-            "selection" => PseudoElement::Selection,
-            "first-line" => PseudoElement::FirstLine,
-            "first-letter" => PseudoElement::FirstLetter,
-            "last-line" => PseudoElement::LastLine,
-            "backdrop" => PseudoElement::Backdrop,
+            "before" => Self::Before,
+            "after" => Self::After,
+            "placeholder" => Self::Placeholder,
+            "file" => Self::File,
+            "marker" => Self::Marker,
+            "selection" => Self::Selection,
+            "first-line" => Self::FirstLine,
+            "first-letter" => Self::FirstLetter,
+            "last-line" => Self::LastLine,
+            "backdrop" => Self::Backdrop,
             _ => return None,
         };
 
@@ -33,16 +33,16 @@ impl PseudoElement {
 
     pub fn to_static_str(self) -> &'static str {
         match self {
-            PseudoElement::Before => "before",
-            PseudoElement::After => "after",
-            PseudoElement::Placeholder => "placeholder",
-            PseudoElement::File => "file-selector-button",
-            PseudoElement::Marker => "marker",
-            PseudoElement::Selection => "selection",
-            PseudoElement::FirstLine => "first-line",
-            PseudoElement::FirstLetter => "first-letter",
-            PseudoElement::LastLine => "last-line",
-            PseudoElement::Backdrop => "backdrop",
+            Self::Before => "before",
+            Self::After => "after",
+            Self::Placeholder => "placeholder",
+            Self::File => "file-selector-button",
+            Self::Marker => "marker",
+            Self::Selection => "selection",
+            Self::FirstLine => "first-line",
+            Self::FirstLetter => "first-letter",
+            Self::LastLine => "last-line",
+            Self::Backdrop => "backdrop",
         }
     }
 }
