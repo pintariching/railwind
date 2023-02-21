@@ -57,61 +57,61 @@ impl<'a> Class<'a> {
         let class = if let Some(interactivity) =
             Interactivity::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Interactivity(interactivity)
+            Self::Interactivity(interactivity)
         } else if let Some(layout) =
             Layout::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Layout(layout)
+            Self::Layout(layout)
         } else if let Some(flexbox_grid) =
             FlexboxGrid::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::FlexboxGrid(flexbox_grid)
+            Self::FlexboxGrid(flexbox_grid)
         } else if let Some(spacing) =
             Spacing::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Spacing(spacing)
+            Self::Spacing(spacing)
         } else if let Some(sizing) =
             Sizing::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Sizing(sizing)
+            Self::Sizing(sizing)
         } else if let Some(svg) =
             Svg::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Svg(svg)
+            Self::Svg(svg)
         } else if let Some(table) =
             Table::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Table(table)
+            Self::Table(table)
         } else if let Some(transitions_animation) =
             TransitionsAnimation::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::TransitionsAnimation(transitions_animation)
+            Self::TransitionsAnimation(transitions_animation)
         } else if let Some(transform) =
             Transform::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Transform(transform)
+            Self::Transform(transform)
         } else if let Some(typography) =
             Typography::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Typography(typography)
+            Self::Typography(typography)
         } else if let Some(accessibility) = Accessibility::new(value) {
             Class::Accessibility(accessibility)
         } else if let Some(effects) =
             Effects::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Effects(effects)
+            Self::Effects(effects)
         } else if let Some(backgrounds) =
             Backgrounds::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Backgrounds(backgrounds)
+            Self::Backgrounds(backgrounds)
         } else if let Some(borders) =
             Borders::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Borders(borders)
+            Self::Borders(borders)
         } else if let Some(filter) =
             Filter::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
-            Class::Filters(filter)
+            Self::Filters(filter)
         } else {
             return Err(Warning::new(
                 raw_class,
