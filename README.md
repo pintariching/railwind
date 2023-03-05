@@ -19,7 +19,7 @@ To first start, generate a default `railwind.config.ron` file using `railwind -g
 #### **content**
 Similar to `tailwind`s option, configure a path to all your HTML templates, Rust or JS files.
 #### **extend_collection_options**
-The compiler reads the file extension and selects an apropriate `regex` or way to parse that file. For example, files ending with `.html` will be parsed with a `regex`: `(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]"` to extract the class names. Similarly, you can specify your own `regex` to parse custom files:
+The compiler reads the file extension and selects an apropriate `regex` or way to parse that file. For example, files ending with `.html` will be parsed with a `regex`: `(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]` to extract the class names. Similarly, you can specify your own `regex` to parse custom files:
 
 ```
 extend_collection_options: Some({
