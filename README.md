@@ -19,7 +19,7 @@ To first start, generate a default `railwind.config.ron` file using `railwind -g
 #### **content**
 Similar to `tailwind`s option, configure a path to all your HTML templates, Rust or JS files.
 #### **extend_collection_options**
-The compiler reads the file extension and selects an apropriate `regex` or way to parse that file. For example, files ending with `.html` will be parsed with a `regex`: `(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]"` to extract the class names. Similarly, you can specify your own `regex` to parse custom files:
+The compiler reads the file extension and selects an apropriate `regex` or way to parse that file. For example, files ending with `.html` will be parsed with a `regex`: `(?:class|className)=(?:["]\W+\s*(?:\w+)\()?["]([^"]+)["]` to extract the class names. Similarly, you can specify your own `regex` to parse custom files:
 
 ```
 extend_collection_options: Some({
@@ -36,7 +36,7 @@ extend_collection_options: Some({
 
 To check out what other options are available, check out the documentation or the `railwind::CollectionOptions` enum which can be expaned.
 
-After setting up the config file, you can run `tailwind` to read the `railwind.config.ron` and generate a `railwind.css` file in the same directory. You can optionally specify a different config file with the `-c` flag and a different output file using the `-o` flag. 
+After setting up the config file, you can run `railwind` to read the `railwind.config.ron` and generate a `railwind.css` file in the same directory. You can optionally specify a different config file with the `-c` flag and a different output file using the `-o` flag. 
 
 ## Authors
 
