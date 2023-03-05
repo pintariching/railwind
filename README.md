@@ -36,7 +36,7 @@ extend_collection_options: Some({
 
 To check out what other options are available, check out the documentation or the `railwind::CollectionOptions` enum which can be expaned.
 
-After setting up the config file, you can run `tailwind` to read the `railwind.config.ron` and generate a `railwind.css` file in the same directory. You can optionally specify a different config file with the `-c` flag and a different output file using the `-o` flag. 
+After setting up the config file, you can run `railwind` to read the `railwind.config.ron` and generate a `railwind.css` file in the same directory. You can optionally specify a different config file with the `-c` flag and a different output file using the `-o` flag. 
 
 ## Authors
 
