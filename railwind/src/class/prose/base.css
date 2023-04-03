@@ -1,0 +1,205 @@
+.prose {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose [class~="lead"] {
+  font-size: 1.25em;
+  line-height: 1.6;
+  margin-top: 1.2em;
+  margin-bottom: 1.2em;
+}
+
+.prose blockquote {
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+  padding-left: 1em;
+}
+
+.prose h1 {
+  font-size: 2.25em;
+  margin-top: 0;
+  margin-bottom: 0.88em;
+  line-height: 1.11;
+}
+
+.prose h2 {
+  font-size: 1.5em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  line-height: 1.33;
+}
+
+.prose h3 {
+  font-size: 1.25em;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  line-height: 1.6;
+}
+
+.prose h4 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.5;
+}
+
+.prose img {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.prose video {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.prose figure {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.prose figure > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.prose figcaption {
+  font-size: 0.875em;
+  line-height: 1.43;
+  margin-top: 0.857em;
+}
+
+.prose code {
+  font-size: 0.875em;
+}
+
+.prose h2 code {
+  font-size: 1.3125em;
+}
+
+.prose h3 code {
+  font-size: 0.9em;
+}
+
+.prose pre {
+  font-size: 0.875em;
+  line-height: 1.71;
+  margin-top: 1.714em;
+  margin-bottom: 1.714em;
+  border-radius: 0.375em;
+  padding-top: 0.857em;
+  padding-right: 1.143em;
+  padding-bottom: 0.857em;
+  padding-left: 1.143em;
+}
+
+.prose ol {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.625em;
+}
+
+.prose ul {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.625em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose ol > li {
+  padding-left: 0.375em;
+}
+
+.prose ul > li {
+  padding-left: 0.375em;
+}
+
+.prose > ul > li p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose > ul > li > *:first-child {
+  margin-top: 1.25em;
+}
+
+.prose > ul > li > *:last-child {
+  margin-bottom: 1.25em;
+}
+
+.prose > ol > li > *:first-child {
+  margin-top: 1.25em;
+}
+
+.prose > ol > li > *:last-child {
+  margin-bottom: 1.25em;
+}
+
+.prose ul ul,
+.prose ul ol,
+.prose ol ul,
+.prose ol ol {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose hr {
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+.prose hr + * {
+  margin-top: 0;
+}
+
+.prose h2 + *,
+.prose h3 + *,
+.prose h4 + * {
+  margin-top: 0;
+}
+
+.prose table {
+  font-size: 0.875em;
+  line-height: 1.71429;
+}
+
+.prose thead th {
+  padding-right: 0.57143em;
+  padding-bottom: 0.57143em;
+  padding-left: 0.57143em;
+}
+
+.prose thead th:first-child {
+  padding-left: 0;
+}
+
+.prose thead th:last-child {
+  padding-right: 0;
+}
+
+.prose tbody td,
+.prose tfoot td {
+  padding-top: 0.57143em;
+  padding-right: 0.57143em;
+  padding-bottom: 0.57143em;
+  padding-left: 0.57143em;
+}
+
+.prose tbody td:first-child,
+.prose tfoot td:first-child {
+  padding-left: 0;
+}
+
+.prose tbody td:last-child,
+.prose tfoot td:last-child {
+  padding-right: 0;
+}
