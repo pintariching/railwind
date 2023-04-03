@@ -6,6 +6,7 @@ mod filters;
 mod flexbox_grid;
 mod interactivity;
 mod layout;
+mod prose;
 mod sizing;
 mod spacing;
 mod svg;
@@ -23,6 +24,7 @@ pub use filters::*;
 pub use flexbox_grid::*;
 pub use interactivity::*;
 pub use layout::*;
+pub use prose::*;
 pub use sizing::*;
 pub use spacing::*;
 pub use svg::*;
@@ -50,6 +52,7 @@ pub enum Class<'a> {
     Borders(Borders<'a>),
     Effects(Effects<'a>),
     Filters(Filter<'a>),
+    Prose(Prose<'a>),
 }
 
 impl<'a> Class<'a> {
@@ -112,6 +115,10 @@ impl<'a> Class<'a> {
             Filter::new(value).map_err(|e| Warning::new(raw_class, position, e))?
         {
             Self::Filters(filter)
+        } else if let Some(prose) =
+            Prose::new(value).map_err(|e| Warning::new(raw_class, position, e))?
+        {
+            Self::Prose(prose)
         } else {
             return Err(Warning::new(
                 raw_class,
@@ -140,6 +147,7 @@ impl<'a> Class<'a> {
             Self::Borders(c) => c.to_decl(),
             Self::Effects(c) => c.to_decl(),
             Self::Filters(c) => c.to_decl(),
+            Self::Prose(c) => c.to_decl(),
         }
     }
 }
