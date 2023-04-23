@@ -3,7 +3,7 @@ use crate::{class::utils::get_value, warning::WarningType};
 
 use super::{HEIGHT, MAX_HEIGHT, MAX_WIDTH, MIN_HEIGHT, MIN_WIDTH, WIDTH};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Width<'a>(pub &'a str);
 
 impl<'a> Width<'a> {
@@ -21,7 +21,7 @@ impl<'a> Width<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MinWidth<'a>(pub &'a str);
 
 impl<'a> MinWidth<'a> {
@@ -39,7 +39,7 @@ impl<'a> MinWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MaxWidth<'a>(pub &'a str);
 
 impl<'a> MaxWidth<'a> {
@@ -57,7 +57,7 @@ impl<'a> MaxWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Height<'a>(pub &'a str);
 
 impl<'a> Height<'a> {
@@ -75,7 +75,7 @@ impl<'a> Height<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MinHeight<'a>(pub &'a str);
 
 impl<'a> MinHeight<'a> {
@@ -93,7 +93,7 @@ impl<'a> MinHeight<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MaxHeight<'a>(pub &'a str);
 
 impl<'a> MaxHeight<'a> {

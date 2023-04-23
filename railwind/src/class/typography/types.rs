@@ -10,7 +10,7 @@ use super::{
     TEXT_UNDERLINE_OFFSET,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct FontFamily<'a>(pub &'a str);
 
 impl<'a> FontFamily<'a> {
@@ -20,7 +20,7 @@ impl<'a> FontFamily<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct FontSize<'a>(pub &'a str);
 
 impl<'a> FontSize<'a> {
@@ -38,7 +38,7 @@ impl<'a> FontSize<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum FontSmoothing {
     Antialiased,
     SubpixelAntialiased,
@@ -69,7 +69,7 @@ impl FontSmoothing {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum FontStyle {
     Italic,
     NonItalic,
@@ -96,7 +96,7 @@ impl FontStyle {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct FontWeight<'a>(pub &'a str);
 
 impl<'a> FontWeight<'a> {
@@ -106,7 +106,7 @@ impl<'a> FontWeight<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum FontVariantNumeric {
     NormalNums,
     Ordinal,
@@ -160,7 +160,7 @@ impl FontVariantNumeric {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct LetterSpacing<'a>(pub &'a str, bool);
 
 impl<'a> LetterSpacing<'a> {
@@ -175,7 +175,7 @@ impl<'a> LetterSpacing<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct LineHeight<'a>(pub &'a str);
 
 impl<'a> LineHeight<'a> {
@@ -185,7 +185,7 @@ impl<'a> LineHeight<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct LineStyleType<'a>(pub &'a str);
 
 impl<'a> LineStyleType<'a> {
@@ -195,7 +195,7 @@ impl<'a> LineStyleType<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ListStylePosition {
     Inside,
     Outside,
@@ -222,7 +222,7 @@ impl ListStylePosition {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TextAlign {
     Left,
     Center,
@@ -261,7 +261,7 @@ impl TextAlign {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TextColor<'a>(pub &'a str);
 
 impl<'a> TextColor<'a> {
@@ -282,7 +282,7 @@ impl<'a> TextColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TextDecoration {
     Underline,
     Overline,
@@ -316,7 +316,7 @@ impl TextDecoration {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TextDecorationColor<'a>(pub &'a str);
 
 impl<'a> TextDecorationColor<'a> {
@@ -329,7 +329,7 @@ impl<'a> TextDecorationColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TextDecorationStyle {
     Solid,
     Double,
@@ -368,7 +368,7 @@ impl TextDecorationStyle {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TextDecorationThickness<'a>(pub &'a str);
 
 impl<'a> TextDecorationThickness<'a> {
@@ -381,7 +381,7 @@ impl<'a> TextDecorationThickness<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TextUnderlineOffset<'a>(pub &'a str);
 
 impl<'a> TextUnderlineOffset<'a> {
@@ -391,7 +391,7 @@ impl<'a> TextUnderlineOffset<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TextTransform {
     Uppercase,
     Lowercase,
@@ -424,7 +424,7 @@ impl TextTransform {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TextOverflow {
     Truncate,
     TextEllipsis,
@@ -460,7 +460,7 @@ impl TextOverflow {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TextIndent<'a>(pub &'a str, pub bool);
 
 impl<'a> TextIndent<'a> {
@@ -475,7 +475,7 @@ impl<'a> TextIndent<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum VerticalAlign {
     Baseline,
     Top,
@@ -541,7 +541,7 @@ impl VerticalAlign {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Whitespace {
     Normal,
     NoWrap,
@@ -579,7 +579,7 @@ impl Whitespace {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum WordBreak {
     Normal,
     Words,
@@ -616,7 +616,7 @@ impl WordBreak {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Content<'a>(pub &'a str);
 
 impl<'a> Content<'a> {

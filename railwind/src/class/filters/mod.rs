@@ -32,7 +32,7 @@ lazy_static! {
         ron::from_str(include_str!("opacity.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Filter<'a> {
     Blur(Blur<'a>),
     Brightness(Brightness<'a>),

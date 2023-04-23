@@ -38,7 +38,7 @@ lazy_static! {
         ron::from_str(include_str!("content.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Typography<'a> {
     FontFamily(FontFamily<'a>),
     FontSize(FontSize<'a>),

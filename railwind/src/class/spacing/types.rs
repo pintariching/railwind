@@ -5,7 +5,7 @@ use crate::warning::WarningType;
 
 use super::{MARGIN, PADDING};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Padding<'a> {
     All(&'a str),
     Top(&'a str),
@@ -70,7 +70,7 @@ impl<'a> Padding<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Margin<'a> {
     All(&'a str, bool),
     Top(&'a str, bool),
@@ -138,7 +138,7 @@ impl<'a> Margin<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum SpaceBetween<'a> {
     X(&'a str, bool),
     Y(&'a str, bool),

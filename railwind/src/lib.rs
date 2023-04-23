@@ -15,6 +15,7 @@ use std::path::PathBuf;
 
 mod class;
 mod modifiers;
+mod parser;
 mod utils;
 pub mod warning;
 
@@ -24,7 +25,7 @@ lazy_static! {
     static ref PREFLIGHT: &'static str = include_str!("../preflight.css");
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct ParsedClass<'a> {
     pub raw_class_name: &'a str,
     pub class: Class<'a>,
@@ -54,7 +55,7 @@ impl<'a> ParsedClass<'a> {
                 if left_bracket_index < colon_index {
                     return Ok(Self::new(
                         raw_class,
-                        Class::new(raw_class, raw_class, &position)?,
+                        Class::new(raw_class).unwrap(),
                         vec![],
                         position.clone(),
                     ));
@@ -71,14 +72,14 @@ impl<'a> ParsedClass<'a> {
 
             Ok(Self::new(
                 raw_class,
-                Class::new(raw_class, entire_class, &position)?,
+                Class::new(raw_class).unwrap(),
                 parsed_states,
                 position.clone(),
             ))
         } else {
             Ok(Self::new(
                 raw_class,
-                Class::new(raw_class, raw_class, &position)?,
+                Class::new(raw_class).unwrap(),
                 vec![],
                 position.clone(),
             ))

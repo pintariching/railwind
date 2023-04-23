@@ -4,7 +4,7 @@ use crate::warning::WarningType;
 
 use super::COLORS;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Fill<'a>(pub &'a str);
 
 impl<'a> Fill<'a> {
@@ -14,7 +14,7 @@ impl<'a> Fill<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Stroke<'a>(pub &'a str);
 
 impl<'a> Stroke<'a> {
@@ -28,7 +28,7 @@ impl<'a> Stroke<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum StrokeWidth {
     Zero,
     One,

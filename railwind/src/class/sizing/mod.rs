@@ -24,7 +24,7 @@ lazy_static! {
         ron::from_str(include_str!("max_height.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Sizing<'a> {
     Width(Width<'a>),
     MinWidth(MinWidth<'a>),

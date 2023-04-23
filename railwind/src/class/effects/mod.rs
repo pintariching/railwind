@@ -20,7 +20,7 @@ lazy_static! {
         ron::from_str(include_str!("opacity.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Effects<'a> {
     BoxShadow(BoxShadow<'a>),
     BoxShadowColor(BoxShadowColor<'a>),

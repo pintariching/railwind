@@ -7,7 +7,7 @@ use super::{ORIGIN, ROTATE, SCALE, SKEW, TRANSLATE};
 
 const TRANSFORM_STYLE: &str = "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TranslateX<'a>(pub &'a str, bool);
 
 impl<'a> TranslateX<'a> {
@@ -25,7 +25,7 @@ impl<'a> TranslateX<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TranslateY<'a>(pub &'a str, bool);
 
 impl<'a> TranslateY<'a> {
@@ -43,7 +43,7 @@ impl<'a> TranslateY<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Rotate<'a>(pub &'a str, bool);
 
 impl<'a> Rotate<'a> {
@@ -61,7 +61,7 @@ impl<'a> Rotate<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct SkewX<'a>(pub &'a str, bool);
 
 impl<'a> SkewX<'a> {
@@ -79,7 +79,7 @@ impl<'a> SkewX<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct SkewY<'a>(pub &'a str, bool);
 
 impl<'a> SkewY<'a> {
@@ -97,7 +97,7 @@ impl<'a> SkewY<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Scale<'a> {
     All(&'a str, bool),
     X(&'a str, bool),
@@ -145,7 +145,7 @@ impl<'a> Scale<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Origin<'a>(pub &'a str);
 
 impl<'a> Origin<'a> {

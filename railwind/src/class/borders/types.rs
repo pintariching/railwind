@@ -8,7 +8,7 @@ use super::{
     OUTLINE_WIDTH, RING_COLOR, RING_OFFSET_COLOR, RING_OFFSET_WIDTH, RING_WIDTH,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderRadius<'a> {
     Around(&'a str),
     Top(&'a str),
@@ -93,7 +93,7 @@ impl<'a> BorderRadius<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderWidth<'a> {
     Around(&'a str),
     X(&'a str),
@@ -168,7 +168,7 @@ impl<'a> BorderWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderColor<'a> {
     Around(&'a str),
     X(&'a str),
@@ -297,7 +297,7 @@ impl<'a> BorderColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderStyle {
     Solid,
     Dashed,
@@ -336,7 +336,7 @@ impl BorderStyle {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum DivideWidth<'a> {
     X(&'a str),
     Y(&'a str),
@@ -412,7 +412,7 @@ impl<'a> DivideWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DivideColor<'a>(pub &'a str);
 
 impl<'a> DivideColor<'a> {
@@ -422,7 +422,7 @@ impl<'a> DivideColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum DivideStyle {
     Solid,
     Dashed,
@@ -458,7 +458,7 @@ impl DivideStyle {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct OutlineWidth<'a>(pub &'a str);
 
 impl<'a> OutlineWidth<'a> {
@@ -468,7 +468,7 @@ impl<'a> OutlineWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct OutlineColor<'a>(pub &'a str);
 
 impl<'a> OutlineColor<'a> {
@@ -478,7 +478,7 @@ impl<'a> OutlineColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum OutlineStyle {
     None,
     Solid,
@@ -519,7 +519,7 @@ impl OutlineStyle {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct OutlineOffset<'a>(pub &'a str);
 
 impl<'a> OutlineOffset<'a> {
@@ -529,7 +529,7 @@ impl<'a> OutlineOffset<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum RingWidth<'a> {
     Value(&'a str),
     Inset,
@@ -565,7 +565,7 @@ impl<'a> RingWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct RingColor<'a>(pub &'a str);
 
 impl<'a> RingColor<'a> {
@@ -575,7 +575,7 @@ impl<'a> RingColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct RingOffsetWidth<'a>(pub &'a str);
 
 impl<'a> RingOffsetWidth<'a> {
@@ -588,7 +588,7 @@ impl<'a> RingOffsetWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct RingOffsetColor<'a>(pub &'a str);
 
 impl<'a> RingOffsetColor<'a> {

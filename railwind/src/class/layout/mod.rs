@@ -30,7 +30,7 @@ lazy_static! {
         ron::from_str(include_str!("z_index.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Layout<'a> {
     AspectRatio(AspectRatio<'a>),
     Container(Container),

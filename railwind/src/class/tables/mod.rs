@@ -14,7 +14,7 @@ lazy_static! {
         ron::from_str(include_str!("border_spacing.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Table<'a> {
     BorderSpacing(BorderSpacing<'a>),
     BorderCollapse(BorderCollapse),

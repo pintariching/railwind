@@ -4,7 +4,7 @@ use crate::{class::utils::get_value, warning::WarningType};
 
 use super::{ANIMATION, DELAY, DURATION, TIMING_FUNCTION};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Transition {
     None,
     All,
@@ -93,7 +93,7 @@ impl Transition {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Duration<'a>(pub &'a str);
 
 impl<'a> Duration<'a> {
@@ -103,7 +103,7 @@ impl<'a> Duration<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TimingFunction<'a>(pub &'a str);
 
 impl<'a> TimingFunction<'a> {
@@ -116,7 +116,7 @@ impl<'a> TimingFunction<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Delay<'a>(pub &'a str);
 
 impl<'a> Delay<'a> {
@@ -126,7 +126,7 @@ impl<'a> Delay<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Animation<'a>(pub &'a str);
 
 impl<'a> Animation<'a> {

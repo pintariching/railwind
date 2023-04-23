@@ -5,7 +5,7 @@ use crate::warning::WarningType;
 
 use super::{ASPECT_RATIO, BOTTOM, COLUMNS, INSET, LEFT, OBJECT_POSITION, RIGHT, TOP};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct AspectRatio<'a>(pub &'a str);
 
 impl<'a> AspectRatio<'a> {
@@ -15,7 +15,7 @@ impl<'a> AspectRatio<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Container;
 
 impl Container {
@@ -59,7 +59,7 @@ impl Container {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Columns<'a>(pub &'a str);
 
 impl<'a> Columns<'a> {
@@ -69,7 +69,7 @@ impl<'a> Columns<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BreakAfter {
     Auto,
     Avoid,
@@ -129,7 +129,7 @@ impl BreakAfter {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BreakBefore {
     Auto,
     Avoid,
@@ -189,7 +189,7 @@ impl BreakBefore {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BreakInside {
     Auto,
     Avoid,
@@ -228,7 +228,7 @@ impl BreakInside {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BoxDecoration {
     Clone,
     Slice,
@@ -260,7 +260,7 @@ impl BoxDecoration {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BoxSizing {
     Border,
     Content,
@@ -289,7 +289,7 @@ impl BoxSizing {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Display {
     Block,
     InlineBlock,
@@ -373,7 +373,7 @@ impl Display {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Floats {
     Right,
     Left,
@@ -405,7 +405,7 @@ impl Floats {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Clear {
     Left,
     Right,
@@ -440,7 +440,7 @@ impl Clear {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Isolation {
     Isolate,
     IsolationAuto,
@@ -467,7 +467,7 @@ impl Isolation {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ObjectFit {
     Contain,
     Cover,
@@ -503,7 +503,7 @@ impl ObjectFit {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct ObjectPosition<'a>(pub &'a str);
 
 impl<'a> ObjectPosition<'a> {
@@ -513,7 +513,7 @@ impl<'a> ObjectPosition<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Overflow {
     Auto,
     Hidden,
@@ -601,7 +601,7 @@ impl Overflow {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Overscroll {
     Auto,
     Contain,
@@ -665,7 +665,7 @@ impl Overscroll {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Position {
     Static,
     Fixed,
@@ -701,7 +701,7 @@ impl Position {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TopRightBottomLeft<'a> {
     Inset(&'a str, bool),
     Top(&'a str, bool),
@@ -775,7 +775,7 @@ impl<'a> TopRightBottomLeft<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Visibility {
     Visible,
     Invisible,
@@ -805,7 +805,7 @@ impl Visibility {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct ZIndex<'a>(pub &'a str, bool);
 
 impl<'a> ZIndex<'a> {

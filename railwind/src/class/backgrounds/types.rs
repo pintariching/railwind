@@ -6,7 +6,7 @@ use super::{
     BACKGROUND_COLOR, BACKGROUND_IMAGE, BACKGROUND_POSITION, BACKGROUND_SIZE, GRADIENT_COLOR_STOPS,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BackgroundAttachment {
     Fixed,
     Local,
@@ -36,7 +36,7 @@ impl BackgroundAttachment {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BackgroundClip {
     Border,
     Padding,
@@ -76,7 +76,7 @@ impl BackgroundClip {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackgroundColor<'a>(pub &'a str);
 
 impl<'a> BackgroundColor<'a> {
@@ -97,7 +97,7 @@ impl<'a> BackgroundColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BackgroundOrigin {
     Border,
     Padding,
@@ -129,7 +129,7 @@ impl BackgroundOrigin {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackgroundPosition<'a>(pub &'a str);
 
 impl<'a> BackgroundPosition<'a> {
@@ -139,7 +139,7 @@ impl<'a> BackgroundPosition<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BackgroundRepeat {
     Repeat,
     NoRepeat,
@@ -178,7 +178,7 @@ impl BackgroundRepeat {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackgroundSize<'a>(pub &'a str);
 
 impl<'a> BackgroundSize<'a> {
@@ -193,7 +193,7 @@ impl<'a> BackgroundSize<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackgroundImage<'a>(pub &'a str);
 
 impl<'a> BackgroundImage<'a> {
@@ -203,7 +203,7 @@ impl<'a> BackgroundImage<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum GradientColorStops<'a> {
     From(&'a str),
     To(&'a str),

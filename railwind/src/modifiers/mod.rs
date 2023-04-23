@@ -12,7 +12,7 @@ pub use pseudo_element::PseudoElement;
 
 use crate::warning::{Position, Warning, WarningType};
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub enum State {
     PseudoClass(PseudoClass),
     PseudoElement(PseudoElement),

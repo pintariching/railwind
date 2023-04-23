@@ -6,7 +6,7 @@ use super::{BOX_SHADOW, BOX_SHADOW_COLOR, OPACITY};
 
 const BOX_SHADOW_STYLE: &str = "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BoxShadow<'a>(pub &'a str);
 
 impl<'a> BoxShadow<'a> {
@@ -31,7 +31,7 @@ impl<'a> BoxShadow<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BoxShadowColor<'a>(pub &'a str);
 impl<'a> BoxShadowColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
@@ -43,7 +43,7 @@ impl<'a> BoxShadowColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Opacity<'a>(pub &'a str);
 impl<'a> Opacity<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
@@ -52,7 +52,7 @@ impl<'a> Opacity<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum MixBlendMode {
     Normal,
     Multiply,
@@ -148,7 +148,7 @@ impl MixBlendMode {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BackgroundBlendMode {
     Normal,
     Multiply,

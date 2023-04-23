@@ -9,7 +9,7 @@ use super::{
     GRID_TEMPLATE_COLUMNS, GRID_TEMPLATE_ROWS, GROW, ORDER, SHRINK,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Basis<'a>(pub &'a str);
 
 impl<'a> Basis<'a> {
@@ -19,7 +19,7 @@ impl<'a> Basis<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Direction {
     Row,
     RowReverse,
@@ -52,7 +52,7 @@ impl Direction {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Wrap {
     Wrap,
     WrapReverse,
@@ -82,7 +82,7 @@ impl Wrap {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Flex<'a>(pub &'a str);
 
 impl<'a> Flex<'a> {
@@ -92,7 +92,7 @@ impl<'a> Flex<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Grow<'a>(pub &'a str);
 
 impl<'a> Grow<'a> {
@@ -102,7 +102,7 @@ impl<'a> Grow<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Shrink<'a>(pub &'a str);
 
 impl<'a> Shrink<'a> {
@@ -112,7 +112,7 @@ impl<'a> Shrink<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Order<'a>(pub &'a str, bool);
 
 impl<'a> Order<'a> {
@@ -127,7 +127,7 @@ impl<'a> Order<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridTemplateColumns<'a>(pub &'a str);
 
 impl<'a> GridTemplateColumns<'a> {
@@ -137,7 +137,7 @@ impl<'a> GridTemplateColumns<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum GridColumn<'a> {
     Auto,
     Span(&'a str),
@@ -181,7 +181,7 @@ impl<'a> GridColumn<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridTepmlateRows<'a>(pub &'a str);
 
 impl<'a> GridTepmlateRows<'a> {
@@ -191,7 +191,7 @@ impl<'a> GridTepmlateRows<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum GridRow<'a> {
     Auto,
     Span(&'a str),
@@ -238,7 +238,7 @@ impl<'a> GridRow<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum GridAutoFlow {
     Row,
     Col,
@@ -276,7 +276,7 @@ impl GridAutoFlow {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridAutoColumns<'a>(pub &'a str);
 
 impl<'a> GridAutoColumns<'a> {
@@ -286,7 +286,7 @@ impl<'a> GridAutoColumns<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridAutoRows<'a>(pub &'a str);
 
 impl<'a> GridAutoRows<'a> {
@@ -296,7 +296,7 @@ impl<'a> GridAutoRows<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Gap<'a>(pub &'a str);
 
 impl<'a> Gap<'a> {
@@ -318,7 +318,7 @@ impl<'a> Gap<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum JustifyContent {
     Start,
     End,
@@ -357,7 +357,7 @@ impl JustifyContent {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum JustifyItems {
     Start,
     End,
@@ -392,7 +392,7 @@ impl JustifyItems {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum JustifySelf {
     Auto,
     Start,
@@ -430,7 +430,7 @@ impl JustifySelf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum AlignContent {
     Center,
     Start,
@@ -470,7 +470,7 @@ impl AlignContent {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum AlignItems {
     Start,
     End,
@@ -508,7 +508,7 @@ impl AlignItems {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum AlignSelf {
     Auto,
     Start,
@@ -549,7 +549,7 @@ impl AlignSelf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PlaceContent {
     Center,
     Start,
@@ -603,7 +603,7 @@ impl PlaceContent {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PlaceItems {
     Start,
     End,
@@ -641,7 +641,7 @@ impl PlaceItems {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PlaceSelf {
     Auto,
     Start,

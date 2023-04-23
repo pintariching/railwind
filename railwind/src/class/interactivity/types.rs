@@ -8,7 +8,7 @@ use super::{COLORS, CURSOR, MARGIN, PADDING};
 const TOUCH_ACTION_STYLE: &str =
     "touch-action: var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct AccentColor<'a>(pub &'a str);
 
 impl<'a> AccentColor<'a> {
@@ -18,7 +18,7 @@ impl<'a> AccentColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Appearance {
     None,
 }
@@ -45,7 +45,7 @@ impl<'a> Appearance {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Cursor<'a>(pub &'a str);
 
 impl<'a> Cursor<'a> {
@@ -55,7 +55,7 @@ impl<'a> Cursor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct CaretColor<'a>(pub &'a str);
 
 impl<'a> CaretColor<'a> {
@@ -65,7 +65,7 @@ impl<'a> CaretColor<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PointerEvents {
     None,
     Auto,
@@ -92,7 +92,7 @@ impl<'a> PointerEvents {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Resize {
     None,
     Y,
@@ -125,7 +125,7 @@ impl<'a> Resize {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollBehavior {
     Auto,
     Smooth,
@@ -148,7 +148,7 @@ impl<'a> ScrollBehavior {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollMargin<'a> {
     All(&'a str, bool),
     X(&'a str, bool),
@@ -215,7 +215,7 @@ impl<'a> ScrollMargin<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollPadding<'a> {
     All(&'a str),
     X(&'a str),
@@ -284,7 +284,7 @@ impl<'a> ScrollPadding<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollSnapAlign {
     Start,
     End,
@@ -313,7 +313,7 @@ impl<'a> ScrollSnapAlign {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollSnapStop {
     Normal,
     Always,
@@ -336,7 +336,7 @@ impl<'a> ScrollSnapStop {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollSnapType {
     None,
     X,
@@ -371,7 +371,7 @@ impl<'a> ScrollSnapType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TouchAction {
     Auto,
     None,
@@ -442,7 +442,7 @@ impl<'a> TouchAction {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum UserSelect {
     None,
     Text,
@@ -482,7 +482,7 @@ impl UserSelect {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum WillChange {
     Auto,
     Scroll,

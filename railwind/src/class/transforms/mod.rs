@@ -22,7 +22,7 @@ lazy_static! {
         ron::from_str(include_str!("origin.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Transform<'a> {
     TranslateX(TranslateX<'a>),
     TranslateY(TranslateY<'a>),

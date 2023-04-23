@@ -4,7 +4,7 @@ use types::*;
 
 use crate::class::Decl;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Accessibility {
     ScreenReaders(ScreenReaders),
 }

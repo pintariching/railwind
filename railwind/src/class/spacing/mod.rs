@@ -1,4 +1,4 @@
-mod types;
+pub mod types;
 
 use types::*;
 
@@ -18,7 +18,7 @@ lazy_static! {
         ron::from_str(include_str!("space_between.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Spacing<'a> {
     Padding(Padding<'a>),
     Margin(Margin<'a>),

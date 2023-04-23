@@ -20,7 +20,7 @@ lazy_static! {
         ron::from_str(include_str!("animation.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TransitionsAnimation<'a> {
     Transition(Transition),
     Duration(Duration<'a>),
