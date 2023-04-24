@@ -10,7 +10,7 @@ pub struct Fill<'a>(pub &'a str);
 impl<'a> Fill<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("fill: {}", value)))
+        Ok(Decl::String(format!("fill: {}", value)))
     }
 }
 
@@ -24,7 +24,7 @@ impl<'a> Stroke<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("stroke: {}", value)))
+        Ok(Decl::String(format!("stroke: {}", value)))
     }
 }
 
@@ -53,6 +53,6 @@ impl StrokeWidth {
             Self::Two => "2",
         };
 
-        Decl::Single(format!("stroke-width: {}", val))
+        Decl::String(format!("stroke-width: {}", val))
     }
 }

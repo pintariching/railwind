@@ -15,7 +15,7 @@ pub struct Basis<'a>(pub &'a str);
 impl<'a> Basis<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BASIS)?;
-        Ok(Decl::Single(format!("flex-basis: {}", value)))
+        Ok(Decl::String(format!("flex-basis: {}", value)))
     }
 }
 
@@ -48,7 +48,7 @@ impl Direction {
             Self::ColReverse => "column-reverse",
         };
 
-        Decl::Single(format!("flex-direction: {}", val))
+        Decl::String(format!("flex-direction: {}", val))
     }
 }
 
@@ -78,7 +78,7 @@ impl Wrap {
             Self::NoWrap => "nowrap",
         };
 
-        Decl::Single(format!("flex-wrap: {}", val))
+        Decl::String(format!("flex-wrap: {}", val))
     }
 }
 
@@ -88,7 +88,7 @@ pub struct Flex<'a>(pub &'a str);
 impl<'a> Flex<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &FLEX)?;
-        Ok(Decl::Single(format!("flex: {}", value)))
+        Ok(Decl::String(format!("flex: {}", value)))
     }
 }
 
@@ -98,7 +98,7 @@ pub struct Grow<'a>(pub &'a str);
 impl<'a> Grow<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GROW)?;
-        Ok(Decl::Single(format!("flex-grow: {}", value)))
+        Ok(Decl::String(format!("flex-grow: {}", value)))
     }
 }
 
@@ -108,7 +108,7 @@ pub struct Shrink<'a>(pub &'a str);
 impl<'a> Shrink<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &SHRINK)?;
-        Ok(Decl::Single(format!("flex-shrink: {}", value)))
+        Ok(Decl::String(format!("flex-shrink: {}", value)))
     }
 }
 
@@ -123,7 +123,7 @@ impl<'a> Order<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &ORDER)?;
-        Ok(Decl::Single(format!("order: {}", value)))
+        Ok(Decl::String(format!("order: {}", value)))
     }
 }
 
@@ -133,7 +133,7 @@ pub struct GridTemplateColumns<'a>(pub &'a str);
 impl<'a> GridTemplateColumns<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_TEMPLATE_COLUMNS)?;
-        Ok(Decl::Single(format!("grid-template-columns: {}", value)))
+        Ok(Decl::String(format!("grid-template-columns: {}", value)))
     }
 }
 
@@ -167,15 +167,15 @@ impl<'a> GridColumn<'a> {
             Self::Auto => Ok(Decl::Lit("grid-column: auto")),
             Self::Span(v) => {
                 let value = get_value(v, &GRID_COLUMN_SPAN)?;
-                Ok(Decl::Single(format!("grid-column: {}", value)))
+                Ok(Decl::String(format!("grid-column: {}", value)))
             }
             Self::Start(v) => {
                 let value = get_value(v, &GRID_COLUMN_START)?;
-                Ok(Decl::Single(format!("grid-column-start: {}", value)))
+                Ok(Decl::String(format!("grid-column-start: {}", value)))
             }
             Self::End(v) => {
                 let value = get_value(v, &GRID_COLUMN_END)?;
-                Ok(Decl::Single(format!("grid-column-end: {}", value)))
+                Ok(Decl::String(format!("grid-column-end: {}", value)))
             }
         }
     }
@@ -187,7 +187,7 @@ pub struct GridTepmlateRows<'a>(pub &'a str);
 impl<'a> GridTepmlateRows<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_TEMPLATE_ROWS)?;
-        Ok(Decl::Single(format!("grid-template-rows: {}", value)))
+        Ok(Decl::String(format!("grid-template-rows: {}", value)))
     }
 }
 
@@ -217,19 +217,19 @@ impl<'a> GridRow<'a> {
             Self::Auto => Ok(Decl::Lit("grid-row: auto")),
             Self::Span(v) => {
                 let value = get_value(v, &GRID_ROW_SPAN)?;
-                Ok(Decl::Single(format!("grid-row: {}", value)))
+                Ok(Decl::String(format!("grid-row: {}", value)))
             }
             Self::Start(v) => {
                 let value = get_value(v, &GRID_ROW_START)?;
-                Ok(Decl::Single(format!("grid-row-start: {}", value)))
+                Ok(Decl::String(format!("grid-row-start: {}", value)))
             }
             Self::End(v) => {
                 let value = get_value(v, &GRID_ROW_END)?;
-                Ok(Decl::Single(format!("grid-row-end: {}", value)))
+                Ok(Decl::String(format!("grid-row-end: {}", value)))
             }
             Self::Arbitrary(v) => {
                 if let Some(value) = get_arbitrary_value(v) {
-                    Ok(Decl::Single(format!("grid-row: {}", value)))
+                    Ok(Decl::String(format!("grid-row: {}", value)))
                 } else {
                     Err(WarningType::InvalidArbitraryArg(v.into()))
                 }
@@ -272,7 +272,7 @@ impl GridAutoFlow {
             Self::ColDense => "column dense",
         };
 
-        Decl::Single(format!("grid-auto-flow: {}", val))
+        Decl::String(format!("grid-auto-flow: {}", val))
     }
 }
 
@@ -282,7 +282,7 @@ pub struct GridAutoColumns<'a>(pub &'a str);
 impl<'a> GridAutoColumns<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_AUTO_COLUMNS)?;
-        Ok(Decl::Single(format!("grid-auto-columns: {}", value)))
+        Ok(Decl::String(format!("grid-auto-columns: {}", value)))
     }
 }
 
@@ -292,7 +292,7 @@ pub struct GridAutoRows<'a>(pub &'a str);
 impl<'a> GridAutoRows<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_AUTO_ROWS)?;
-        Ok(Decl::Single(format!("grid-auto-rows: {}", value)))
+        Ok(Decl::String(format!("grid-auto-rows: {}", value)))
     }
 }
 
@@ -304,15 +304,15 @@ impl<'a> Gap<'a> {
         match get_class_name(self.0) {
             "x" => {
                 let val = get_value(get_args(self.0)?, &GAP_X)?;
-                Ok(Decl::Single(format!("column-gap: {}", val)))
+                Ok(Decl::String(format!("column-gap: {}", val)))
             }
             "y" => {
                 let val = get_value(get_args(self.0)?, &GAP_Y)?;
-                Ok(Decl::Single(format!("row-gap: {}", val)))
+                Ok(Decl::String(format!("row-gap: {}", val)))
             }
             _ => {
                 let val = get_value(self.0, &GAP)?;
-                Ok(Decl::Single(format!("gap: {}", val)))
+                Ok(Decl::String(format!("gap: {}", val)))
             }
         }
     }
@@ -353,7 +353,7 @@ impl JustifyContent {
             Self::Evenly => "space-evenly",
         };
 
-        Decl::Single(format!("justify-content: {}", val))
+        Decl::String(format!("justify-content: {}", val))
     }
 }
 
@@ -388,7 +388,7 @@ impl JustifyItems {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("justify-items: {}", val))
+        Decl::String(format!("justify-items: {}", val))
     }
 }
 
@@ -426,7 +426,7 @@ impl JustifySelf {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("justify-self: {}", val))
+        Decl::String(format!("justify-self: {}", val))
     }
 }
 
@@ -466,7 +466,7 @@ impl AlignContent {
             Self::Baseline => "baseline",
         };
 
-        Decl::Single(format!("align-content: {}", val))
+        Decl::String(format!("align-content: {}", val))
     }
 }
 
@@ -504,7 +504,7 @@ impl AlignItems {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("align-items: {}", val))
+        Decl::String(format!("align-items: {}", val))
     }
 }
 
@@ -545,7 +545,7 @@ impl AlignSelf {
             Self::Baseline => "baseline",
         };
 
-        Decl::Single(format!("align-self: {}", val))
+        Decl::String(format!("align-self: {}", val))
     }
 }
 
@@ -599,7 +599,7 @@ impl PlaceContent {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("place-content: {}", val))
+        Decl::String(format!("place-content: {}", val))
     }
 }
 
@@ -637,7 +637,7 @@ impl PlaceItems {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("place-items: {}", val))
+        Decl::String(format!("place-items: {}", val))
     }
 }
 
@@ -675,6 +675,6 @@ impl PlaceSelf {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("place-self: {}", val))
+        Decl::String(format!("place-self: {}", val))
     }
 }

@@ -14,7 +14,7 @@ pub struct AccentColor<'a>(pub &'a str);
 impl<'a> AccentColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("accent-color: {}", value)))
+        Ok(Decl::String(format!("accent-color: {}", value)))
     }
 }
 
@@ -51,7 +51,7 @@ pub struct Cursor<'a>(pub &'a str);
 impl<'a> Cursor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &CURSOR)?;
-        Ok(Decl::Single(format!("cursor: {}", value)))
+        Ok(Decl::String(format!("cursor: {}", value)))
     }
 }
 
@@ -61,7 +61,7 @@ pub struct CaretColor<'a>(pub &'a str);
 impl<'a> CaretColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("caret-color: {}", value)))
+        Ok(Decl::String(format!("caret-color: {}", value)))
     }
 }
 
@@ -86,8 +86,8 @@ impl<'a> PointerEvents {
 
     pub fn to_decl(self) -> Decl {
         match self {
-            Self::None => Decl::Single("pointer-events: none".into()),
-            Self::Auto => Decl::Single("pointer-events: auto".into()),
+            Self::None => Decl::String("pointer-events: none".into()),
+            Self::Auto => Decl::String("pointer-events: auto".into()),
         }
     }
 }
@@ -179,7 +179,7 @@ impl<'a> ScrollMargin<'a> {
         match self {
             Self::All(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin: {}", value)))
+                Ok(Decl::String(format!("scroll-margin: {}", value)))
             }
             Self::X(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
@@ -197,19 +197,19 @@ impl<'a> ScrollMargin<'a> {
             }
             Self::Top(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-top: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-top: {}", value)))
             }
             Self::Right(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-right: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-right: {}", value)))
             }
             Self::Bottom(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-bottom: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-bottom: {}", value)))
             }
             Self::Left(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-left: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-left: {}", value)))
             }
         }
     }
@@ -248,7 +248,7 @@ impl<'a> ScrollPadding<'a> {
         match self {
             Self::All(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding: {}", value)))
+                Ok(Decl::String(format!("scroll-padding: {}", value)))
             }
             Self::X(p) => {
                 let value = get_value(p, &PADDING)?;
@@ -266,19 +266,19 @@ impl<'a> ScrollPadding<'a> {
             }
             Self::Top(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-top: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-top: {}", value)))
             }
             Self::Right(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-right: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-right: {}", value)))
             }
             Self::Bottom(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-bottom: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-bottom: {}", value)))
             }
             Self::Left(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-left: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-left: {}", value)))
             }
         }
     }
@@ -518,6 +518,6 @@ impl WillChange {
             Self::Transform => "transform",
         };
 
-        Decl::Single(format!("will-change: {}", value))
+        Decl::String(format!("will-change: {}", value))
     }
 }

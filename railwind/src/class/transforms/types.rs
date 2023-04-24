@@ -151,6 +151,6 @@ pub struct Origin<'a>(pub &'a str);
 impl<'a> Origin<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &ORIGIN)?;
-        Ok(Decl::Single(format!("transform-origin: {}", value)))
+        Ok(Decl::String(format!("transform-origin: {}", value)))
     }
 }

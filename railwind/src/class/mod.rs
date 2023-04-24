@@ -23,6 +23,7 @@ pub use filters::*;
 pub use flexbox_grid::*;
 pub use interactivity::*;
 pub use layout::*;
+use nom::{combinator::map, IResult};
 pub use sizing::*;
 pub use spacing::*;
 pub use svg::*;
@@ -50,6 +51,10 @@ pub enum Class<'a> {
     Borders(Borders<'a>),
     Effects(Effects<'a>),
     Filters(Filter<'a>),
+}
+
+pub fn class(input: &str) -> IResult<&str, Class> {
+    map(spacing, Class::Spacing)(input)
 }
 
 impl<'a> Eq for Class<'a> {}
@@ -132,7 +137,7 @@ impl<'a> Class<'a> {
             Self::Interactivity(c) => c.to_decl(),
             Self::Layout(c) => c.to_decl(),
             Self::FlexboxGrid(c) => c.to_decl(),
-            Self::Spacing(c) => c.to_decl(),
+            Self::Spacing(c) => todo!(), // c.to_decl(),
             Self::Sizing(c) => c.to_decl(),
             Self::Svg(c) => c.to_decl(),
             Self::Table(c) => c.to_decl(),
@@ -148,26 +153,42 @@ impl<'a> Class<'a> {
     }
 }
 
+pub trait IntoDeclaration {
+    fn to_decl(self) -> Decl;
+}
+
 #[derive(Debug, PartialEq, Hash)]
 pub enum Decl {
     Lit(&'static str),
-    Single(String),
+    String(String),
     Double([String; 2]),
     Triple([String; 3]),
     Quad([String; 4]),
-    Multiple(Vec<String>),
+    Vec(Vec<String>),
     FullClass(String),
+}
+
+impl ToString for Decl {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Lit(lit) => lit.to_string(),
+            Self::String(s) => s.to_string(),
+            Self::Vec(m) => m.join(";\n    "),
+            Self::FullClass(fc) => fc.to_string(),
+            _ => todo!(),
+        }
+    }
 }
 
 impl Decl {
     pub fn to_string(self) -> String {
         match self {
             Self::Lit(lit) => lit.to_string(),
-            Self::Single(s) => s,
+            Self::String(s) => s,
             Self::Triple(t) => t.join(";\n    "),
             Self::Double(d) => d.join(";\n    "),
             Self::Quad(q) => q.join(";\n    "),
-            Self::Multiple(m) => m.join(";\n    "),
+            Self::Vec(m) => m.join(";\n    "),
             Self::FullClass(fc) => fc,
         }
     }

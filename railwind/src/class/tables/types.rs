@@ -28,7 +28,7 @@ impl BorderCollapse {
             Self::Separate => "separate",
         };
 
-        Decl::Single(format!("border-collapse: {}", val))
+        Decl::String(format!("border-collapse: {}", val))
     }
 }
 
@@ -101,6 +101,6 @@ impl Layout {
             Self::Fixed => "fixed",
         };
 
-        Decl::Single(format!("table-layout: {}", val))
+        Decl::String(format!("table-layout: {}", val))
     }
 }

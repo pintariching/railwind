@@ -32,7 +32,7 @@ impl BackgroundAttachment {
             Self::Scroll => "scroll",
         };
 
-        Decl::Single(format!("background-attachment: {}", val))
+        Decl::String(format!("background-attachment: {}", val))
     }
 }
 
@@ -72,7 +72,7 @@ impl BackgroundClip {
             }
         };
 
-        Decl::Single(format!("background-clip: {}", val))
+        Decl::String(format!("background-clip: {}", val))
     }
 }
 
@@ -92,7 +92,7 @@ impl<'a> BackgroundColor<'a> {
                 ),
             ]))
         } else {
-            return Ok(Decl::Single(format!("background-color: {}", value)));
+            return Ok(Decl::String(format!("background-color: {}", value)));
         }
     }
 }
@@ -125,7 +125,7 @@ impl BackgroundOrigin {
             Self::Content => "content-box",
         };
 
-        Decl::Single(format!("background-origin: {}", val))
+        Decl::String(format!("background-origin: {}", val))
     }
 }
 
@@ -135,7 +135,7 @@ pub struct BackgroundPosition<'a>(pub &'a str);
 impl<'a> BackgroundPosition<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BACKGROUND_POSITION)?;
-        Ok(Decl::Single(format!("background-position: {}", value)))
+        Ok(Decl::String(format!("background-position: {}", value)))
     }
 }
 
@@ -174,7 +174,7 @@ impl BackgroundRepeat {
             Self::RepeatSpace => "space",
         };
 
-        Decl::Single(format!("background-repeat: {}", val))
+        Decl::String(format!("background-repeat: {}", val))
     }
 }
 
@@ -189,7 +189,7 @@ impl<'a> BackgroundSize<'a> {
             value = value[7..].into();
         }
 
-        Ok(Decl::Single(format!("background-size: {}", value)))
+        Ok(Decl::String(format!("background-size: {}", value)))
     }
 }
 
@@ -199,7 +199,7 @@ pub struct BackgroundImage<'a>(pub &'a str);
 impl<'a> BackgroundImage<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BACKGROUND_IMAGE)?;
-        Ok(Decl::Single(format!("background-image: {}", value)))
+        Ok(Decl::String(format!("background-image: {}", value)))
     }
 }
 
@@ -259,7 +259,7 @@ impl<'a> GradientColorStops<'a> {
             }
             Self::To(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;
-                Ok(Decl::Single(format!("--tw-gradient-to: {}", value)))
+                Ok(Decl::String(format!("--tw-gradient-to: {}", value)))
             }
             Self::Via(g) => {
                 let value = get_value(g, &GRADIENT_COLOR_STOPS)?;

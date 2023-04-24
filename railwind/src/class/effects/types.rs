@@ -48,7 +48,7 @@ pub struct Opacity<'a>(pub &'a str);
 impl<'a> Opacity<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OPACITY)?;
-        Ok(Decl::Single(format!("opacity: {}", value)))
+        Ok(Decl::String(format!("opacity: {}", value)))
     }
 }
 
@@ -144,7 +144,7 @@ impl MixBlendMode {
             Self::PlusLighter => "plus-lighter",
         };
 
-        Decl::Single(format!("mix-blend-mode: {}", val))
+        Decl::String(format!("mix-blend-mode: {}", val))
     }
 }
 
@@ -236,6 +236,6 @@ impl BackgroundBlendMode {
             Self::Luminosity => "luminosity",
         };
 
-        Decl::Single(format!("background-blend-mode: {}", val))
+        Decl::String(format!("background-blend-mode: {}", val))
     }
 }

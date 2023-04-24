@@ -16,7 +16,7 @@ pub struct FontFamily<'a>(pub &'a str);
 impl<'a> FontFamily<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &FONT_FAMILY)?;
-        Ok(Decl::Single(format!("font-family: {}", value)))
+        Ok(Decl::String(format!("font-family: {}", value)))
     }
 }
 
@@ -33,7 +33,7 @@ impl<'a> FontSize<'a> {
                 format!("line-height: {}", value.1),
             ]))
         } else {
-            Ok(Decl::Single(format!("font-size: {}", value.0)))
+            Ok(Decl::String(format!("font-size: {}", value.0)))
         }
     }
 }
@@ -92,7 +92,7 @@ impl FontStyle {
             Self::NonItalic => "normal",
         };
 
-        Decl::Single(format!("font-style: {}", value))
+        Decl::String(format!("font-style: {}", value))
     }
 }
 
@@ -102,7 +102,7 @@ pub struct FontWeight<'a>(pub &'a str);
 impl<'a> FontWeight<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &FONT_WEIGHT)?;
-        Ok(Decl::Single(format!("font-weight: {}", value)))
+        Ok(Decl::String(format!("font-weight: {}", value)))
     }
 }
 
@@ -171,7 +171,7 @@ impl<'a> LetterSpacing<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &LETTER_SPACING)?;
-        Ok(Decl::Single(format!("letter-spacing: {}", value)))
+        Ok(Decl::String(format!("letter-spacing: {}", value)))
     }
 }
 
@@ -181,7 +181,7 @@ pub struct LineHeight<'a>(pub &'a str);
 impl<'a> LineHeight<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &LINE_HEIGHT)?;
-        Ok(Decl::Single(format!("line-height: {}", value)))
+        Ok(Decl::String(format!("line-height: {}", value)))
     }
 }
 
@@ -191,7 +191,7 @@ pub struct LineStyleType<'a>(pub &'a str);
 impl<'a> LineStyleType<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &LINE_STYLE_TYPE)?;
-        Ok(Decl::Single(format!("list-style-type: {}", value)))
+        Ok(Decl::String(format!("list-style-type: {}", value)))
     }
 }
 
@@ -218,7 +218,7 @@ impl ListStylePosition {
             Self::Outside => "outside",
         };
 
-        Decl::Single(format!("list-style-position: {}", value))
+        Decl::String(format!("list-style-position: {}", value))
     }
 }
 
@@ -257,7 +257,7 @@ impl TextAlign {
             Self::End => "end",
         };
 
-        Decl::Single(format!("text-align: {}", value))
+        Decl::String(format!("text-align: {}", value))
     }
 }
 
@@ -277,7 +277,7 @@ impl<'a> TextColor<'a> {
                 ),
             ]))
         } else {
-            return Ok(Decl::Single(format!("color: {}", value)));
+            return Ok(Decl::String(format!("color: {}", value)));
         }
     }
 }
@@ -374,7 +374,7 @@ pub struct TextDecorationThickness<'a>(pub &'a str);
 impl<'a> TextDecorationThickness<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &TEXT_DECORATION_THICKNESS)?;
-        Ok(Decl::Single(format!(
+        Ok(Decl::String(format!(
             "text-decoration-thickness: {}",
             value
         )))
@@ -387,7 +387,7 @@ pub struct TextUnderlineOffset<'a>(pub &'a str);
 impl<'a> TextUnderlineOffset<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &TEXT_UNDERLINE_OFFSET)?;
-        Ok(Decl::Single(format!("text-underline-offset: {}", value)))
+        Ok(Decl::String(format!("text-underline-offset: {}", value)))
     }
 }
 
@@ -420,7 +420,7 @@ impl TextTransform {
             Self::NormalCase => "none",
         };
 
-        Decl::Single(format!("text-transform: {}", value))
+        Decl::String(format!("text-transform: {}", value))
     }
 }
 
@@ -456,7 +456,7 @@ impl TextOverflow {
             Self::TextClip => "clip",
         };
 
-        Decl::Single(format!("text-overflow: {}", value))
+        Decl::String(format!("text-overflow: {}", value))
     }
 }
 
@@ -471,7 +471,7 @@ impl<'a> TextIndent<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &TEXT_INDENT)?;
-        Ok(Decl::Single(format!("text-indent: {}", value)))
+        Ok(Decl::String(format!("text-indent: {}", value)))
     }
 }
 
@@ -534,10 +534,10 @@ impl VerticalAlign {
             Self::TextBottom => "text-bottom",
             Self::Sub => "sub",
             Self::Super => "super",
-            Self::Arbitrary(a) => return Ok(Decl::Single(format!("vertical-align: {}", a))),
+            Self::Arbitrary(a) => return Ok(Decl::String(format!("vertical-align: {}", a))),
         };
 
-        Ok(Decl::Single(format!("vertical-align: {}", value)))
+        Ok(Decl::String(format!("vertical-align: {}", value)))
     }
 }
 
@@ -575,7 +575,7 @@ impl Whitespace {
             Self::PreWrap => "pre-wrap",
         };
 
-        Decl::Single(format!("white-space: {}", value))
+        Decl::String(format!("white-space: {}", value))
     }
 }
 
@@ -612,7 +612,7 @@ impl WordBreak {
             Self::Keep => "keep-all",
         };
 
-        Decl::Single(format!("word-break: {}", value))
+        Decl::String(format!("word-break: {}", value))
     }
 }
 

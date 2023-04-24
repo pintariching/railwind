@@ -19,7 +19,7 @@ impl ScreenReaders {
 
     pub fn to_decl(self) -> Decl {
         match self {
-            Self::SROnly => Decl::Multiple(vec![
+            Self::SROnly => Decl::Vec(vec![
                 "position: absolute".into(),
                 "width: 1px".into(),
                 "height: 1px".into(),
@@ -30,7 +30,7 @@ impl ScreenReaders {
                 "white-space: nowrap".into(),
                 "border-width: 0".into(),
             ]),
-            Self::NotSROnly => Decl::Multiple(vec![
+            Self::NotSROnly => Decl::Vec(vec![
                 "position: static".into(),
                 "width: auto".into(),
                 "height: auto".into(),

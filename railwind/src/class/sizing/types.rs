@@ -17,7 +17,7 @@ impl<'a> Width<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("width: {}", value)))
+        Ok(Decl::String(format!("width: {}", value)))
     }
 }
 
@@ -35,7 +35,7 @@ impl<'a> MinWidth<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("min-width: {}", value)))
+        Ok(Decl::String(format!("min-width: {}", value)))
     }
 }
 
@@ -53,7 +53,7 @@ impl<'a> MaxWidth<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("max-width: {}", value)))
+        Ok(Decl::String(format!("max-width: {}", value)))
     }
 }
 
@@ -71,7 +71,7 @@ impl<'a> Height<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("height: {}", value)))
+        Ok(Decl::String(format!("height: {}", value)))
     }
 }
 
@@ -89,7 +89,7 @@ impl<'a> MinHeight<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("min-height: {}", value)))
+        Ok(Decl::String(format!("min-height: {}", value)))
     }
 }
 
@@ -107,6 +107,6 @@ impl<'a> MaxHeight<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("max-height: {}", value)))
+        Ok(Decl::String(format!("max-height: {}", value)))
     }
 }
