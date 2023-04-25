@@ -1,16 +1,13 @@
-use nom::branch::alt;
-use nom::bytes::complete::{is_not, tag};
-use nom::combinator::{map, map_opt};
-use nom::sequence::{preceded, terminated};
-use nom::IResult;
-
-use crate::class::Decl;
-
 use lazy_static::lazy_static;
+use nom::branch::alt;
+use nom::bytes::complete::tag;
+use nom::combinator::map;
+use nom::IResult;
 use std::collections::HashMap;
 
-use super::utils::{arbitrary, negative, pos_neg_val, pos_val, positive};
-use super::IntoDeclaration;
+use crate::class::utils::{pos_neg_val, pos_val};
+use crate::class::Decl;
+use crate::class::IntoDeclaration;
 
 lazy_static! {
     pub static ref MARGIN: HashMap<&'static str, &'static str> =
@@ -36,38 +33,15 @@ pub fn spacing(input: &str) -> IResult<&str, Spacing> {
     ))(input)
 }
 
-// impl<'a> Spacing<'a> {
-//     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
-//         let class_name = get_class_name(value);
-//         let args = if let Ok(str) = get_args(value) {
-//             str
-//         } else {
-//             return Ok(None);
-//         };
-
-//         let spacing = if let Some(padding) = Padding::new(class_name, args) {
-//             Self::Padding(padding)
-//         } else if let Some(margin) = Margin::new(class_name, args) {
-//             Self::Margin(margin)
-//         } else {
-//             if let Some(sb) = SpaceBetween::new(class_name, args)? {
-//                 Self::SpaceBetween(sb)
-//             } else {
-//                 return Ok(None);
-//             }
-//         };
-
-//         Ok(Some(spacing))
-//     }
-
-// pub fn to_decl(self) -> Result<Decl, WarningType> {
-//     match self {
-//         Self::Padding(s) => s.to_decl(),
-//         Self::Margin(s) => s.to_decl(),
-//         Self::SpaceBetween(s) => s.to_decl(),
-//     }
-// }
-// }
+impl<'a> IntoDeclaration for Spacing<'a> {
+    fn to_decl(self) -> Decl {
+        match self {
+            Spacing::Padding(s) => s.to_decl(),
+            Spacing::Margin(s) => s.to_decl(),
+            Spacing::SpaceBetween(s) => s.to_decl(),
+        }
+    }
+}
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Padding<'a> {

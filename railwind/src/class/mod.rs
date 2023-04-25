@@ -133,23 +133,24 @@ impl<'a> Class<'a> {
     }
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
-        match self {
-            Self::Interactivity(c) => c.to_decl(),
-            Self::Layout(c) => c.to_decl(),
-            Self::FlexboxGrid(c) => c.to_decl(),
-            Self::Spacing(c) => todo!(), // c.to_decl(),
-            Self::Sizing(c) => c.to_decl(),
-            Self::Svg(c) => c.to_decl(),
-            Self::Table(c) => c.to_decl(),
-            Self::TransitionsAnimation(c) => c.to_decl(),
-            Self::Transform(c) => c.to_decl(),
-            Self::Typography(c) => c.to_decl(),
-            Self::Accessibility(c) => Ok(c.to_decl()),
-            Self::Backgrounds(c) => c.to_decl(),
-            Self::Borders(c) => c.to_decl(),
-            Self::Effects(c) => c.to_decl(),
-            Self::Filters(c) => c.to_decl(),
-        }
+        todo!()
+        // match self {
+        //     Self::Interactivity(c) => c.to_decl(),
+        //     Self::Layout(c) => c.to_decl(),
+        //     Self::FlexboxGrid(c) => c.to_decl(),
+        //     Self::Spacing(c) => todo!(), // c.to_decl(),
+        //     Self::Sizing(c) => c.to_decl(),
+        //     Self::Svg(c) => c.to_decl(),
+        //     Self::Table(c) => c.to_decl(),
+        //     Self::TransitionsAnimation(c) => c.to_decl(),
+        //     Self::Transform(c) => c.to_decl(),
+        //     Self::Typography(c) => c.to_decl(),
+        //     Self::Accessibility(c) => Ok(c.to_decl()),
+        //     Self::Backgrounds(c) => c.to_decl(),
+        //     Self::Borders(c) => c.to_decl(),
+        //     Self::Effects(c) => c.to_decl(),
+        //     Self::Filters(c) => c.to_decl(),
+        // }
     }
 }
 
@@ -165,6 +166,7 @@ pub enum Decl {
     Triple([String; 3]),
     Quad([String; 4]),
     Vec(Vec<String>),
+    LitVec(Vec<&'static str>),
     FullClass(String),
 }
 
@@ -189,6 +191,7 @@ impl Decl {
             Self::Double(d) => d.join(";\n    "),
             Self::Quad(q) => q.join(";\n    "),
             Self::Vec(m) => m.join(";\n    "),
+            Self::LitVec(l) => l.join(";\n    "),
             Self::FullClass(fc) => fc,
         }
     }
