@@ -28,7 +28,7 @@ pub enum ScreenReaders {
     NotSrOnly,
 }
 
-pub fn screen_readers(input: &str) -> IResult<&str, ScreenReaders> {
+fn screen_readers(input: &str) -> IResult<&str, ScreenReaders> {
     alt((
         map(tag("sr-only"), |_| ScreenReaders::SrOnly),
         map(tag("not-sr-only"), |_| ScreenReaders::NotSrOnly),

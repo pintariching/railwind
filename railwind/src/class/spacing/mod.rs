@@ -5,7 +5,7 @@ use nom::combinator::map;
 use nom::IResult;
 use std::collections::HashMap;
 
-use crate::class::utils::{pos_neg_val, pos_val};
+use crate::class::utils::{keyword_value, pos_neg_keyword_value};
 use crate::class::Decl;
 use crate::class::IntoDeclaration;
 
@@ -56,13 +56,13 @@ pub enum Padding<'a> {
 
 fn padding(input: &str) -> IResult<&str, Padding> {
     alt((
-        map(pos_val("p", &PADDING), Padding::All),
-        map(pos_val("pt", &PADDING), Padding::Top),
-        map(pos_val("pr", &PADDING), Padding::Right),
-        map(pos_val("pb", &PADDING), Padding::Bottom),
-        map(pos_val("pl", &PADDING), Padding::Left),
-        map(pos_val("px", &PADDING), Padding::X),
-        map(pos_val("py", &PADDING), Padding::Y),
+        map(keyword_value("p", &PADDING), Padding::All),
+        map(keyword_value("pt", &PADDING), Padding::Top),
+        map(keyword_value("pr", &PADDING), Padding::Right),
+        map(keyword_value("pb", &PADDING), Padding::Bottom),
+        map(keyword_value("pl", &PADDING), Padding::Left),
+        map(keyword_value("px", &PADDING), Padding::X),
+        map(keyword_value("py", &PADDING), Padding::Y),
     ))(input)
 }
 
@@ -99,13 +99,13 @@ pub enum Margin {
 
 fn margin(input: &str) -> IResult<&str, Margin> {
     alt((
-        map(pos_neg_val("m", &MARGIN), Margin::All),
-        map(pos_neg_val("mt", &MARGIN), Margin::Top),
-        map(pos_neg_val("mr", &MARGIN), Margin::Right),
-        map(pos_neg_val("mb", &MARGIN), Margin::Bottom),
-        map(pos_neg_val("ml", &MARGIN), Margin::Left),
-        map(pos_neg_val("mx", &MARGIN), Margin::X),
-        map(pos_neg_val("my", &MARGIN), Margin::Y),
+        map(pos_neg_keyword_value("m", &MARGIN), Margin::All),
+        map(pos_neg_keyword_value("mt", &MARGIN), Margin::Top),
+        map(pos_neg_keyword_value("mr", &MARGIN), Margin::Right),
+        map(pos_neg_keyword_value("mb", &MARGIN), Margin::Bottom),
+        map(pos_neg_keyword_value("ml", &MARGIN), Margin::Left),
+        map(pos_neg_keyword_value("mx", &MARGIN), Margin::X),
+        map(pos_neg_keyword_value("my", &MARGIN), Margin::Y),
     ))(input)
 }
 
@@ -139,8 +139,14 @@ pub enum SpaceBetween {
 
 fn space_between(input: &str) -> IResult<&str, SpaceBetween> {
     alt((
-        map(pos_neg_val("space-x", &SPACE_BETWEEN), SpaceBetween::X),
-        map(pos_neg_val("space-y", &SPACE_BETWEEN), SpaceBetween::Y),
+        map(
+            pos_neg_keyword_value("space-x", &SPACE_BETWEEN),
+            SpaceBetween::X,
+        ),
+        map(
+            pos_neg_keyword_value("space-y", &SPACE_BETWEEN),
+            SpaceBetween::Y,
+        ),
         map(tag("space-x-reverse"), |_| SpaceBetween::ReverseX),
         map(tag("space-y-reverse"), |_| SpaceBetween::ReverseY),
     ))(input)

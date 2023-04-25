@@ -1,15 +1,13 @@
-mod types;
-
-pub use types::*;
-
 use lazy_static::lazy_static;
+use nom::branch::alt;
+use nom::bytes::complete::tag;
+use nom::combinator::map;
+use nom::sequence::preceded;
+use nom::IResult;
 use std::collections::HashMap;
 
-use super::{utils::value_is_hex, Decl};
-use crate::{
-    utils::{get_args, get_class_name},
-    warning::WarningType,
-};
+use crate::class::utils::{hashmap_value, hex_to_rgb_color, keyword_value};
+use crate::class::{Decl, IntoDeclaration};
 
 lazy_static! {
     pub static ref BACKGROUND_COLOR: HashMap<&'static str, &'static str> =
@@ -37,59 +35,291 @@ pub enum Backgrounds<'a> {
     GradientColorStops(GradientColorStops<'a>),
 }
 
-impl<'a> Backgrounds<'a> {
-    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
-        let args = if let Ok(str) = get_args(value) {
-            str
-        } else {
-            return Ok(None);
+pub fn background(input: &str) -> IResult<&str, Backgrounds> {
+    preceded(
+        preceded(tag("bg"), tag("-")),
+        alt((
+            map(attachment, Backgrounds::BackgroundAttachment),
+            map(clip, Backgrounds::BackgroundClip),
+            map(color, Backgrounds::BackgroundColor),
+            map(origin, Backgrounds::BackgroundOrigin),
+            map(position, Backgrounds::BackgroundPosition),
+            map(repeat, Backgrounds::BackgroundRepeat),
+            map(size, Backgrounds::BackgroundSize),
+            map(image, Backgrounds::BackgroundImage),
+            map(gradient_color_stops, Backgrounds::GradientColorStops),
+        )),
+    )(input)
+}
+
+impl<'a> IntoDeclaration for Backgrounds<'a> {
+    fn to_decl(self) -> Decl {
+        match self {
+            Backgrounds::BackgroundAttachment(b) => b.to_decl(),
+            Backgrounds::BackgroundClip(b) => b.to_decl(),
+            Backgrounds::BackgroundColor(b) => b.to_decl(),
+            Backgrounds::BackgroundOrigin(b) => b.to_decl(),
+            Backgrounds::BackgroundPosition(b) => b.to_decl(),
+            Backgrounds::BackgroundRepeat(b) => b.to_decl(),
+            Backgrounds::BackgroundSize(b) => b.to_decl(),
+            Backgrounds::BackgroundImage(b) => b.to_decl(),
+            Backgrounds::GradientColorStops(b) => b.to_decl(),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BackgroundAttachment {
+    Fixed,
+    Local,
+    Scroll,
+}
+
+fn attachment(input: &str) -> IResult<&str, BackgroundAttachment> {
+    alt((
+        map(tag("fixed"), |_| BackgroundAttachment::Fixed),
+        map(tag("local"), |_| BackgroundAttachment::Local),
+        map(tag("scroll"), |_| BackgroundAttachment::Scroll),
+    ))(input)
+}
+
+impl IntoDeclaration for BackgroundAttachment {
+    fn to_decl(self) -> Decl {
+        let val = match self {
+            Self::Fixed => "fixed",
+            Self::Local => "local",
+            Self::Scroll => "scroll",
         };
 
-        let backgrounds = match get_class_name(value) {
-            "bg" => match get_class_name(args) {
-                "clip" => Self::BackgroundClip(BackgroundClip::new(get_args(args)?)?),
-                "origin" => Self::BackgroundOrigin(BackgroundOrigin::new(get_args(args)?)?),
-                "gradient" | "none" if BACKGROUND_IMAGE.contains_key(args) => {
-                    Self::BackgroundImage(BackgroundImage(args))
-                }
-                _ => {
-                    if let Some(attachment) = BackgroundAttachment::new(args) {
-                        Self::BackgroundAttachment(attachment)
-                    } else if let Some(repeat) = BackgroundRepeat::new(args) {
-                        Self::BackgroundRepeat(repeat)
-                    } else if BACKGROUND_SIZE.contains_key(args) || args.starts_with("[length:") {
-                        Self::BackgroundSize(BackgroundSize(args))
-                    } else if args.contains("url(") {
-                        Self::BackgroundImage(BackgroundImage(args))
-                    } else if BACKGROUND_POSITION.contains_key(args)
-                        || (!value_is_hex(args) && !&BACKGROUND_COLOR.contains_key(args))
-                    {
-                        Self::BackgroundPosition(BackgroundPosition(args))
-                    } else {
-                        Self::BackgroundColor(BackgroundColor(args))
-                    }
-                }
-            },
-            "from" | "via" | "to" => {
-                Self::GradientColorStops(GradientColorStops::new(get_class_name(value), args)?)
+        Decl::String(format!("background-attachment: {}", val))
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BackgroundClip {
+    Border,
+    Padding,
+    Content,
+    Text,
+}
+
+fn clip(input: &str) -> IResult<&str, BackgroundClip> {
+    alt((
+        map(tag("border"), |_| BackgroundClip::Border),
+        map(tag("padding"), |_| BackgroundClip::Padding),
+        map(tag("content"), |_| BackgroundClip::Content),
+        map(tag("text"), |_| BackgroundClip::Text),
+    ))(input)
+}
+
+impl IntoDeclaration for BackgroundClip {
+    fn to_decl(self) -> Decl {
+        let val = match self {
+            Self::Border => "border-box",
+            Self::Padding => "padding-box",
+            Self::Content => "content-box",
+            Self::Text => {
+                return Decl::Double([
+                    "-webkit-background-clip: text".into(),
+                    "background-clip: text".into(),
+                ])
             }
-            _ => return Ok(None),
         };
 
-        Ok(Some(backgrounds))
+        Decl::String(format!("background-clip: {}", val))
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackgroundColor<'a>(pub &'a str);
+
+fn color(input: &str) -> IResult<&str, BackgroundColor> {
+    map(hashmap_value(&BACKGROUND_COLOR), BackgroundColor)(input)
+}
+
+impl<'a> IntoDeclaration for BackgroundColor<'a> {
+    fn to_decl(self) -> Decl {
+        if let Some(color) = hex_to_rgb_color(self.0) {
+            Decl::Double([
+                "--tw-bg-opacity: 1".into(),
+                format!(
+                    "background-color: rgb({} {} {} / var(--tw-bg-opacity))",
+                    color[0], color[1], color[2]
+                ),
+            ])
+        } else {
+            return Decl::String(format!("background-color: {}", self.0));
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BackgroundOrigin {
+    Border,
+    Padding,
+    Content,
+}
+
+fn origin(input: &str) -> IResult<&str, BackgroundOrigin> {
+    alt((
+        map(tag("border"), |_| BackgroundOrigin::Border),
+        map(tag("padding"), |_| BackgroundOrigin::Padding),
+        map(tag("content"), |_| BackgroundOrigin::Content),
+    ))(input)
+}
+
+impl IntoDeclaration for BackgroundOrigin {
+    fn to_decl(self) -> Decl {
+        let val = match self {
+            Self::Border => "border-box",
+            Self::Padding => "padding-box",
+            Self::Content => "content-box",
+        };
+
+        Decl::String(format!("background-origin: {}", val))
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackgroundPosition<'a>(pub &'a str);
+
+fn position(input: &str) -> IResult<&str, BackgroundPosition> {
+    map(hashmap_value(&BACKGROUND_POSITION), BackgroundPosition)(input)
+}
+
+impl<'a> IntoDeclaration for BackgroundPosition<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::String(format!("background-position: {}", self.0))
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BackgroundRepeat {
+    Repeat,
+    NoRepeat,
+    RepeatX,
+    RepeatY,
+    RepeatRound,
+    RepeatSpace,
+}
+
+fn repeat(input: &str) -> IResult<&str, BackgroundRepeat> {
+    alt((
+        map(tag("repeat"), |_| BackgroundRepeat::Repeat),
+        map(tag("no-repeat"), |_| BackgroundRepeat::NoRepeat),
+        map(tag("repeat-x"), |_| BackgroundRepeat::RepeatX),
+        map(tag("repeat-y"), |_| BackgroundRepeat::RepeatY),
+        map(tag("repeat-round"), |_| BackgroundRepeat::RepeatRound),
+        map(tag("repeat-space"), |_| BackgroundRepeat::RepeatSpace),
+    ))(input)
+}
+
+impl IntoDeclaration for BackgroundRepeat {
+    fn to_decl(self) -> Decl {
+        let val = match self {
+            Self::Repeat => "repeat",
+            Self::NoRepeat => "no-repeat",
+            Self::RepeatX => "repeat-x",
+            Self::RepeatY => "repeat-y",
+            Self::RepeatRound => "round",
+            Self::RepeatSpace => "space",
+        };
+
+        Decl::String(format!("background-repeat: {}", val))
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackgroundSize<'a>(pub &'a str);
+
+fn size(input: &str) -> IResult<&str, BackgroundSize> {
+    map(hashmap_value(&BACKGROUND_SIZE), BackgroundSize)(input)
+}
+
+impl<'a> IntoDeclaration for BackgroundSize<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::String(format!("background-size: {}", self.0))
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackgroundImage<'a>(pub &'a str);
+
+fn image(input: &str) -> IResult<&str, BackgroundImage> {
+    map(hashmap_value(&BACKGROUND_IMAGE), BackgroundImage)(input)
+}
+
+impl<'a> IntoDeclaration for BackgroundImage<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::String(format!("background-image: {}", self.0))
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum GradientColorStops<'a> {
+    From(&'a str),
+    To(&'a str),
+    Via(&'a str),
+}
+
+fn gradient_color_stops(input: &str) -> IResult<&str, GradientColorStops> {
+    let g = |keyword| keyword_value(keyword, &GRADIENT_COLOR_STOPS);
+
+    alt((
+        map(g("from"), GradientColorStops::From),
+        map(g("to"), GradientColorStops::To),
+        map(g("via"), GradientColorStops::Via),
+    ))(input)
+}
+
+impl<'a> IntoDeclaration for GradientColorStops<'a> {
+    fn to_decl(self) -> Decl {
+        match self {
+            Self::From(g) => Decl::Vec(vec![
+                format!("--tw-gradient-from: {}", g),
+                format!("--tw-gradient-to: {}", g),
+                "--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)".into(),
+            ]),
+            Self::To(g) => Decl::String(format!("--tw-gradient-to: {}", g)),
+            Self::Via(g) => Decl::Vec(vec![
+                format!("--tw-gradient-to: {}", g),
+                format!(
+                    "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to)",
+                    g
+                ),
+            ]),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_attachment() {
+        assert_eq!(
+            background("bg-fixed"),
+            Ok((
+                "",
+                Backgrounds::BackgroundAttachment(BackgroundAttachment::Fixed)
+            ))
+        );
     }
 
-    pub fn to_decl(self) -> Result<Decl, WarningType> {
-        match self {
-            Self::BackgroundAttachment(b) => Ok(b.to_decl()),
-            Self::BackgroundClip(b) => Ok(b.to_decl()),
-            Self::BackgroundColor(b) => b.to_decl(),
-            Self::BackgroundOrigin(b) => Ok(b.to_decl()),
-            Self::BackgroundPosition(b) => b.to_decl(),
-            Self::BackgroundRepeat(b) => Ok(b.to_decl()),
-            Self::BackgroundSize(b) => b.to_decl(),
-            Self::BackgroundImage(b) => b.to_decl(),
-            Self::GradientColorStops(b) => b.to_decl(),
-        }
+    #[test]
+    fn test_clip() {
+        assert_eq!(
+            background("bg-content"),
+            Ok(("", Backgrounds::BackgroundClip(BackgroundClip::Content)))
+        );
+    }
+
+    #[test]
+    fn test_color() {
+        assert_eq!(
+            background("bg-red-500"),
+            Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#ef4444"))))
+        );
     }
 }
