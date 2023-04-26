@@ -1,26 +1,12 @@
-use lazy_static::lazy_static;
 use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::combinator::map;
-use nom::sequence::preceded;
+use nom::bytes::complete::{is_not, tag};
+use nom::combinator::{map, map_opt};
+use nom::sequence::{preceded, terminated};
 use nom::IResult;
-use std::collections::HashMap;
 
-use crate::class::utils::{hashmap_value, hex_to_rgb_color, keyword_value};
+use crate::class::utils::{arbitrary, hex_to_rgb_color, keyword_dash};
 use crate::class::{Decl, IntoDeclaration};
-
-lazy_static! {
-    pub static ref BACKGROUND_COLOR: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("../colors.ron")).unwrap();
-    pub static ref BACKGROUND_POSITION: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("background_position.ron")).unwrap();
-    pub static ref BACKGROUND_SIZE: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("background_size.ron")).unwrap();
-    pub static ref BACKGROUND_IMAGE: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("background_image.ron")).unwrap();
-    pub static ref GRADIENT_COLOR_STOPS: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("../colors.ron")).unwrap();
-}
+use crate::CONFIG;
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Backgrounds<'a> {
@@ -35,7 +21,7 @@ pub enum Backgrounds<'a> {
     GradientColorStops(GradientColorStops<'a>),
 }
 
-pub fn background(input: &str) -> IResult<&str, Backgrounds> {
+pub fn background<'a>(input: &'a str) -> IResult<&'a str, Backgrounds<'a>> {
     preceded(
         preceded(tag("bg"), tag("-")),
         alt((
@@ -134,7 +120,15 @@ impl IntoDeclaration for BackgroundClip {
 pub struct BackgroundColor<'a>(pub &'a str);
 
 fn color(input: &str) -> IResult<&str, BackgroundColor> {
-    map(hashmap_value(&BACKGROUND_COLOR), BackgroundColor)(input)
+    map(
+        alt((
+            arbitrary,
+            map_opt(is_not(" "), |value| {
+                CONFIG.lock().unwrap().backgrounds.color.get(value).copied()
+            }),
+        )),
+        BackgroundColor,
+    )(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundColor<'a> {
@@ -184,7 +178,21 @@ impl IntoDeclaration for BackgroundOrigin {
 pub struct BackgroundPosition<'a>(pub &'a str);
 
 fn position(input: &str) -> IResult<&str, BackgroundPosition> {
-    map(hashmap_value(&BACKGROUND_POSITION), BackgroundPosition)(input)
+    map(
+        alt((
+            arbitrary,
+            map_opt(is_not(" "), |value| {
+                CONFIG
+                    .lock()
+                    .unwrap()
+                    .backgrounds
+                    .position
+                    .get(value)
+                    .copied()
+            }),
+        )),
+        BackgroundPosition,
+    )(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundPosition<'a> {
@@ -233,7 +241,15 @@ impl IntoDeclaration for BackgroundRepeat {
 pub struct BackgroundSize<'a>(pub &'a str);
 
 fn size(input: &str) -> IResult<&str, BackgroundSize> {
-    map(hashmap_value(&BACKGROUND_SIZE), BackgroundSize)(input)
+    map(
+        alt((
+            arbitrary,
+            map_opt(is_not(" "), |value| {
+                CONFIG.lock().unwrap().backgrounds.size.get(value).copied()
+            }),
+        )),
+        BackgroundSize,
+    )(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundSize<'a> {
@@ -246,7 +262,15 @@ impl<'a> IntoDeclaration for BackgroundSize<'a> {
 pub struct BackgroundImage<'a>(pub &'a str);
 
 fn image(input: &str) -> IResult<&str, BackgroundImage> {
-    map(hashmap_value(&BACKGROUND_IMAGE), BackgroundImage)(input)
+    map(
+        alt((
+            arbitrary,
+            map_opt(is_not(" "), |value| {
+                CONFIG.lock().unwrap().backgrounds.image.get(value).copied()
+            }),
+        )),
+        BackgroundImage,
+    )(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundImage<'a> {
@@ -263,7 +287,17 @@ pub enum GradientColorStops<'a> {
 }
 
 fn gradient_color_stops(input: &str) -> IResult<&str, GradientColorStops> {
-    let g = |keyword| keyword_value(keyword, &GRADIENT_COLOR_STOPS);
+    let g = |keyword| {
+        terminated(
+            keyword_dash(keyword),
+            alt((
+                arbitrary,
+                map_opt(is_not(" "), |value| {
+                    CONFIG.lock().unwrap().backgrounds.image.get(value).copied()
+                }),
+            )),
+        )
+    };
 
     alt((
         map(g("from"), GradientColorStops::From),
@@ -320,6 +354,21 @@ mod tests {
         assert_eq!(
             background("bg-red-500"),
             Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#ef4444"))))
+        );
+    }
+
+    #[test]
+    fn test_config() {
+        CONFIG
+            .lock()
+            .unwrap()
+            .backgrounds
+            .color
+            .insert("yellow", "#yellow");
+
+        assert_eq!(
+            background("bg-yellow"),
+            Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#yellow"))))
         );
     }
 }

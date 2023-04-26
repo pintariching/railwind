@@ -11,43 +11,28 @@ pub fn arbitrary(input: &str) -> IResult<&str, &str> {
     delimited(tag("["), is_not("]"), tag("]"))(input)
 }
 
-pub fn positive<'a>(keyword: &'a str) -> impl FnMut(&'a str) -> IResult<&str, &str> {
-    terminated(tag(keyword), tag("-"))
+pub fn keyword_dash<'a>(keyword: &'a str) -> impl FnMut(&'a str) -> IResult<&str, &str> {
+    preceded(tag(keyword), tag("-"))
 }
 
-pub fn negative<'a>(keyword: &'a str) -> impl FnMut(&'a str) -> IResult<&str, &str> {
+pub fn negative_keyword_dash<'a>(keyword: &'a str) -> impl FnMut(&'a str) -> IResult<&str, &str> {
     delimited(tag("-"), tag(keyword), tag("-"))
 }
 
-pub fn hashmap_value<'a>(
-    hashmap: &'a HashMap<&'static str, &'static str>,
-) -> impl FnMut(&'a str) -> IResult<&str, &str> {
-    alt((arbitrary, map_opt(is_not(" "), |v| hashmap.get(v).copied())))
-}
-
-pub fn keyword_value<'a>(
-    keyword: &'a str,
-    hashmap: &'a HashMap<&'static str, &'static str>,
-) -> impl FnMut(&'a str) -> IResult<&str, &str> {
-    preceded(
-        terminated(tag(keyword), tag("-")),
-        alt((arbitrary, map_opt(is_not(" "), |v| hashmap.get(v).copied()))),
-    )
-}
 pub fn pos_neg_keyword_value<'a>(
     keyword: &'a str,
     hashmap: &'a HashMap<&'static str, &'static str>,
 ) -> impl FnMut(&'a str) -> IResult<&str, String> {
     alt((
         preceded(
-            positive(keyword),
+            keyword_dash(keyword),
             alt((
                 map(arbitrary, |m| m.to_string()),
                 map_opt(is_not(" "), |m| hashmap.get(m).map(|m| m.to_string())),
             )),
         ),
         preceded(
-            negative(keyword),
+            negative_keyword_dash(keyword),
             alt((
                 map(arbitrary, |m| format!("-{m}")),
                 map_opt(is_not(" "), |m| hashmap.get(m).map(|m| format!("-{m}"))),
@@ -213,12 +198,12 @@ mod tests {
 
     #[test]
     fn test_positive() {
-        assert_eq!(positive("p")("p-5"), Ok(("5", "p")));
-        assert!(positive("p")("-p-5").finish().is_err())
+        assert_eq!(keyword_dash("p")("p-5"), Ok(("5", "p")));
+        assert!(keyword_dash("p")("-p-5").finish().is_err())
     }
 
     #[test]
     fn test_negative() {
-        assert_eq!(negative("m")("-m-5"), Ok(("5", "m")))
+        assert_eq!(negative_keyword_dash("m")("-m-5"), Ok(("5", "m")))
     }
 }

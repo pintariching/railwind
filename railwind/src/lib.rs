@@ -1,22 +1,88 @@
-// use indexmap::IndexMap;
-// use modifiers::{generate_state_selector, MediaQuery, State};
-// use serde::{Deserialize, Serialize};
-// use utils::{indent_string, replace_invalid_chars};
-// use warning::{Position, Warning, WarningType};
-
-// use lazy_static::lazy_static;
-// use line_col::LineColLookup;
-// use regex::Regex;
-// use std::collections::HashMap;
-// use std::fs::{read_to_string, File};
-// use std::io::Write;
-// use std::path::PathBuf;
+use lazy_static::lazy_static;
+use std::{collections::HashMap, sync::Mutex};
 
 mod class;
 mod modifiers;
 mod parser;
 mod utils;
 pub mod warning;
+
+lazy_static! {
+    pub static ref CONFIG: Mutex<Config> = {
+        let mut c = Config::new();
+        Mutex::new(c)
+    };
+}
+
+pub struct Config {
+    backgrounds: BackgroundsConfig,
+    spacing: SpacingConfig,
+}
+
+impl Config {
+    pub fn new() -> Self {
+        Self {
+            backgrounds: BackgroundsConfig::new(),
+            spacing: SpacingConfig::new(),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct BackgroundsConfig {
+    color: HashMap<&'static str, &'static str>,
+    position: HashMap<&'static str, &'static str>,
+    size: HashMap<&'static str, &'static str>,
+    image: HashMap<&'static str, &'static str>,
+    gradient_color_stops: HashMap<&'static str, &'static str>,
+}
+
+impl BackgroundsConfig {
+    pub fn new() -> Self {
+        let color: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/colors.ron")).unwrap();
+        let position: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/backgrounds/background_position.ron")).unwrap();
+        let size: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/backgrounds/background_size.ron")).unwrap();
+        let image: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/backgrounds/background_image.ron")).unwrap();
+        let gradient_color_stops: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/colors.ron")).unwrap();
+
+        Self {
+            color,
+            position,
+            size,
+            image,
+            gradient_color_stops,
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct SpacingConfig {
+    padding: HashMap<&'static str, &'static str>,
+    margin: HashMap<&'static str, &'static str>,
+    space_between: HashMap<&'static str, &'static str>,
+}
+
+impl SpacingConfig {
+    pub fn new() -> Self {
+        let margin: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/spacing/margin.ron")).unwrap();
+        let padding: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/spacing/padding.ron")).unwrap();
+        let space_between: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/spacing/space_between.ron")).unwrap();
+
+        Self {
+            padding,
+            margin,
+            space_between,
+        }
+    }
+}
 
 // lazy_static! {
 //     static ref HTML_CLASS_REGEX: Regex =

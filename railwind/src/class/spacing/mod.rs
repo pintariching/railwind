@@ -1,22 +1,12 @@
-use lazy_static::lazy_static;
 use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::combinator::map;
+use nom::bytes::complete::is_not;
 use nom::IResult;
-use std::collections::HashMap;
+use nom::{bytes::complete::tag, combinator::map};
+use nom::{combinator::map_opt, sequence::preceded};
 
-use crate::class::utils::{keyword_value, pos_neg_keyword_value};
-use crate::class::Decl;
-use crate::class::IntoDeclaration;
-
-lazy_static! {
-    pub static ref MARGIN: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("margin.ron")).unwrap();
-    pub static ref PADDING: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("padding.ron")).unwrap();
-    pub static ref SPACE_BETWEEN: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("space_between.ron")).unwrap();
-}
+use crate::class::utils::{arbitrary, keyword_dash, negative_keyword_dash};
+use crate::class::{Decl, IntoDeclaration};
+use crate::CONFIG;
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Spacing<'a> {
@@ -55,14 +45,26 @@ pub enum Padding<'a> {
 }
 
 fn padding(input: &str) -> IResult<&str, Padding> {
+    let p = |keyword| {
+        preceded(
+            keyword_dash(keyword),
+            alt((
+                arbitrary,
+                map_opt(is_not(" "), |value| {
+                    CONFIG.lock().unwrap().spacing.padding.get(value).copied()
+                }),
+            )),
+        )
+    };
+
     alt((
-        map(keyword_value("p", &PADDING), Padding::All),
-        map(keyword_value("pt", &PADDING), Padding::Top),
-        map(keyword_value("pr", &PADDING), Padding::Right),
-        map(keyword_value("pb", &PADDING), Padding::Bottom),
-        map(keyword_value("pl", &PADDING), Padding::Left),
-        map(keyword_value("px", &PADDING), Padding::X),
-        map(keyword_value("py", &PADDING), Padding::Y),
+        map(p("p"), Padding::All),
+        map(p("pt"), Padding::Top),
+        map(p("pr"), Padding::Right),
+        map(p("pb"), Padding::Bottom),
+        map(p("pl"), Padding::Left),
+        map(p("px"), Padding::X),
+        map(p("py"), Padding::Y),
     ))(input)
 }
 
@@ -98,14 +100,49 @@ pub enum Margin {
 }
 
 fn margin(input: &str) -> IResult<&str, Margin> {
+    let m = |keyword| {
+        alt((
+            preceded(
+                keyword_dash(keyword),
+                alt((
+                    map(arbitrary, String::from),
+                    map_opt(is_not(" "), |value| {
+                        CONFIG
+                            .lock()
+                            .unwrap()
+                            .spacing
+                            .margin
+                            .get(value)
+                            .map(|m| m.to_string())
+                    }),
+                )),
+            ),
+            preceded(
+                negative_keyword_dash(keyword),
+                alt((
+                    map(arbitrary, |m| format!("-{m}")),
+                    map_opt(is_not(" "), |value| {
+                        CONFIG
+                            .lock()
+                            .unwrap()
+                            .spacing
+                            .margin
+                            .get(value)
+                            .map(|m| format!("-{m}"))
+                    }),
+                )),
+            ),
+        ))
+    };
+
     alt((
-        map(pos_neg_keyword_value("m", &MARGIN), Margin::All),
-        map(pos_neg_keyword_value("mt", &MARGIN), Margin::Top),
-        map(pos_neg_keyword_value("mr", &MARGIN), Margin::Right),
-        map(pos_neg_keyword_value("mb", &MARGIN), Margin::Bottom),
-        map(pos_neg_keyword_value("ml", &MARGIN), Margin::Left),
-        map(pos_neg_keyword_value("mx", &MARGIN), Margin::X),
-        map(pos_neg_keyword_value("my", &MARGIN), Margin::Y),
+        map(m("m"), Margin::All),
+        map(m("mt"), Margin::Top),
+        map(m("mr"), Margin::Right),
+        map(m("mb"), Margin::Bottom),
+        map(m("ml"), Margin::Left),
+        map(m("mx"), Margin::X),
+        map(m("my"), Margin::Y),
     ))(input)
 }
 
@@ -138,15 +175,44 @@ pub enum SpaceBetween {
 }
 
 fn space_between(input: &str) -> IResult<&str, SpaceBetween> {
+    let s = |keyword| {
+        alt((
+            preceded(
+                keyword_dash(keyword),
+                alt((
+                    map(arbitrary, String::from),
+                    map_opt(is_not(" "), |value| {
+                        CONFIG
+                            .lock()
+                            .unwrap()
+                            .spacing
+                            .space_between
+                            .get(value)
+                            .map(|s| s.to_string())
+                    }),
+                )),
+            ),
+            preceded(
+                negative_keyword_dash(keyword),
+                alt((
+                    map(arbitrary, |s| format!("-{s}")),
+                    map_opt(is_not(" "), |value| {
+                        CONFIG
+                            .lock()
+                            .unwrap()
+                            .spacing
+                            .padding
+                            .get(value)
+                            .map(|s| format!("-{s}"))
+                    }),
+                )),
+            ),
+        ))
+    };
+
     alt((
-        map(
-            pos_neg_keyword_value("space-x", &SPACE_BETWEEN),
-            SpaceBetween::X,
-        ),
-        map(
-            pos_neg_keyword_value("space-y", &SPACE_BETWEEN),
-            SpaceBetween::Y,
-        ),
+        map(s("space-x"), SpaceBetween::X),
+        map(s("space-y"), SpaceBetween::Y),
         map(tag("space-x-reverse"), |_| SpaceBetween::ReverseX),
         map(tag("space-y-reverse"), |_| SpaceBetween::ReverseY),
     ))(input)
