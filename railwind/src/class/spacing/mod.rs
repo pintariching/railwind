@@ -9,15 +9,6 @@ use crate::class::Decl;
 use crate::class::IntoDeclaration;
 use crate::Config;
 
-lazy_static! {
-    pub static ref MARGIN: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("margin.ron")).unwrap();
-    pub static ref PADDING: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("padding.ron")).unwrap();
-    pub static ref SPACE_BETWEEN: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("space_between.ron")).unwrap();
-}
-
 #[derive(Debug, PartialEq, Hash)]
 pub enum Spacing<'a> {
     Padding(Padding<'a>),

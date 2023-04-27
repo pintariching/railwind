@@ -6,7 +6,9 @@ use nom::IResult;
 
 use crate::class::utils::{arbitrary, hex_to_rgb_color, keyword_dash};
 use crate::class::{Decl, IntoDeclaration};
-use crate::CONFIG;
+use crate::Config;
+
+use super::utils::{hashmap_value, keyword_value};
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Backgrounds<'a> {
@@ -320,15 +322,11 @@ mod tests {
 
     #[test]
     fn test_config() {
-        CONFIG
-            .lock()
-            .unwrap()
-            .backgrounds
-            .color
-            .insert("yellow", "#yellow");
+        let mut c = Config::new();
+        c.backgrounds.color.insert("yellow", "#yellow");
 
         assert_eq!(
-            background("bg-yellow"),
+            background("bg-yellow", &c),
             Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#yellow"))))
         );
     }
