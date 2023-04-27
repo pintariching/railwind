@@ -1,9 +1,8 @@
-use lazy_static::lazy_static;
 use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::combinator::map;
+use nom::bytes::complete::is_not;
 use nom::IResult;
-use std::collections::HashMap;
+use nom::{bytes::complete::tag, combinator::map};
+use nom::{combinator::map_opt, sequence::preceded};
 
 use crate::class::utils::{keyword_value, neg_keyword_value};
 use crate::class::Decl;

@@ -1,14 +1,12 @@
-use lazy_static::lazy_static;
 use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::combinator::map;
-use nom::sequence::preceded;
+use nom::bytes::complete::{is_not, tag};
+use nom::combinator::{map, map_opt};
+use nom::sequence::{preceded, terminated};
 use nom::IResult;
-use std::collections::HashMap;
 
-use crate::class::utils::{hashmap_value, hex_to_rgb_color, keyword_value};
+use crate::class::utils::{arbitrary, hex_to_rgb_color, keyword_dash};
 use crate::class::{Decl, IntoDeclaration};
-use crate::Config;
+use crate::CONFIG;
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Backgrounds<'a> {
@@ -317,6 +315,21 @@ mod tests {
         assert_eq!(
             background("bg-red-500", &Config::new()),
             Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#ef4444"))))
+        );
+    }
+
+    #[test]
+    fn test_config() {
+        CONFIG
+            .lock()
+            .unwrap()
+            .backgrounds
+            .color
+            .insert("yellow", "#yellow");
+
+        assert_eq!(
+            background("bg-yellow"),
+            Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#yellow"))))
         );
     }
 }
