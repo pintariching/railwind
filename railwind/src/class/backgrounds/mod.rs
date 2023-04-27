@@ -125,7 +125,10 @@ impl IntoDeclaration for BackgroundClip {
 pub struct BackgroundColor<'a>(pub &'a str);
 
 fn color<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundColor<'a>> {
-    map(hashmap_value(&config.backgrounds.color), BackgroundColor)(input)
+    map(
+        hashmap_value(&config.get_backgrounds().color),
+        BackgroundColor,
+    )(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundColor<'a> {
@@ -176,7 +179,7 @@ pub struct BackgroundPosition<'a>(pub &'a str);
 
 fn position<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundPosition<'a>> {
     map(
-        hashmap_value(&config.backgrounds.position),
+        hashmap_value(&config.get_backgrounds().position),
         BackgroundPosition,
     )(input)
 }
@@ -227,7 +230,10 @@ impl IntoDeclaration for BackgroundRepeat {
 pub struct BackgroundSize<'a>(pub &'a str);
 
 fn size<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundSize<'a>> {
-    map(hashmap_value(&config.backgrounds.size), BackgroundSize)(input)
+    map(
+        hashmap_value(&config.get_backgrounds().size),
+        BackgroundSize,
+    )(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundSize<'a> {
@@ -240,7 +246,10 @@ impl<'a> IntoDeclaration for BackgroundSize<'a> {
 pub struct BackgroundImage<'a>(pub &'a str);
 
 fn image<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundImage<'a>> {
-    map(hashmap_value(&config.backgrounds.image), BackgroundImage)(input)
+    map(
+        hashmap_value(&config.get_backgrounds().image),
+        BackgroundImage,
+    )(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundImage<'a> {
@@ -260,7 +269,7 @@ fn gradient_color_stops<'a>(
     input: &'a str,
     config: &'a Config,
 ) -> IResult<&'a str, GradientColorStops<'a>> {
-    let g = |keyword| keyword_value(keyword, &config.backgrounds.gradient_color_stops);
+    let g = |keyword| keyword_value(keyword, &config.get_backgrounds().gradient_color_stops);
 
     alt((
         map(g("from"), GradientColorStops::From),
@@ -323,7 +332,8 @@ mod tests {
     #[test]
     fn test_config() {
         let mut c = Config::new();
-        c.backgrounds.color.insert("yellow", "#yellow");
+
+        c.get_mut_backgrounds().color.insert("yellow", "#yellow");
 
         assert_eq!(
             background("bg-yellow", &c),

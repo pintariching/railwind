@@ -12,7 +12,7 @@
 // use std::io::Write;
 // use std::path::PathBuf;
 
-use std::collections::HashMap;
+use std::{cell::OnceCell, collections::HashMap};
 
 mod class;
 mod modifiers;
@@ -21,16 +21,34 @@ mod utils;
 pub mod warning;
 
 pub struct Config {
-    backgrounds: BackgroundsConfig,
-    spacing: SpacingConfig,
+    backgrounds: OnceCell<BackgroundsConfig>,
+    spacing: OnceCell<SpacingConfig>,
 }
 
 impl Config {
     pub fn new() -> Self {
         Self {
-            backgrounds: BackgroundsConfig::new(),
-            spacing: SpacingConfig::new(),
+            backgrounds: OnceCell::new(),
+            spacing: OnceCell::new(),
         }
+    }
+
+    pub fn get_backgrounds(&self) -> &BackgroundsConfig {
+        self.backgrounds.get_or_init(BackgroundsConfig::new)
+    }
+
+    pub fn get_mut_backgrounds(&mut self) -> &mut BackgroundsConfig {
+        let _ = self.get_backgrounds();
+        self.backgrounds.get_mut().unwrap()
+    }
+
+    pub fn get_spacing(&self) -> &SpacingConfig {
+        self.spacing.get_or_init(SpacingConfig::new)
+    }
+
+    pub fn get_mut_spacing(&mut self) -> &mut SpacingConfig {
+        let _ = self.get_spacing();
+        self.spacing.get_mut().unwrap()
     }
 }
 

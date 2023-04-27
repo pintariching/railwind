@@ -1,8 +1,6 @@
 use nom::branch::alt;
-use nom::bytes::complete::is_not;
 use nom::IResult;
 use nom::{bytes::complete::tag, combinator::map};
-use nom::{combinator::map_opt, sequence::preceded};
 
 use crate::class::utils::{keyword_value, neg_keyword_value};
 use crate::class::Decl;
@@ -47,16 +45,34 @@ pub enum Padding<'a> {
 
 fn padding<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Padding<'a>> {
     alt((
-        map(keyword_value("p", &config.spacing.padding), Padding::All),
-        map(keyword_value("pt", &config.spacing.padding), Padding::Top),
-        map(keyword_value("pr", &config.spacing.padding), Padding::Right),
         map(
-            keyword_value("pb", &config.spacing.padding),
+            keyword_value("p", &config.get_spacing().padding),
+            Padding::All,
+        ),
+        map(
+            keyword_value("pt", &config.get_spacing().padding),
+            Padding::Top,
+        ),
+        map(
+            keyword_value("pr", &config.get_spacing().padding),
+            Padding::Right,
+        ),
+        map(
+            keyword_value("pb", &config.get_spacing().padding),
             Padding::Bottom,
         ),
-        map(keyword_value("pl", &config.spacing.padding), Padding::Left),
-        map(keyword_value("px", &config.spacing.padding), Padding::X),
-        map(keyword_value("py", &config.spacing.padding), Padding::Y),
+        map(
+            keyword_value("pl", &config.get_spacing().padding),
+            Padding::Left,
+        ),
+        map(
+            keyword_value("px", &config.get_spacing().padding),
+            Padding::X,
+        ),
+        map(
+            keyword_value("py", &config.get_spacing().padding),
+            Padding::Y,
+        ),
     ))(input)
 }
 
@@ -93,22 +109,34 @@ pub enum Margin {
 
 fn margin<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Margin> {
     alt((
-        map(neg_keyword_value("m", &config.spacing.margin), Margin::All),
-        map(neg_keyword_value("mt", &config.spacing.margin), Margin::Top),
         map(
-            neg_keyword_value("mr", &config.spacing.margin),
+            neg_keyword_value("m", &config.get_spacing().margin),
+            Margin::All,
+        ),
+        map(
+            neg_keyword_value("mt", &config.get_spacing().margin),
+            Margin::Top,
+        ),
+        map(
+            neg_keyword_value("mr", &config.get_spacing().margin),
             Margin::Right,
         ),
         map(
-            neg_keyword_value("mb", &config.spacing.margin),
+            neg_keyword_value("mb", &config.get_spacing().margin),
             Margin::Bottom,
         ),
         map(
-            neg_keyword_value("ml", &config.spacing.margin),
+            neg_keyword_value("ml", &config.get_spacing().margin),
             Margin::Left,
         ),
-        map(neg_keyword_value("mx", &config.spacing.margin), Margin::X),
-        map(neg_keyword_value("my", &config.spacing.margin), Margin::Y),
+        map(
+            neg_keyword_value("mx", &config.get_spacing().margin),
+            Margin::X,
+        ),
+        map(
+            neg_keyword_value("my", &config.get_spacing().margin),
+            Margin::Y,
+        ),
     ))(input)
 }
 
@@ -143,11 +171,11 @@ pub enum SpaceBetween {
 fn space_between<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, SpaceBetween> {
     alt((
         map(
-            neg_keyword_value("space-x", &config.spacing.space_between),
+            neg_keyword_value("space-x", &config.get_spacing().space_between),
             SpaceBetween::X,
         ),
         map(
-            neg_keyword_value("space-y", &config.spacing.space_between),
+            neg_keyword_value("space-y", &config.get_spacing().space_between),
             SpaceBetween::Y,
         ),
         map(tag("space-x-reverse"), |_| SpaceBetween::ReverseX),
