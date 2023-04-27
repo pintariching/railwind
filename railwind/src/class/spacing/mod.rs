@@ -5,9 +5,10 @@ use nom::combinator::map;
 use nom::IResult;
 use std::collections::HashMap;
 
-use crate::class::utils::{keyword_value, pos_neg_keyword_value};
+use crate::class::utils::{keyword_value, neg_keyword_value};
 use crate::class::Decl;
 use crate::class::IntoDeclaration;
+use crate::Config;
 
 lazy_static! {
     pub static ref MARGIN: HashMap<&'static str, &'static str> =
@@ -25,11 +26,11 @@ pub enum Spacing<'a> {
     SpaceBetween(SpaceBetween),
 }
 
-pub fn spacing(input: &str) -> IResult<&str, Spacing> {
+pub fn spacing<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Spacing<'a>> {
     alt((
-        map(padding, Spacing::Padding),
-        map(margin, Spacing::Margin),
-        map(space_between, Spacing::SpaceBetween),
+        map(|i| padding(i, config), Spacing::Padding),
+        map(|i| margin(i, config), Spacing::Margin),
+        map(|i| space_between(i, config), Spacing::SpaceBetween),
     ))(input)
 }
 
@@ -54,15 +55,18 @@ pub enum Padding<'a> {
     Y(&'a str),
 }
 
-fn padding(input: &str) -> IResult<&str, Padding> {
+fn padding<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Padding<'a>> {
     alt((
-        map(keyword_value("p", &PADDING), Padding::All),
-        map(keyword_value("pt", &PADDING), Padding::Top),
-        map(keyword_value("pr", &PADDING), Padding::Right),
-        map(keyword_value("pb", &PADDING), Padding::Bottom),
-        map(keyword_value("pl", &PADDING), Padding::Left),
-        map(keyword_value("px", &PADDING), Padding::X),
-        map(keyword_value("py", &PADDING), Padding::Y),
+        map(keyword_value("p", &config.spacing.padding), Padding::All),
+        map(keyword_value("pt", &config.spacing.padding), Padding::Top),
+        map(keyword_value("pr", &config.spacing.padding), Padding::Right),
+        map(
+            keyword_value("pb", &config.spacing.padding),
+            Padding::Bottom,
+        ),
+        map(keyword_value("pl", &config.spacing.padding), Padding::Left),
+        map(keyword_value("px", &config.spacing.padding), Padding::X),
+        map(keyword_value("py", &config.spacing.padding), Padding::Y),
     ))(input)
 }
 
@@ -97,15 +101,24 @@ pub enum Margin {
     Y(String),
 }
 
-fn margin(input: &str) -> IResult<&str, Margin> {
+fn margin<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Margin> {
     alt((
-        map(pos_neg_keyword_value("m", &MARGIN), Margin::All),
-        map(pos_neg_keyword_value("mt", &MARGIN), Margin::Top),
-        map(pos_neg_keyword_value("mr", &MARGIN), Margin::Right),
-        map(pos_neg_keyword_value("mb", &MARGIN), Margin::Bottom),
-        map(pos_neg_keyword_value("ml", &MARGIN), Margin::Left),
-        map(pos_neg_keyword_value("mx", &MARGIN), Margin::X),
-        map(pos_neg_keyword_value("my", &MARGIN), Margin::Y),
+        map(neg_keyword_value("m", &config.spacing.margin), Margin::All),
+        map(neg_keyword_value("mt", &config.spacing.margin), Margin::Top),
+        map(
+            neg_keyword_value("mr", &config.spacing.margin),
+            Margin::Right,
+        ),
+        map(
+            neg_keyword_value("mb", &config.spacing.margin),
+            Margin::Bottom,
+        ),
+        map(
+            neg_keyword_value("ml", &config.spacing.margin),
+            Margin::Left,
+        ),
+        map(neg_keyword_value("mx", &config.spacing.margin), Margin::X),
+        map(neg_keyword_value("my", &config.spacing.margin), Margin::Y),
     ))(input)
 }
 
@@ -137,14 +150,14 @@ pub enum SpaceBetween {
     ReverseY,
 }
 
-fn space_between(input: &str) -> IResult<&str, SpaceBetween> {
+fn space_between<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, SpaceBetween> {
     alt((
         map(
-            pos_neg_keyword_value("space-x", &SPACE_BETWEEN),
+            neg_keyword_value("space-x", &config.spacing.space_between),
             SpaceBetween::X,
         ),
         map(
-            pos_neg_keyword_value("space-y", &SPACE_BETWEEN),
+            neg_keyword_value("space-y", &config.spacing.space_between),
             SpaceBetween::Y,
         ),
         map(tag("space-x-reverse"), |_| SpaceBetween::ReverseX),
@@ -183,23 +196,32 @@ mod tests {
 
     #[test]
     fn test_padding() {
-        assert_eq!(padding("p-5"), Ok(("", Padding::All("1.25rem"))));
-        assert_eq!(padding("p-[3.251rem]"), Ok(("", Padding::All("3.251rem"))));
+        assert_eq!(
+            padding("p-5", &Config::new()),
+            Ok(("", Padding::All("1.25rem")))
+        );
+        assert_eq!(
+            padding("p-[3.251rem]", &Config::new()),
+            Ok(("", Padding::All("3.251rem")))
+        );
     }
 
     #[test]
     fn test_margin() {
-        assert_eq!(margin("m-5"), Ok(("", Margin::All("1.25rem".to_string()))));
         assert_eq!(
-            margin("-m-5"),
+            margin("m-5", &Config::new()),
+            Ok(("", Margin::All("1.25rem".to_string())))
+        );
+        assert_eq!(
+            margin("-m-5", &Config::new()),
             Ok(("", Margin::All("-1.25rem".to_string())))
         );
         assert_eq!(
-            margin("m-[3.14px]"),
+            margin("m-[3.14px]", &Config::new()),
             Ok(("", Margin::All("3.14px".to_string())))
         );
         assert_eq!(
-            margin("-m-[3.14px]"),
+            margin("-m-[3.14px]", &Config::new()),
             Ok(("", Margin::All("-3.14px".to_string())))
         );
     }
@@ -207,27 +229,27 @@ mod tests {
     #[test]
     fn test_space_between() {
         assert_eq!(
-            space_between("space-x-5"),
+            space_between("space-x-5", &Config::new()),
             Ok(("", SpaceBetween::X("1.25rem".to_string())))
         );
         assert_eq!(
-            space_between("-space-x-5"),
+            space_between("-space-x-5", &Config::new()),
             Ok(("", SpaceBetween::X("-1.25rem".to_string())))
         );
         assert_eq!(
-            space_between("space-x-[42rem]"),
+            space_between("space-x-[42rem]", &Config::new()),
             Ok(("", SpaceBetween::X("42rem".to_string())))
         );
         assert_eq!(
-            space_between("space-x-[-42rem]"),
+            space_between("space-x-[-42rem]", &Config::new()),
             Ok(("", SpaceBetween::X("-42rem".to_string())))
         );
         assert_eq!(
-            space_between("space-x-reverse"),
+            space_between("space-x-reverse", &Config::new()),
             Ok(("", SpaceBetween::ReverseX))
         );
         assert_eq!(
-            space_between("space-y-reverse"),
+            space_between("space-y-reverse", &Config::new()),
             Ok(("", SpaceBetween::ReverseY))
         );
     }

@@ -12,11 +12,81 @@
 // use std::io::Write;
 // use std::path::PathBuf;
 
+use std::collections::HashMap;
+
 mod class;
 mod modifiers;
 mod parser;
 mod utils;
 pub mod warning;
+
+pub struct Config {
+    backgrounds: BackgroundsConfig,
+    spacing: SpacingConfig,
+}
+
+impl Config {
+    pub fn new() -> Self {
+        Self {
+            backgrounds: BackgroundsConfig::new(),
+            spacing: SpacingConfig::new(),
+        }
+    }
+}
+
+pub struct BackgroundsConfig {
+    color: HashMap<&'static str, &'static str>,
+    position: HashMap<&'static str, &'static str>,
+    size: HashMap<&'static str, &'static str>,
+    image: HashMap<&'static str, &'static str>,
+    gradient_color_stops: HashMap<&'static str, &'static str>,
+}
+
+impl BackgroundsConfig {
+    pub fn new() -> Self {
+        let color: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/colors.ron")).unwrap();
+        let position: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/backgrounds/background_position.ron")).unwrap();
+        let size: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/backgrounds/background_size.ron")).unwrap();
+        let image: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/backgrounds/background_image.ron")).unwrap();
+        let gradient_color_stops: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/colors.ron")).unwrap();
+
+        Self {
+            color,
+            position,
+            size,
+            image,
+            gradient_color_stops,
+        }
+    }
+}
+
+pub struct SpacingConfig {
+    padding: HashMap<&'static str, &'static str>,
+    margin: HashMap<&'static str, &'static str>,
+    space_between: HashMap<&'static str, &'static str>,
+}
+
+impl SpacingConfig {
+    pub fn new() -> Self {
+        let margin: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/spacing/margin.ron")).unwrap();
+        let padding: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/spacing/padding.ron")).unwrap();
+        let space_between: HashMap<&'static str, &'static str> =
+            ron::from_str(include_str!("class/spacing/space_between.ron")).unwrap();
+
+        Self {
+            padding,
+            margin,
+            space_between,
+        }
+    }
+}
 
 // lazy_static! {
 //     static ref HTML_CLASS_REGEX: Regex =

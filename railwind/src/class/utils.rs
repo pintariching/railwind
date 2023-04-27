@@ -34,7 +34,7 @@ pub fn keyword_value<'a>(
         alt((arbitrary, map_opt(is_not(" "), |v| hashmap.get(v).copied()))),
     )
 }
-pub fn pos_neg_keyword_value<'a>(
+pub fn neg_keyword_value<'a>(
     keyword: &'a str,
     hashmap: &'a HashMap<&'static str, &'static str>,
 ) -> impl FnMut(&'a str) -> IResult<&str, String> {

@@ -32,7 +32,7 @@ pub use transforms::*;
 pub use transitions_animation::*;
 pub use typography::*;
 
-use crate::warning::WarningType;
+use crate::{warning::WarningType, Config};
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Class<'a> {
@@ -53,8 +53,8 @@ pub enum Class<'a> {
     Filters(Filter<'a>),
 }
 
-pub fn class(input: &str) -> IResult<&str, Class> {
-    map(spacing, Class::Spacing)(input)
+pub fn class<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Class<'a>> {
+    map(|i| spacing(i, config), Class::Spacing)(input)
 }
 
 impl<'a> Eq for Class<'a> {}
