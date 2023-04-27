@@ -5,17 +5,17 @@ use crate::warning::WarningType;
 
 use super::{ASPECT_RATIO, BOTTOM, COLUMNS, INSET, LEFT, OBJECT_POSITION, RIGHT, TOP};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct AspectRatio<'a>(pub &'a str);
 
 impl<'a> AspectRatio<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &ASPECT_RATIO)?;
-        Ok(Decl::Single(format!("aspect-ratio: {}", value)))
+        Ok(Decl::String(format!("aspect-ratio: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Container;
 
 impl Container {
@@ -59,17 +59,17 @@ impl Container {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Columns<'a>(pub &'a str);
 
 impl<'a> Columns<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLUMNS)?;
-        Ok(Decl::Single(format!("columns: {}", value)))
+        Ok(Decl::String(format!("columns: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BreakAfter {
     Auto,
     Avoid,
@@ -125,11 +125,11 @@ impl BreakAfter {
             Self::Column => "column",
         };
 
-        Decl::Single(format!("break-after: {}", val))
+        Decl::String(format!("break-after: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BreakBefore {
     Auto,
     Avoid,
@@ -185,11 +185,11 @@ impl BreakBefore {
             Self::Column => "column",
         };
 
-        Decl::Single(format!("break-before: {}", val))
+        Decl::String(format!("break-before: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BreakInside {
     Auto,
     Avoid,
@@ -224,11 +224,11 @@ impl BreakInside {
             Self::AvoidColumn => "avoid-column",
         };
 
-        Decl::Single(format!("break-inside: {}", val))
+        Decl::String(format!("break-inside: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BoxDecoration {
     Clone,
     Slice,
@@ -260,7 +260,7 @@ impl BoxDecoration {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BoxSizing {
     Border,
     Content,
@@ -285,11 +285,11 @@ impl BoxSizing {
             Self::Content => "content-box",
         };
 
-        Decl::Single(format!("box-sizing: {}", val))
+        Decl::String(format!("box-sizing: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Display {
     Block,
     InlineBlock,
@@ -369,11 +369,11 @@ impl Display {
             Self::Hidden => "none",
         };
 
-        Decl::Single(format!("display: {}", val))
+        Decl::String(format!("display: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Floats {
     Right,
     Left,
@@ -401,11 +401,11 @@ impl Floats {
             Self::None => "none",
         };
 
-        Decl::Single(format!("float: {}", val))
+        Decl::String(format!("float: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Clear {
     Left,
     Right,
@@ -436,11 +436,11 @@ impl Clear {
             Self::None => "none",
         };
 
-        Decl::Single(format!("clear: {}", val))
+        Decl::String(format!("clear: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Isolation {
     Isolate,
     IsolationAuto,
@@ -463,11 +463,11 @@ impl Isolation {
             Self::IsolationAuto => "auto",
         };
 
-        Decl::Single(format!("isolation: {}", val))
+        Decl::String(format!("isolation: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ObjectFit {
     Contain,
     Cover,
@@ -499,21 +499,21 @@ impl ObjectFit {
             Self::ScaleDown => "scale-down",
         };
 
-        Decl::Single(format!("object-fit: {}", val))
+        Decl::String(format!("object-fit: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct ObjectPosition<'a>(pub &'a str);
 
 impl<'a> ObjectPosition<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OBJECT_POSITION)?;
-        Ok(Decl::Single(format!("object-position: {}", value)))
+        Ok(Decl::String(format!("object-position: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Overflow {
     Auto,
     Hidden,
@@ -597,11 +597,11 @@ impl Overflow {
             Self::YScroll => "-y: scroll",
         };
 
-        Decl::Single(format!("overflow{}", val))
+        Decl::String(format!("overflow{}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Overscroll {
     Auto,
     Contain,
@@ -661,11 +661,11 @@ impl Overscroll {
             Self::XNone => "-x: none",
         };
 
-        Decl::Single(format!("overscroll-behavior{}", val))
+        Decl::String(format!("overscroll-behavior{}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Position {
     Static,
     Fixed,
@@ -697,11 +697,11 @@ impl Position {
             Self::Sticky => "sticky",
         };
 
-        Decl::Single(format!("position: {}", val))
+        Decl::String(format!("position: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TopRightBottomLeft<'a> {
     Inset(&'a str, bool),
     Top(&'a str, bool),
@@ -757,25 +757,25 @@ impl<'a> TopRightBottomLeft<'a> {
             },
             Self::Top(arg, neg) => {
                 let val = get_value_neg(neg, arg, &TOP)?;
-                Ok(Decl::Single(format!("top: {}", val)))
+                Ok(Decl::String(format!("top: {}", val)))
             }
             Self::Right(arg, neg) => {
                 let val = get_value_neg(neg, arg, &RIGHT)?;
-                Ok(Decl::Single(format!("right: {}", val)))
+                Ok(Decl::String(format!("right: {}", val)))
             }
             Self::Bottom(arg, neg) => {
                 let val = get_value_neg(neg, arg, &BOTTOM)?;
-                Ok(Decl::Single(format!("bottom: {}", val)))
+                Ok(Decl::String(format!("bottom: {}", val)))
             }
             Self::Left(arg, neg) => {
                 let val = get_value_neg(neg, arg, &LEFT)?;
-                Ok(Decl::Single(format!("left: {}", val)))
+                Ok(Decl::String(format!("left: {}", val)))
             }
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Visibility {
     Visible,
     Invisible,
@@ -801,11 +801,11 @@ impl Visibility {
             Self::Collapse => "collapse",
         };
 
-        Decl::Single(format!("visibility: {}", val))
+        Decl::String(format!("visibility: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct ZIndex<'a>(pub &'a str, bool);
 
 impl<'a> ZIndex<'a> {
@@ -816,6 +816,6 @@ impl<'a> ZIndex<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &Z_INDEX)?;
-        Ok(Decl::Single(format!("z-index: {}", value)))
+        Ok(Decl::String(format!("z-index: {}", value)))
     }
 }

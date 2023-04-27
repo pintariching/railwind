@@ -14,7 +14,7 @@ lazy_static! {
         ron::from_str(include_str!("../colors.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Svg<'a> {
     Fill(Fill<'a>),
     Stroke(Stroke<'a>),

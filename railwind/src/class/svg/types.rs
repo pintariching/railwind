@@ -4,17 +4,17 @@ use crate::warning::WarningType;
 
 use super::COLORS;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Fill<'a>(pub &'a str);
 
 impl<'a> Fill<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("fill: {}", value)))
+        Ok(Decl::String(format!("fill: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Stroke<'a>(pub &'a str);
 
 impl<'a> Stroke<'a> {
@@ -24,11 +24,11 @@ impl<'a> Stroke<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("stroke: {}", value)))
+        Ok(Decl::String(format!("stroke: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum StrokeWidth {
     Zero,
     One,
@@ -53,6 +53,6 @@ impl StrokeWidth {
             Self::Two => "2",
         };
 
-        Decl::Single(format!("stroke-width: {}", val))
+        Decl::String(format!("stroke-width: {}", val))
     }
 }

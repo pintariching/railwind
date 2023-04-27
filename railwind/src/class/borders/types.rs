@@ -8,7 +8,7 @@ use super::{
     OUTLINE_WIDTH, RING_COLOR, RING_OFFSET_COLOR, RING_OFFSET_WIDTH, RING_WIDTH,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderRadius<'a> {
     Around(&'a str),
     Top(&'a str),
@@ -41,7 +41,7 @@ impl<'a> BorderRadius<'a> {
         let value = match self {
             Self::Around(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
-                Decl::Single(format!("border-radius: {}", value))
+                Decl::String(format!("border-radius: {}", value))
             }
             Self::Top(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
@@ -73,19 +73,19 @@ impl<'a> BorderRadius<'a> {
             }
             Self::TopLeft(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
-                Decl::Single(format!("border-top-left-radius: {}", value))
+                Decl::String(format!("border-top-left-radius: {}", value))
             }
             Self::TopRight(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
-                Decl::Single(format!("border-top-right-radius: {}", value))
+                Decl::String(format!("border-top-right-radius: {}", value))
             }
             Self::BottomRight(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
-                Decl::Single(format!("border-bottom-right-radius: {}", value))
+                Decl::String(format!("border-bottom-right-radius: {}", value))
             }
             Self::BottomLeft(b) => {
                 let value = get_value(b, &BORDER_RADIUS)?;
-                Decl::Single(format!("border-bottom-left-radius: {}", value))
+                Decl::String(format!("border-bottom-left-radius: {}", value))
             }
         };
 
@@ -93,7 +93,7 @@ impl<'a> BorderRadius<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderWidth<'a> {
     Around(&'a str),
     X(&'a str),
@@ -130,7 +130,7 @@ impl<'a> BorderWidth<'a> {
         let value = match self {
             Self::Around(b) => {
                 let value = get_value(b, &BORDER_WIDTH)?;
-                Decl::Single(format!("border-width: {}", value))
+                Decl::String(format!("border-width: {}", value))
             }
             Self::X(b) => {
                 let value = get_value(b, &BORDER_WIDTH)?;
@@ -148,19 +148,19 @@ impl<'a> BorderWidth<'a> {
             }
             Self::Top(b) => {
                 let value = get_value(b, &BORDER_WIDTH)?;
-                Decl::Single(format!("border-top-width: {}", value))
+                Decl::String(format!("border-top-width: {}", value))
             }
             Self::Right(b) => {
                 let value = get_value(b, &BORDER_WIDTH)?;
-                Decl::Single(format!("border-right-width: {}", value))
+                Decl::String(format!("border-right-width: {}", value))
             }
             Self::Bottom(b) => {
                 let value = get_value(b, &BORDER_WIDTH)?;
-                Decl::Single(format!("border-bottom-width: {}", value))
+                Decl::String(format!("border-bottom-width: {}", value))
             }
             Self::Left(b) => {
                 let value = get_value(b, &BORDER_WIDTH)?;
-                Decl::Single(format!("border-left-width: {}", value))
+                Decl::String(format!("border-left-width: {}", value))
             }
         };
 
@@ -168,7 +168,7 @@ impl<'a> BorderWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderColor<'a> {
     Around(&'a str),
     X(&'a str),
@@ -279,7 +279,7 @@ impl<'a> BorderColor<'a> {
             Ok(decl)
         } else {
             match self {
-                Self::Around(_) => Ok(Decl::Single(format!("border-color: {}", value))),
+                Self::Around(_) => Ok(Decl::String(format!("border-color: {}", value))),
                 Self::X(_) => Ok(Decl::Double([
                     format!("border-left-color: {}", value),
                     format!("border-right-color: {}", value),
@@ -288,16 +288,16 @@ impl<'a> BorderColor<'a> {
                     format!("border-top-color: {}", value),
                     format!("border-bottom-color: {}", value),
                 ])),
-                Self::Top(_) => Ok(Decl::Single(format!("border-top-color: {}", value))),
-                Self::Right(_) => Ok(Decl::Single(format!("border-right-color: {}", value))),
-                Self::Bottom(_) => Ok(Decl::Single(format!("border-bottom-color: {}", value))),
-                Self::Left(_) => Ok(Decl::Single(format!("border-left-color: {}", value))),
+                Self::Top(_) => Ok(Decl::String(format!("border-top-color: {}", value))),
+                Self::Right(_) => Ok(Decl::String(format!("border-right-color: {}", value))),
+                Self::Bottom(_) => Ok(Decl::String(format!("border-bottom-color: {}", value))),
+                Self::Left(_) => Ok(Decl::String(format!("border-left-color: {}", value))),
             }
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderStyle {
     Solid,
     Dashed,
@@ -332,11 +332,11 @@ impl BorderStyle {
             Self::None => "none",
         };
 
-        Decl::Single(format!("border-style: {}", val))
+        Decl::String(format!("border-style: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum DivideWidth<'a> {
     X(&'a str),
     Y(&'a str),
@@ -412,17 +412,17 @@ impl<'a> DivideWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DivideColor<'a>(pub &'a str);
 
 impl<'a> DivideColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &DIVIDE_COLOR)?;
-        Ok(Decl::Single(format!("border-color: {}", value)))
+        Ok(Decl::String(format!("border-color: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum DivideStyle {
     Solid,
     Dashed,
@@ -454,31 +454,31 @@ impl DivideStyle {
             Self::None => "none",
         };
 
-        Decl::Single(format!("border-style: {}", val))
+        Decl::String(format!("border-style: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct OutlineWidth<'a>(pub &'a str);
 
 impl<'a> OutlineWidth<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OUTLINE_WIDTH)?;
-        Ok(Decl::Single(format!("outline-width: {}", value)))
+        Ok(Decl::String(format!("outline-width: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct OutlineColor<'a>(pub &'a str);
 
 impl<'a> OutlineColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &DIVIDE_COLOR)?;
-        Ok(Decl::Single(format!("outline-color: {}", value)))
+        Ok(Decl::String(format!("outline-color: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum OutlineStyle {
     None,
     Solid,
@@ -515,21 +515,21 @@ impl OutlineStyle {
             Self::Double => "double",
         };
 
-        Decl::Single(format!("border-style: {}", val))
+        Decl::String(format!("border-style: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct OutlineOffset<'a>(pub &'a str);
 
 impl<'a> OutlineOffset<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &OUTLINE_OFFSET)?;
-        Ok(Decl::Single(format!("outline-offset: {}", value)))
+        Ok(Decl::String(format!("outline-offset: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum RingWidth<'a> {
     Value(&'a str),
     Inset,
@@ -556,7 +556,7 @@ impl<'a> RingWidth<'a> {
         let val = match self {
             Self::Value(r) => {
                 let value = get_value(r, &RING_WIDTH)?;
-                Decl::Single(format!("box-shadow: {}", value))
+                Decl::String(format!("box-shadow: {}", value))
             }
             Self::Inset => Decl::Lit("--tw-ring-inset: inset"),
         };
@@ -565,17 +565,17 @@ impl<'a> RingWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct RingColor<'a>(pub &'a str);
 
 impl<'a> RingColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &RING_COLOR)?;
-        Ok(Decl::Single(format!("--tw-ring-color: {}", value)))
+        Ok(Decl::String(format!("--tw-ring-color: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct RingOffsetWidth<'a>(pub &'a str);
 
 impl<'a> RingOffsetWidth<'a> {
@@ -588,7 +588,7 @@ impl<'a> RingOffsetWidth<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct RingOffsetColor<'a>(pub &'a str);
 
 impl<'a> RingOffsetColor<'a> {

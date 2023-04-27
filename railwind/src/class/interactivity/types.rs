@@ -8,17 +8,17 @@ use super::{COLORS, CURSOR, MARGIN, PADDING};
 const TOUCH_ACTION_STYLE: &str =
     "touch-action: var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct AccentColor<'a>(pub &'a str);
 
 impl<'a> AccentColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("accent-color: {}", value)))
+        Ok(Decl::String(format!("accent-color: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Appearance {
     None,
 }
@@ -45,27 +45,27 @@ impl<'a> Appearance {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Cursor<'a>(pub &'a str);
 
 impl<'a> Cursor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &CURSOR)?;
-        Ok(Decl::Single(format!("cursor: {}", value)))
+        Ok(Decl::String(format!("cursor: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct CaretColor<'a>(pub &'a str);
 
 impl<'a> CaretColor<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &COLORS)?;
-        Ok(Decl::Single(format!("caret-color: {}", value)))
+        Ok(Decl::String(format!("caret-color: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PointerEvents {
     None,
     Auto,
@@ -86,13 +86,13 @@ impl<'a> PointerEvents {
 
     pub fn to_decl(self) -> Decl {
         match self {
-            Self::None => Decl::Single("pointer-events: none".into()),
-            Self::Auto => Decl::Single("pointer-events: auto".into()),
+            Self::None => Decl::String("pointer-events: none".into()),
+            Self::Auto => Decl::String("pointer-events: auto".into()),
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Resize {
     None,
     Y,
@@ -125,7 +125,7 @@ impl<'a> Resize {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollBehavior {
     Auto,
     Smooth,
@@ -148,7 +148,7 @@ impl<'a> ScrollBehavior {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollMargin<'a> {
     All(&'a str, bool),
     X(&'a str, bool),
@@ -179,7 +179,7 @@ impl<'a> ScrollMargin<'a> {
         match self {
             Self::All(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin: {}", value)))
+                Ok(Decl::String(format!("scroll-margin: {}", value)))
             }
             Self::X(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
@@ -197,25 +197,25 @@ impl<'a> ScrollMargin<'a> {
             }
             Self::Top(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-top: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-top: {}", value)))
             }
             Self::Right(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-right: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-right: {}", value)))
             }
             Self::Bottom(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-bottom: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-bottom: {}", value)))
             }
             Self::Left(m, n) => {
                 let value = get_value_neg(n, m, &MARGIN)?;
-                Ok(Decl::Single(format!("scroll-margin-left: {}", value)))
+                Ok(Decl::String(format!("scroll-margin-left: {}", value)))
             }
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollPadding<'a> {
     All(&'a str),
     X(&'a str),
@@ -248,7 +248,7 @@ impl<'a> ScrollPadding<'a> {
         match self {
             Self::All(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding: {}", value)))
+                Ok(Decl::String(format!("scroll-padding: {}", value)))
             }
             Self::X(p) => {
                 let value = get_value(p, &PADDING)?;
@@ -266,25 +266,25 @@ impl<'a> ScrollPadding<'a> {
             }
             Self::Top(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-top: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-top: {}", value)))
             }
             Self::Right(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-right: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-right: {}", value)))
             }
             Self::Bottom(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-bottom: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-bottom: {}", value)))
             }
             Self::Left(p) => {
                 let value = get_value(p, &PADDING)?;
-                Ok(Decl::Single(format!("scroll-padding-left: {}", value)))
+                Ok(Decl::String(format!("scroll-padding-left: {}", value)))
             }
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollSnapAlign {
     Start,
     End,
@@ -313,7 +313,7 @@ impl<'a> ScrollSnapAlign {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollSnapStop {
     Normal,
     Always,
@@ -336,7 +336,7 @@ impl<'a> ScrollSnapStop {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum ScrollSnapType {
     None,
     X,
@@ -371,7 +371,7 @@ impl<'a> ScrollSnapType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum TouchAction {
     Auto,
     None,
@@ -442,7 +442,7 @@ impl<'a> TouchAction {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum UserSelect {
     None,
     Text,
@@ -482,7 +482,7 @@ impl UserSelect {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum WillChange {
     Auto,
     Scroll,
@@ -518,6 +518,6 @@ impl WillChange {
             Self::Transform => "transform",
         };
 
-        Decl::Single(format!("will-change: {}", value))
+        Decl::String(format!("will-change: {}", value))
     }
 }

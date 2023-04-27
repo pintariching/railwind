@@ -9,17 +9,17 @@ use super::{
     GRID_TEMPLATE_COLUMNS, GRID_TEMPLATE_ROWS, GROW, ORDER, SHRINK,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Basis<'a>(pub &'a str);
 
 impl<'a> Basis<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &BASIS)?;
-        Ok(Decl::Single(format!("flex-basis: {}", value)))
+        Ok(Decl::String(format!("flex-basis: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Direction {
     Row,
     RowReverse,
@@ -48,11 +48,11 @@ impl Direction {
             Self::ColReverse => "column-reverse",
         };
 
-        Decl::Single(format!("flex-direction: {}", val))
+        Decl::String(format!("flex-direction: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Wrap {
     Wrap,
     WrapReverse,
@@ -78,41 +78,41 @@ impl Wrap {
             Self::NoWrap => "nowrap",
         };
 
-        Decl::Single(format!("flex-wrap: {}", val))
+        Decl::String(format!("flex-wrap: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Flex<'a>(pub &'a str);
 
 impl<'a> Flex<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &FLEX)?;
-        Ok(Decl::Single(format!("flex: {}", value)))
+        Ok(Decl::String(format!("flex: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Grow<'a>(pub &'a str);
 
 impl<'a> Grow<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GROW)?;
-        Ok(Decl::Single(format!("flex-grow: {}", value)))
+        Ok(Decl::String(format!("flex-grow: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Shrink<'a>(pub &'a str);
 
 impl<'a> Shrink<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &SHRINK)?;
-        Ok(Decl::Single(format!("flex-shrink: {}", value)))
+        Ok(Decl::String(format!("flex-shrink: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Order<'a>(pub &'a str, bool);
 
 impl<'a> Order<'a> {
@@ -123,21 +123,21 @@ impl<'a> Order<'a> {
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value_neg(self.1, self.0, &ORDER)?;
-        Ok(Decl::Single(format!("order: {}", value)))
+        Ok(Decl::String(format!("order: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridTemplateColumns<'a>(pub &'a str);
 
 impl<'a> GridTemplateColumns<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_TEMPLATE_COLUMNS)?;
-        Ok(Decl::Single(format!("grid-template-columns: {}", value)))
+        Ok(Decl::String(format!("grid-template-columns: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum GridColumn<'a> {
     Auto,
     Span(&'a str),
@@ -167,31 +167,31 @@ impl<'a> GridColumn<'a> {
             Self::Auto => Ok(Decl::Lit("grid-column: auto")),
             Self::Span(v) => {
                 let value = get_value(v, &GRID_COLUMN_SPAN)?;
-                Ok(Decl::Single(format!("grid-column: {}", value)))
+                Ok(Decl::String(format!("grid-column: {}", value)))
             }
             Self::Start(v) => {
                 let value = get_value(v, &GRID_COLUMN_START)?;
-                Ok(Decl::Single(format!("grid-column-start: {}", value)))
+                Ok(Decl::String(format!("grid-column-start: {}", value)))
             }
             Self::End(v) => {
                 let value = get_value(v, &GRID_COLUMN_END)?;
-                Ok(Decl::Single(format!("grid-column-end: {}", value)))
+                Ok(Decl::String(format!("grid-column-end: {}", value)))
             }
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridTepmlateRows<'a>(pub &'a str);
 
 impl<'a> GridTepmlateRows<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_TEMPLATE_ROWS)?;
-        Ok(Decl::Single(format!("grid-template-rows: {}", value)))
+        Ok(Decl::String(format!("grid-template-rows: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum GridRow<'a> {
     Auto,
     Span(&'a str),
@@ -217,19 +217,19 @@ impl<'a> GridRow<'a> {
             Self::Auto => Ok(Decl::Lit("grid-row: auto")),
             Self::Span(v) => {
                 let value = get_value(v, &GRID_ROW_SPAN)?;
-                Ok(Decl::Single(format!("grid-row: {}", value)))
+                Ok(Decl::String(format!("grid-row: {}", value)))
             }
             Self::Start(v) => {
                 let value = get_value(v, &GRID_ROW_START)?;
-                Ok(Decl::Single(format!("grid-row-start: {}", value)))
+                Ok(Decl::String(format!("grid-row-start: {}", value)))
             }
             Self::End(v) => {
                 let value = get_value(v, &GRID_ROW_END)?;
-                Ok(Decl::Single(format!("grid-row-end: {}", value)))
+                Ok(Decl::String(format!("grid-row-end: {}", value)))
             }
             Self::Arbitrary(v) => {
                 if let Some(value) = get_arbitrary_value(v) {
-                    Ok(Decl::Single(format!("grid-row: {}", value)))
+                    Ok(Decl::String(format!("grid-row: {}", value)))
                 } else {
                     Err(WarningType::InvalidArbitraryArg(v.into()))
                 }
@@ -238,7 +238,7 @@ impl<'a> GridRow<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum GridAutoFlow {
     Row,
     Col,
@@ -272,31 +272,31 @@ impl GridAutoFlow {
             Self::ColDense => "column dense",
         };
 
-        Decl::Single(format!("grid-auto-flow: {}", val))
+        Decl::String(format!("grid-auto-flow: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridAutoColumns<'a>(pub &'a str);
 
 impl<'a> GridAutoColumns<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_AUTO_COLUMNS)?;
-        Ok(Decl::Single(format!("grid-auto-columns: {}", value)))
+        Ok(Decl::String(format!("grid-auto-columns: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct GridAutoRows<'a>(pub &'a str);
 
 impl<'a> GridAutoRows<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &GRID_AUTO_ROWS)?;
-        Ok(Decl::Single(format!("grid-auto-rows: {}", value)))
+        Ok(Decl::String(format!("grid-auto-rows: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Gap<'a>(pub &'a str);
 
 impl<'a> Gap<'a> {
@@ -304,21 +304,21 @@ impl<'a> Gap<'a> {
         match get_class_name(self.0) {
             "x" => {
                 let val = get_value(get_args(self.0)?, &GAP_X)?;
-                Ok(Decl::Single(format!("column-gap: {}", val)))
+                Ok(Decl::String(format!("column-gap: {}", val)))
             }
             "y" => {
                 let val = get_value(get_args(self.0)?, &GAP_Y)?;
-                Ok(Decl::Single(format!("row-gap: {}", val)))
+                Ok(Decl::String(format!("row-gap: {}", val)))
             }
             _ => {
                 let val = get_value(self.0, &GAP)?;
-                Ok(Decl::Single(format!("gap: {}", val)))
+                Ok(Decl::String(format!("gap: {}", val)))
             }
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum JustifyContent {
     Start,
     End,
@@ -353,11 +353,11 @@ impl JustifyContent {
             Self::Evenly => "space-evenly",
         };
 
-        Decl::Single(format!("justify-content: {}", val))
+        Decl::String(format!("justify-content: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum JustifyItems {
     Start,
     End,
@@ -388,11 +388,11 @@ impl JustifyItems {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("justify-items: {}", val))
+        Decl::String(format!("justify-items: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum JustifySelf {
     Auto,
     Start,
@@ -426,11 +426,11 @@ impl JustifySelf {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("justify-self: {}", val))
+        Decl::String(format!("justify-self: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum AlignContent {
     Center,
     Start,
@@ -466,11 +466,11 @@ impl AlignContent {
             Self::Baseline => "baseline",
         };
 
-        Decl::Single(format!("align-content: {}", val))
+        Decl::String(format!("align-content: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum AlignItems {
     Start,
     End,
@@ -504,11 +504,11 @@ impl AlignItems {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("align-items: {}", val))
+        Decl::String(format!("align-items: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum AlignSelf {
     Auto,
     Start,
@@ -545,11 +545,11 @@ impl AlignSelf {
             Self::Baseline => "baseline",
         };
 
-        Decl::Single(format!("align-self: {}", val))
+        Decl::String(format!("align-self: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PlaceContent {
     Center,
     Start,
@@ -599,11 +599,11 @@ impl PlaceContent {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("place-content: {}", val))
+        Decl::String(format!("place-content: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PlaceItems {
     Start,
     End,
@@ -637,11 +637,11 @@ impl PlaceItems {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("place-items: {}", val))
+        Decl::String(format!("place-items: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum PlaceSelf {
     Auto,
     Start,
@@ -675,6 +675,6 @@ impl PlaceSelf {
             Self::Stretch => "stretch",
         };
 
-        Decl::Single(format!("place-self: {}", val))
+        Decl::String(format!("place-self: {}", val))
     }
 }

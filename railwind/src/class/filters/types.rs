@@ -12,7 +12,7 @@ const FILTER_STYLE: &str = "filter: var(--tw-blur) var(--tw-brightness) var(--tw
 const WEBKIT_BACKDROP_FILTER_STYLE: &str = "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)";
 const BACKDROP_FILTER_STYLE: &str = "        backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Blur<'a>(pub &'a str);
 
 impl<'a> Blur<'a> {
@@ -25,7 +25,7 @@ impl<'a> Blur<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Brightness<'a>(pub &'a str);
 
 impl<'a> Brightness<'a> {
@@ -38,7 +38,7 @@ impl<'a> Brightness<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Contrast<'a>(pub &'a str);
 
 impl<'a> Contrast<'a> {
@@ -51,7 +51,7 @@ impl<'a> Contrast<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DropShadow<'a>(pub &'a str);
 
 impl<'a> DropShadow<'a> {
@@ -64,7 +64,7 @@ impl<'a> DropShadow<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Grayscale<'a>(pub &'a str);
 
 impl<'a> Grayscale<'a> {
@@ -77,7 +77,7 @@ impl<'a> Grayscale<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct HueRotate<'a>(pub &'a str, bool);
 
 impl<'a> HueRotate<'a> {
@@ -95,7 +95,7 @@ impl<'a> HueRotate<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Invert<'a>(pub &'a str);
 
 impl<'a> Invert<'a> {
@@ -108,7 +108,7 @@ impl<'a> Invert<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Saturate<'a>(pub &'a str);
 
 impl<'a> Saturate<'a> {
@@ -121,7 +121,7 @@ impl<'a> Saturate<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Sepia<'a>(pub &'a str);
 
 impl<'a> Sepia<'a> {
@@ -134,7 +134,7 @@ impl<'a> Sepia<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropBlur<'a>(pub &'a str);
 
 impl<'a> BackdropBlur<'a> {
@@ -148,7 +148,7 @@ impl<'a> BackdropBlur<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropBrightness<'a>(pub &'a str);
 
 impl<'a> BackdropBrightness<'a> {
@@ -162,7 +162,7 @@ impl<'a> BackdropBrightness<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropContrast<'a>(pub &'a str);
 
 impl<'a> BackdropContrast<'a> {
@@ -176,7 +176,7 @@ impl<'a> BackdropContrast<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropGrayscale<'a>(pub &'a str);
 
 impl<'a> BackdropGrayscale<'a> {
@@ -190,7 +190,7 @@ impl<'a> BackdropGrayscale<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropHueRotate<'a>(pub &'a str, bool);
 
 impl<'a> BackdropHueRotate<'a> {
@@ -209,7 +209,7 @@ impl<'a> BackdropHueRotate<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropInvert<'a>(pub &'a str);
 
 impl<'a> BackdropInvert<'a> {
@@ -223,7 +223,7 @@ impl<'a> BackdropInvert<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropOpacity<'a>(pub &'a str);
 
 impl<'a> BackdropOpacity<'a> {
@@ -237,7 +237,7 @@ impl<'a> BackdropOpacity<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropSaturate<'a>(pub &'a str);
 
 impl<'a> BackdropSaturate<'a> {
@@ -251,7 +251,7 @@ impl<'a> BackdropSaturate<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct BackdropSepia<'a>(pub &'a str);
 
 impl<'a> BackdropSepia<'a> {

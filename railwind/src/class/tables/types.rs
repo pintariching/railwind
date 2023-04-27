@@ -5,7 +5,7 @@ use crate::warning::WarningType;
 
 use super::BORDER_SPACING;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderCollapse {
     Collapse,
     Separate,
@@ -28,11 +28,11 @@ impl BorderCollapse {
             Self::Separate => "separate",
         };
 
-        Decl::Single(format!("border-collapse: {}", val))
+        Decl::String(format!("border-collapse: {}", val))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum BorderSpacing<'a> {
     All(&'a str),
     X(&'a str),
@@ -76,7 +76,7 @@ impl<'a> BorderSpacing<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Layout {
     Auto,
     Fixed,
@@ -101,6 +101,6 @@ impl Layout {
             Self::Fixed => "fixed",
         };
 
-        Decl::Single(format!("table-layout: {}", val))
+        Decl::String(format!("table-layout: {}", val))
     }
 }

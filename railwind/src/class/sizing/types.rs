@@ -3,7 +3,7 @@ use crate::{class::utils::get_value, warning::WarningType};
 
 use super::{HEIGHT, MAX_HEIGHT, MAX_WIDTH, MIN_HEIGHT, MIN_WIDTH, WIDTH};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Width<'a>(pub &'a str);
 
 impl<'a> Width<'a> {
@@ -17,11 +17,11 @@ impl<'a> Width<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("width: {}", value)))
+        Ok(Decl::String(format!("width: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MinWidth<'a>(pub &'a str);
 
 impl<'a> MinWidth<'a> {
@@ -35,11 +35,11 @@ impl<'a> MinWidth<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("min-width: {}", value)))
+        Ok(Decl::String(format!("min-width: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MaxWidth<'a>(pub &'a str);
 
 impl<'a> MaxWidth<'a> {
@@ -53,11 +53,11 @@ impl<'a> MaxWidth<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("max-width: {}", value)))
+        Ok(Decl::String(format!("max-width: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Height<'a>(pub &'a str);
 
 impl<'a> Height<'a> {
@@ -71,11 +71,11 @@ impl<'a> Height<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("height: {}", value)))
+        Ok(Decl::String(format!("height: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MinHeight<'a>(pub &'a str);
 
 impl<'a> MinHeight<'a> {
@@ -89,11 +89,11 @@ impl<'a> MinHeight<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("min-height: {}", value)))
+        Ok(Decl::String(format!("min-height: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct MaxHeight<'a>(pub &'a str);
 
 impl<'a> MaxHeight<'a> {
@@ -107,6 +107,6 @@ impl<'a> MaxHeight<'a> {
             ]));
         }
 
-        Ok(Decl::Single(format!("max-height: {}", value)))
+        Ok(Decl::String(format!("max-height: {}", value)))
     }
 }

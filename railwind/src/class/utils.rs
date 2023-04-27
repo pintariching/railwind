@@ -1,6 +1,60 @@
+use nom::branch::alt;
+use nom::bytes::complete::{is_not, tag};
+use nom::combinator::{map, map_opt};
+use nom::sequence::{delimited, preceded, terminated};
+use nom::IResult;
 use std::collections::HashMap;
 
 use crate::warning::WarningType;
+
+pub fn arbitrary(input: &str) -> IResult<&str, &str> {
+    delimited(tag("["), is_not("]"), tag("]"))(input)
+}
+
+pub fn keyword_dash<'a>(keyword: &'a str) -> impl FnMut(&'a str) -> IResult<&str, &str> {
+    preceded(tag(keyword), tag("-"))
+}
+
+pub fn negative_keyword_dash<'a>(keyword: &'a str) -> impl FnMut(&'a str) -> IResult<&str, &str> {
+    delimited(tag("-"), tag(keyword), tag("-"))
+}
+
+pub fn hashmap_value<'a>(
+    hashmap: &'a HashMap<&'static str, &'static str>,
+) -> impl FnMut(&'a str) -> IResult<&str, &str> {
+    alt((arbitrary, map_opt(is_not(" "), |v| hashmap.get(v).copied())))
+}
+
+pub fn keyword_value<'a>(
+    keyword: &'a str,
+    hashmap: &'a HashMap<&'static str, &'static str>,
+) -> impl FnMut(&'a str) -> IResult<&str, &str> {
+    preceded(
+        terminated(tag(keyword), tag("-")),
+        alt((arbitrary, map_opt(is_not(" "), |v| hashmap.get(v).copied()))),
+    )
+}
+pub fn neg_keyword_value<'a>(
+    keyword: &'a str,
+    hashmap: &'a HashMap<&'static str, &'static str>,
+) -> impl FnMut(&'a str) -> IResult<&str, String> {
+    alt((
+        preceded(
+            keyword_dash(keyword),
+            alt((
+                map(arbitrary, |m| m.to_string()),
+                map_opt(is_not(" "), |m| hashmap.get(m).map(|m| m.to_string())),
+            )),
+        ),
+        preceded(
+            negative_keyword_dash(keyword),
+            alt((
+                map(arbitrary, |m| format!("-{m}")),
+                map_opt(is_not(" "), |m| hashmap.get(m).map(|m| format!("-{m}"))),
+            )),
+        ),
+    ))
+}
 
 pub fn get_value<'a>(
     arg: &'a str,
@@ -137,6 +191,8 @@ pub fn hex_to_rgb_color(value: &str) -> Option<[u8; 3]> {
 
 #[cfg(test)]
 mod tests {
+    use nom::Finish;
+
     use super::*;
 
     #[test]
@@ -153,5 +209,16 @@ mod tests {
         assert_eq!(hex_to_rgb_color("#000").unwrap(), [0, 0, 0]);
         assert_eq!(hex_to_rgb_color("#64748b").unwrap(), [100, 116, 139]);
         assert!(hex_to_rgb_color("#color").is_none());
+    }
+
+    #[test]
+    fn test_positive() {
+        assert_eq!(keyword_dash("p")("p-5"), Ok(("5", "p")));
+        assert!(keyword_dash("p")("-p-5").finish().is_err())
+    }
+
+    #[test]
+    fn test_negative() {
+        assert_eq!(negative_keyword_dash("m")("-m-5"), Ok(("5", "m")))
     }
 }

@@ -1,0 +1,2 @@
+regex for selecting "@apply" for issue #4
+@apply\s*([^;@]*?)\s*;

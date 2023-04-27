@@ -4,7 +4,7 @@ use crate::{class::utils::get_value, warning::WarningType};
 
 use super::{ANIMATION, DELAY, DURATION, TIMING_FUNCTION};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Transition {
     None,
     All,
@@ -49,20 +49,20 @@ impl Transition {
     }
     pub fn to_decl(self) -> Decl {
         match self {
-            Self::None => Decl::Single("transition-property: none".into()),
+            Self::None => Decl::String("transition-property: none".into()),
             Self::All => Decl::Triple([
                 "transition-property: all".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Self::Transition => Decl::Multiple(vec![
+            Self::Transition => Decl::Vec(vec![
                 "transition-property: color, background-color, border-color, outline-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter".into(),
                 "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)".into(),
                 "transition-duration: 150ms".into(),
             ]),
-            Self::Colors => Decl::Multiple(vec![
+            Self::Colors => Decl::Vec(vec![
                 "transition-property: color, background-color, border-color, outline-color, fill, stroke, -webkit-text-decoration-color".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke".into(),
                 "transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color".into(),
@@ -93,40 +93,40 @@ impl Transition {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Duration<'a>(pub &'a str);
 
 impl<'a> Duration<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &DURATION)?;
-        Ok(Decl::Single(format!("transition-duration: {}", value)))
+        Ok(Decl::String(format!("transition-duration: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct TimingFunction<'a>(pub &'a str);
 
 impl<'a> TimingFunction<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &TIMING_FUNCTION)?;
-        Ok(Decl::Single(format!(
+        Ok(Decl::String(format!(
             "transition-timing-function: {}",
             value
         )))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Delay<'a>(pub &'a str);
 
 impl<'a> Delay<'a> {
     pub fn to_decl(self) -> Result<Decl, WarningType> {
         let value = get_value(self.0, &DELAY)?;
-        Ok(Decl::Single(format!("transition-delay: {}", value)))
+        Ok(Decl::String(format!("transition-delay: {}", value)))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct Animation<'a>(pub &'a str);
 
 impl<'a> Animation<'a> {
@@ -134,7 +134,7 @@ impl<'a> Animation<'a> {
         let value = get_value(self.0, &ANIMATION)?;
 
         if value.as_str() == "none" {
-            Ok(Decl::Single(format!("animation: {value}")))
+            Ok(Decl::String(format!("animation: {value}")))
         } else {
             Ok(Decl::FullClass(value))
         }

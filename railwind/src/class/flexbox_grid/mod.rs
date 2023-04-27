@@ -48,7 +48,7 @@ lazy_static! {
         ron::from_str(include_str!("gap.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum FlexboxGrid<'a> {
     Basis(Basis<'a>),
     Direction(Direction),

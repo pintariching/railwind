@@ -20,7 +20,7 @@ lazy_static! {
         ron::from_str(include_str!("padding.ron")).unwrap();
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum Interactivity<'a> {
     AccentColor(AccentColor<'a>),
     Appearance(Appearance),
