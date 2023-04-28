@@ -48,7 +48,7 @@ pub enum Class<'a> {
     Typography(Typography<'a>),
     Accessibility(Accessibility),
     Backgrounds(Backgrounds<'a>),
-    Borders(Borders<'a>),
+    // Borders(Borders<'a>),
     Effects(Effects<'a>),
     Filters(Filter<'a>),
 }

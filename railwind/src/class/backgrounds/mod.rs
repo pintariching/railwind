@@ -23,7 +23,7 @@ pub enum Backgrounds<'a> {
     GradientColorStops(GradientColorStops<'a>),
 }
 
-pub fn background<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Backgrounds<'a>> {
+pub fn backgrounds<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Backgrounds<'a>> {
     preceded(
         preceded(tag("bg"), tag("-")),
         alt((
@@ -126,7 +126,7 @@ pub struct BackgroundColor<'a>(pub &'a str);
 
 fn color<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundColor<'a>> {
     map(
-        hashmap_value(&config.get_backgrounds().color),
+        hashmap_value(config.backgrounds.get_color()),
         BackgroundColor,
     )(input)
 }
@@ -179,7 +179,7 @@ pub struct BackgroundPosition<'a>(pub &'a str);
 
 fn position<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundPosition<'a>> {
     map(
-        hashmap_value(&config.get_backgrounds().position),
+        hashmap_value(config.backgrounds.get_position()),
         BackgroundPosition,
     )(input)
 }
@@ -230,10 +230,7 @@ impl IntoDeclaration for BackgroundRepeat {
 pub struct BackgroundSize<'a>(pub &'a str);
 
 fn size<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundSize<'a>> {
-    map(
-        hashmap_value(&config.get_backgrounds().size),
-        BackgroundSize,
-    )(input)
+    map(hashmap_value(config.backgrounds.get_size()), BackgroundSize)(input)
 }
 
 impl<'a> IntoDeclaration for BackgroundSize<'a> {
@@ -247,7 +244,7 @@ pub struct BackgroundImage<'a>(pub &'a str);
 
 fn image<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundImage<'a>> {
     map(
-        hashmap_value(&config.get_backgrounds().image),
+        hashmap_value(config.backgrounds.get_image()),
         BackgroundImage,
     )(input)
 }
@@ -269,7 +266,7 @@ fn gradient_color_stops<'a>(
     input: &'a str,
     config: &'a Config,
 ) -> IResult<&'a str, GradientColorStops<'a>> {
-    let g = |keyword| keyword_value(keyword, &config.get_backgrounds().gradient_color_stops);
+    let g = |keyword| keyword_value(keyword, config.backgrounds.get_gradient_color_stops());
 
     alt((
         map(g("from"), GradientColorStops::From),

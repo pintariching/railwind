@@ -38,45 +38,9 @@ fn classes(input: &str) -> IResult<&str, Vec<&str>> {
     separated_list0(multispace1, is_not("\"\n\t "))(input)
 }
 
-lazy_static! {
-    pub static ref PADDING: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("class/spacing/padding.ron")).unwrap();
-}
-
-fn arbitrary(input: &str) -> IResult<&str, &str> {
-    delimited(tag("["), is_not("]"), tag("]"))(input)
-}
-
-fn p<'a>(
-    keyword: &'a str,
-) -> impl FnMut(&'a str) -> Result<(&str, &str), nom::Err<nom::error::Error<&str>>> {
-    preceded(
-        terminated(tag(keyword), tag("-")),
-        alt((arbitrary, map_opt(is_not(" "), |v| PADDING.get(v).copied()))),
-    )
-}
-
-fn padding(input: &str) -> IResult<&str, Padding> {
-    alt((
-        map(p("p"), Padding::All),
-        map(p("pt"), Padding::Top),
-        map(p("pr"), Padding::Right),
-        map(p("pb"), Padding::Bottom),
-        map(p("pl"), Padding::Left),
-        map(p("px"), Padding::X),
-        map(p("py"), Padding::Y),
-    ))(input)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_padding() {
-        assert_eq!(padding("p-5"), Ok(("", Padding::All("1.25rem"))));
-        assert_eq!(padding("p-[3.251rem]"), Ok(("", Padding::All("3.251rem"))));
-    }
 
     #[test]
     fn test_classes() {
