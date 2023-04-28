@@ -23,6 +23,7 @@ indexmap = "1.9.2"
 serde = { version = "1.0.152", features = ["derive"] }
 
 nom = "7.1.3"
+get_derive = { path = "../get_derive" }
 
 [dev-dependencies]
 walkdir = "2.3.2"

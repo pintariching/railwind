@@ -32,7 +32,7 @@ pub use transforms::*;
 pub use transitions_animation::*;
 pub use typography::*;
 
-use crate::{warning::WarningType, Config};
+use crate::{config::Config, warning::WarningType};
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Class<'a> {

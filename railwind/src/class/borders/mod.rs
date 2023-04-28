@@ -37,24 +37,122 @@
 //         ron::from_str(include_str!("../colors.ron")).unwrap();
 // }
 
-// #[derive(Debug, PartialEq, Hash)]
-// pub enum Borders<'a> {
-//     BorderRadius(BorderRadius<'a>),
-//     BorderWidth(BorderWidth<'a>),
-//     BorderColor(BorderColor<'a>),
-//     BorderStyle(BorderStyle),
-//     DivideWidth(DivideWidth<'a>),
-//     DivideColor(DivideColor<'a>),
-//     DivideStyle(DivideStyle),
-//     OutlineWidth(OutlineWidth<'a>),
-//     OutlineColor(OutlineColor<'a>),
-//     OutlineStyle(OutlineStyle),
-//     OutlineOffset(OutlineOffset<'a>),
-//     RingWidth(RingWidth<'a>),
-//     RingColor(RingColor<'a>),
-//     RingOffsetWidth(RingOffsetWidth<'a>),
-//     RingOffsetColor(RingOffsetColor<'a>),
-// }
+#[derive(Debug, PartialEq, Hash)]
+pub enum Borders<'a> {
+    BorderRadius(BorderRadius<'a>),
+    BorderWidth(BorderWidth<'a>),
+    BorderColor(BorderColor<'a>),
+    BorderStyle(BorderStyle),
+    DivideWidth(DivideWidth<'a>),
+    DivideColor(DivideColor<'a>),
+    DivideStyle(DivideStyle),
+    OutlineWidth(OutlineWidth<'a>),
+    OutlineColor(OutlineColor<'a>),
+    OutlineStyle(OutlineStyle),
+    OutlineOffset(OutlineOffset<'a>),
+    RingWidth(RingWidth<'a>),
+    RingColor(RingColor<'a>),
+    RingOffsetWidth(RingOffsetWidth<'a>),
+    RingOffsetColor(RingOffsetColor<'a>),
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BorderRadius<'a> {
+    Around(&'a str),
+    Top(&'a str),
+    Right(&'a str),
+    Bottom(&'a str),
+    Left(&'a str),
+    TopLeft(&'a str),
+    TopRight(&'a str),
+    BottomRight(&'a str),
+    BottomLeft(&'a str),
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BorderColor<'a> {
+    Around(&'a str),
+    X(&'a str),
+    Y(&'a str),
+    Top(&'a str),
+    Right(&'a str),
+    Bottom(&'a str),
+    Left(&'a str),
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BorderStyle {
+    Solid,
+    Dashed,
+    Dotted,
+    Double,
+    Hidden,
+    None,
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum BorderWidth<'a> {
+    Around(&'a str),
+    X(&'a str),
+    Y(&'a str),
+    Top(&'a str),
+    Right(&'a str),
+    Bottom(&'a str),
+    Left(&'a str),
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum DivideWidth<'a> {
+    X(&'a str),
+    Y(&'a str),
+    ReverseX,
+    ReverseY,
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct DivideColor<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum DivideStyle {
+    Solid,
+    Dashed,
+    Dotted,
+    Double,
+    None,
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct OutlineWidth<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct OutlineColor<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum OutlineStyle {
+    None,
+    Solid,
+    Dashed,
+    Dotted,
+    Double,
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct OutlineOffset<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash)]
+pub enum RingWidth<'a> {
+    Value(&'a str),
+    Inset,
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct RingColor<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct RingOffsetWidth<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct RingOffsetColor<'a>(pub &'a str);
 
 // pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borders<'a>> {
 //     todo!()

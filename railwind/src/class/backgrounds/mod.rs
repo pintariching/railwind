@@ -6,7 +6,7 @@ use nom::IResult;
 
 use crate::class::utils::{arbitrary, hex_to_rgb_color, keyword_dash};
 use crate::class::{Decl, IntoDeclaration};
-use crate::Config;
+use crate::config::Config;
 
 use super::utils::{hashmap_value, keyword_value};
 
@@ -302,7 +302,7 @@ mod tests {
     #[test]
     fn test_attachment() {
         assert_eq!(
-            background("bg-fixed", &Config::new()),
+            backgrounds("bg-fixed", &Config::new()),
             Ok((
                 "",
                 Backgrounds::BackgroundAttachment(BackgroundAttachment::Fixed)
@@ -313,7 +313,7 @@ mod tests {
     #[test]
     fn test_clip() {
         assert_eq!(
-            background("bg-content", &Config::new()),
+            backgrounds("bg-content", &Config::new()),
             Ok(("", Backgrounds::BackgroundClip(BackgroundClip::Content)))
         );
     }
@@ -321,7 +321,7 @@ mod tests {
     #[test]
     fn test_color() {
         assert_eq!(
-            background("bg-red-500", &Config::new()),
+            backgrounds("bg-red-500", &Config::new()),
             Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#ef4444"))))
         );
     }
@@ -330,10 +330,10 @@ mod tests {
     fn test_config() {
         let mut c = Config::new();
 
-        c.get_mut_backgrounds().color.insert("yellow", "#yellow");
+        c.backgrounds.get_mut_color().insert("yellow", "#yellow");
 
         assert_eq!(
-            background("bg-yellow", &c),
+            backgrounds("bg-yellow", &c),
             Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#yellow"))))
         );
     }

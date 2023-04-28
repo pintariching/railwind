@@ -5,7 +5,7 @@ use nom::{bytes::complete::tag, combinator::map};
 use crate::class::utils::{keyword_value, neg_keyword_value};
 use crate::class::Decl;
 use crate::class::IntoDeclaration;
-use crate::Config;
+use crate::config::Config;
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Spacing<'a> {
