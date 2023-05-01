@@ -24,7 +24,7 @@ pub use filters::*;
 pub use flexbox_grid::*;
 pub use interactivity::*;
 pub use layout::*;
-use nom::{combinator::map, IResult};
+use nom::{branch::alt, combinator::map, IResult};
 pub use sizing::*;
 pub use spacing::*;
 pub use svg::*;
@@ -49,13 +49,19 @@ pub enum Class<'a> {
     Typography(Typography<'a>),
     Accessibility(Accessibility),
     Backgrounds(Backgrounds<'a>),
-    // Borders(Borders<'a>),
+    Borders(Borders<'a>),
     Effects(Effects<'a>),
     Filters(Filter<'a>),
 }
 
 pub fn class<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Class<'a>> {
-    map(|i| spacing(i, config), Class::Spacing)(input)
+    alt((
+        map(accessibility, Class::Accessibility),
+        map(|i| backgrounds(i, config), Class::Backgrounds),
+        map(|i| borders(i, config), Class::Borders),
+    ))(input)
+
+    // map(|i| spacing(i, config), Class::Spacing)(input)
 }
 
 impl<'a> Eq for Class<'a> {}

@@ -12,17 +12,6 @@ use std::collections::HashMap;
 
 use crate::class::Class;
 
-#[derive(Debug, PartialEq, Hash)]
-pub enum Padding<'a> {
-    All(&'a str),
-    Top(&'a str),
-    Right(&'a str),
-    Bottom(&'a str),
-    Left(&'a str),
-    X(&'a str),
-    Y(&'a str),
-}
-
 fn class_attr(input: &str) -> IResult<&str, IndexSet<Class>> {
     map(
         delimited(
