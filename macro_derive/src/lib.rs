@@ -70,8 +70,17 @@ pub fn derive_enum_parser_fn(input: TokenStream) -> TokenStream {
         _ => panic!("expected an enum"),
     };
 
-    let variant_name = variants.iter().map(|v| &v.ident);
-    let variant_tag = variants.iter().map(|v| get_attr::<Lit>(&v.attrs, "tag"));
+    let variant_name = variants.iter().filter_map(|v| {
+        if v.attrs.is_empty() {
+            None
+        } else {
+            Some(&v.ident)
+        }
+    });
+
+    let variant_tag = variants
+        .iter()
+        .filter_map(|v| get_attr_opt::<Lit>(&v.attrs, "tag"));
 
     let parser_name = get_attr::<Ident>(&input.attrs, "name");
 

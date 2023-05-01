@@ -35,14 +35,55 @@ pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borde
             keyword_dash("rounded"),
             map(|i| border_radius(i, config), Borders::BorderRadius),
         ),
+        map(tag("rounded"), |_| {
+            Borders::BorderRadius(BorderRadius::Around(""))
+        }),
         preceded(
             keyword_dash("border"),
             alt((
-                //map(|i| border_style(i, config), Borders::BorderStyle),
-                map(|i| border_color(i, config), Borders::BorderColor),
                 map(|i| border_width(i, config), Borders::BorderWidth),
+                map(|i| border_color(i, config), Borders::BorderColor),
+                map(border_style, Borders::BorderStyle),
             )),
         ),
+        map(tag("border"), |_| {
+            Borders::BorderWidth(BorderWidth::Around(""))
+        }),
+        preceded(
+            keyword_dash("divide"),
+            alt((
+                map(|i| divide_width(i, config), Borders::DivideWidth),
+                map(|i| divide_color(i, config), Borders::DivideColor),
+                map(divide_style, Borders::DivideStyle),
+            )),
+        ),
+        preceded(
+            keyword_dash("outline"),
+            alt((
+                map(|i| outline_width(i, config), Borders::OutlineWidth),
+                map(|i| outline_color(i, config), Borders::OutlineColor),
+                map(outline_style, Borders::OutlineStyle),
+                map(|i| outline_offset(i, config), Borders::OutlineOffset),
+            )),
+        ),
+        map(tag("outline"), |_| {
+            Borders::OutlineStyle(OutlineStyle::Solid)
+        }),
+        preceded(
+            keyword_dash("ring"),
+            alt((
+                map(|i| ring_width(i, config), Borders::RingWidth),
+                map(|i| ring_color(i, config), Borders::RingColor),
+                preceded(
+                    keyword_dash("offset"),
+                    alt((
+                        map(|i| ring_offset_width(i, config), Borders::RingOffsetWidth),
+                        map(|i| ring_offset_color(i, config), Borders::RingOffsetColor),
+                    )),
+                ),
+            )),
+        ),
+        map(tag("ring"), |_| Borders::RingWidth(RingWidth::Value(""))),
     ))(input)
 }
 
@@ -274,6 +315,8 @@ fn divide_width<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Divi
         map(keyword_value("y", width), DivideWidth::Y),
         map(tag("x-reverse"), |_| DivideWidth::ReverseX),
         map(tag("y-reverse"), |_| DivideWidth::ReverseY),
+        map(tag("x"), |_| DivideWidth::X("")),
+        map(tag("y"), |_| DivideWidth::Y("")),
     ))(input)
 }
 
@@ -347,7 +390,6 @@ pub struct OutlineColor<'a>(pub &'a str);
 pub enum OutlineStyle {
     #[tag("none")]
     None,
-    #[tag("outline")]
     Solid,
     #[tag("dashed")]
     Dashed,
@@ -388,102 +430,54 @@ pub enum RingWidth<'a> {
     Inset,
 }
 
-#[derive(Debug, PartialEq, Hash)]
+fn ring_width<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, RingWidth<'a>> {
+    let w = || config.borders.get_ring_width();
+
+    alt((
+        map(arbitrary_hashmap_value(w), RingWidth::Value),
+        map(tag("inset"), |_| RingWidth::Inset),
+    ))(input)
+}
+
+impl<'a> IntoDeclaration for RingWidth<'a> {
+    fn to_decl(self) -> Decl {
+        match self {
+            Self::Value(w) => Decl::String(format!("box-shadow: {}", w)),
+            Self::Inset => Decl::Lit("--tw-ring-inset: inset"),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
+#[name(ring_color)]
+#[config(borders.get_ring_color)]
+#[decl("--tw-ring-color")]
 pub struct RingColor<'a>(pub &'a str);
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[name(ring_offset_width)]
+#[config(borders.get_ring_offset_width)]
 pub struct RingOffsetWidth<'a>(pub &'a str);
 
-#[derive(Debug, PartialEq, Hash)]
+impl<'a> IntoDeclaration for RingOffsetWidth<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-ring-offset-width: {}", self.0),
+            "box-shadow: 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), var(--tw-ring-shadow)".into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[name(ring_offset_color)]
+#[config(borders.get_ring_offset_color)]
 pub struct RingOffsetColor<'a>(pub &'a str);
 
-// pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borders<'a>> {
-//     todo!()
-// }
-
-// // impl<'a> Borders<'a> {
-// //     pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
-// //         let borders = match get_class_name(value) {
-// //             "rounded" => Self::BorderRadius(BorderRadius::new(get_opt_args(value))),
-// //             "border" => {
-// //                 if let Ok(args) = get_args(value) {
-// //                     if let Some(style) = BorderStyle::new(args) {
-// //                         Self::BorderStyle(style)
-// //                     } else if let Some(border_color) = BorderColor::new(args) {
-// //                         Self::BorderColor(border_color)
-// //                     } else if let Some(width) = BorderWidth::new(args) {
-// //                         Self::BorderWidth(width)
-// //                     } else {
-// //                         // TODO: Add warnings here
-// //                         return Ok(None);
-// //                     }
-// //                 } else {
-// //                     Self::BorderWidth(BorderWidth::Around(""))
-// //                 }
-// //             }
-// //             "divide" => {
-// //                 let args = get_args(value)?;
-// //                 if let Some(style) = DivideStyle::new(args) {
-// //                     Self::DivideStyle(style)
-// //                 } else if let Some(width) = DivideWidth::new(args) {
-// //                     Self::DivideWidth(width)
-// //                 } else {
-// //                     // TODO: Add warnings here
-// //                     return Ok(None);
-// //                 }
-// //             }
-// //             "outline" => match get_class_name(get_opt_args(value)) {
-// //                 "offset" => Self::OutlineOffset(OutlineOffset(get_args(get_opt_args(value))?)),
-// //                 _ => {
-// //                     if let Some(style) = OutlineStyle::new(get_opt_args(value)) {
-// //                         Self::OutlineStyle(style)
-// //                     } else if OUTLINE_WIDTH.contains_key(get_args(value)?) {
-// //                         Self::OutlineWidth(OutlineWidth(get_args(value)?))
-// //                     } else {
-// //                         Self::OutlineColor(OutlineColor(get_args(value)?))
-// //                     }
-// //                 }
-// //             },
-// //             "ring" => match get_class_name(get_opt_args(value)) {
-// //                 "offset" => {
-// //                     let args = get_args(value)?;
-// //                     if RING_OFFSET_WIDTH.contains_key(get_args(args)?) {
-// //                         Self::RingOffsetWidth(RingOffsetWidth(get_args(args)?))
-// //                     } else {
-// //                         Self::RingOffsetColor(RingOffsetColor(get_args(args)?))
-// //                     }
-// //                 }
-// //                 _ => {
-// //                     if let Some(width) = RingWidth::new(get_opt_args(value)) {
-// //                         Self::RingWidth(width)
-// //                     } else {
-// //                         Self::RingColor(RingColor(get_args(value)?))
-// //                     }
-// //                 }
-// //             },
-// //             _ => return Ok(None),
-// //         };
-
-// //         Ok(Some(borders))
-// //     }
-
-// //     pub fn to_decl(self) -> Result<Decl, WarningType> {
-// //         match self {
-// //             Self::BorderRadius(b) => b.to_decl(),
-// //             Self::BorderWidth(b) => b.to_decl(),
-// //             Self::BorderColor(b) => b.to_decl(),
-// //             Self::BorderStyle(b) => Ok(b.to_decl()),
-// //             Self::DivideWidth(b) => b.to_decl(),
-// //             Self::DivideColor(b) => b.to_decl(),
-// //             Self::DivideStyle(b) => Ok(b.to_decl()),
-// //             Self::OutlineWidth(b) => b.to_decl(),
-// //             Self::OutlineColor(b) => b.to_decl(),
-// //             Self::OutlineStyle(b) => Ok(b.to_decl()),
-// //             Self::OutlineOffset(b) => b.to_decl(),
-// //             Self::RingWidth(b) => b.to_decl(),
-// //             Self::RingColor(b) => b.to_decl(),
-// //             Self::RingOffsetWidth(b) => b.to_decl(),
-// //             Self::RingOffsetColor(b) => b.to_decl(),
-// //         }
-// //     }
-// // }
+impl<'a> IntoDeclaration for RingOffsetColor<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-ring-offset-color: {}", self.0),
+            "box-shadow: 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), var(--tw-ring-shadow)".into(),
+        ])
+    }
+}
