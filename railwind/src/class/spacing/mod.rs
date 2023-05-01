@@ -44,7 +44,7 @@ pub enum Padding<'a> {
 }
 
 fn padding<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Padding<'a>> {
-    let padding = config.spacing.get_padding();
+    let padding = || config.spacing.get_padding();
 
     alt((
         map(keyword_value("p", padding), Padding::All),

@@ -1,6 +1,7 @@
 mod accessibility;
 mod backgrounds;
 mod borders;
+mod colors;
 mod effects;
 mod filters;
 mod flexbox_grid;

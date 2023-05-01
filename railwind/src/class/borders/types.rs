@@ -374,7 +374,6 @@ impl<'a> DivideWidth<'a> {
     }
 
     pub fn to_decl(self) -> Result<Decl, WarningType> {
-        dbg!(&self);
         let val = match self {
             Self::X(m) => {
                 let value = get_value(m, &DIVIDE_WIDTH)?;

@@ -1,14 +1,14 @@
+use macro_derive::{ConfigurableEnumParser, ConfigurableParser, EnumParser};
 use nom::branch::alt;
-use nom::bytes::complete::{is_not, tag};
-use nom::combinator::{map, map_opt};
-use nom::sequence::{preceded, terminated};
+use nom::combinator::map;
+use nom::sequence::preceded;
 use nom::IResult;
 
-use crate::class::utils::{arbitrary, hex_to_rgb_color, keyword_dash};
+use crate::class::utils::keyword_dash;
 use crate::class::{Decl, IntoDeclaration};
 use crate::config::Config;
 
-use super::utils::{hashmap_value, keyword_value};
+use super::colors::hex_color;
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Backgrounds<'a> {
@@ -24,23 +24,25 @@ pub enum Backgrounds<'a> {
 }
 
 pub fn backgrounds<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Backgrounds<'a>> {
-    preceded(
-        preceded(tag("bg"), tag("-")),
-        alt((
-            map(attachment, Backgrounds::BackgroundAttachment),
-            map(clip, Backgrounds::BackgroundClip),
-            map(|i| color(i, config), Backgrounds::BackgroundColor),
-            map(origin, Backgrounds::BackgroundOrigin),
-            map(|i| position(i, config), Backgrounds::BackgroundPosition),
-            map(repeat, Backgrounds::BackgroundRepeat),
-            map(|i| size(i, config), Backgrounds::BackgroundSize),
-            map(|i| image(i, config), Backgrounds::BackgroundImage),
-            map(
-                |i| gradient_color_stops(i, config),
-                Backgrounds::GradientColorStops,
-            ),
-        )),
-    )(input)
+    alt((
+        preceded(
+            keyword_dash("bg"),
+            alt((
+                map(attachment, Backgrounds::BackgroundAttachment),
+                map(clip, Backgrounds::BackgroundClip),
+                map(|i| color(i, config), Backgrounds::BackgroundColor),
+                map(origin, Backgrounds::BackgroundOrigin),
+                map(|i| position(i, config), Backgrounds::BackgroundPosition),
+                map(repeat, Backgrounds::BackgroundRepeat),
+                map(|i| size(i, config), Backgrounds::BackgroundSize),
+                map(|i| image(i, config), Backgrounds::BackgroundImage),
+            )),
+        ),
+        map(
+            |i| gradient_color_stops(i, config),
+            Backgrounds::GradientColorStops,
+        ),
+    ))(input)
 }
 
 impl<'a> IntoDeclaration for Backgrounds<'a> {
@@ -59,19 +61,15 @@ impl<'a> IntoDeclaration for Backgrounds<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[name(attachment)]
 pub enum BackgroundAttachment {
+    #[tag("fixed")]
     Fixed,
+    #[tag("local")]
     Local,
+    #[tag("scroll")]
     Scroll,
-}
-
-fn attachment(input: &str) -> IResult<&str, BackgroundAttachment> {
-    alt((
-        map(tag("fixed"), |_| BackgroundAttachment::Fixed),
-        map(tag("local"), |_| BackgroundAttachment::Local),
-        map(tag("scroll"), |_| BackgroundAttachment::Scroll),
-    ))(input)
 }
 
 impl IntoDeclaration for BackgroundAttachment {
@@ -86,21 +84,17 @@ impl IntoDeclaration for BackgroundAttachment {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[name(clip)]
 pub enum BackgroundClip {
+    #[tag("border")]
     Border,
+    #[tag("padding")]
     Padding,
+    #[tag("content")]
     Content,
+    #[tag("text")]
     Text,
-}
-
-fn clip(input: &str) -> IResult<&str, BackgroundClip> {
-    alt((
-        map(tag("border"), |_| BackgroundClip::Border),
-        map(tag("padding"), |_| BackgroundClip::Padding),
-        map(tag("content"), |_| BackgroundClip::Content),
-        map(tag("text"), |_| BackgroundClip::Text),
-    ))(input)
 }
 
 impl IntoDeclaration for BackgroundClip {
@@ -110,7 +104,7 @@ impl IntoDeclaration for BackgroundClip {
             Self::Padding => "padding-box",
             Self::Content => "content-box",
             Self::Text => {
-                return Decl::Double([
+                return Decl::Vec(vec![
                     "-webkit-background-clip: text".into(),
                     "background-clip: text".into(),
                 ])
@@ -121,25 +115,17 @@ impl IntoDeclaration for BackgroundClip {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[name(color)]
+#[config(backgrounds.get_color)]
 pub struct BackgroundColor<'a>(pub &'a str);
-
-fn color<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundColor<'a>> {
-    map(
-        hashmap_value(config.backgrounds.get_color()),
-        BackgroundColor,
-    )(input)
-}
 
 impl<'a> IntoDeclaration for BackgroundColor<'a> {
     fn to_decl(self) -> Decl {
-        if let Some(color) = hex_to_rgb_color(self.0) {
+        if let Ok((_, color)) = hex_color(self.0) {
             Decl::Double([
                 "--tw-bg-opacity: 1".into(),
-                format!(
-                    "background-color: rgb({} {} {} / var(--tw-bg-opacity))",
-                    color[0], color[1], color[2]
-                ),
+                format!("background-color: rgb({color} / var(--tw-bg-opacity))"),
             ])
         } else {
             return Decl::String(format!("background-color: {}", self.0));
@@ -147,19 +133,15 @@ impl<'a> IntoDeclaration for BackgroundColor<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[name(origin)]
 pub enum BackgroundOrigin {
+    #[tag("border")]
     Border,
+    #[tag("padding")]
     Padding,
+    #[tag("content")]
     Content,
-}
-
-fn origin(input: &str) -> IResult<&str, BackgroundOrigin> {
-    alt((
-        map(tag("border"), |_| BackgroundOrigin::Border),
-        map(tag("padding"), |_| BackgroundOrigin::Padding),
-        map(tag("content"), |_| BackgroundOrigin::Content),
-    ))(input)
 }
 
 impl IntoDeclaration for BackgroundOrigin {
@@ -174,15 +156,10 @@ impl IntoDeclaration for BackgroundOrigin {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[name(position)]
+#[config(backgrounds.get_position)]
 pub struct BackgroundPosition<'a>(pub &'a str);
-
-fn position<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundPosition<'a>> {
-    map(
-        hashmap_value(config.backgrounds.get_position()),
-        BackgroundPosition,
-    )(input)
-}
 
 impl<'a> IntoDeclaration for BackgroundPosition<'a> {
     fn to_decl(self) -> Decl {
@@ -190,25 +167,21 @@ impl<'a> IntoDeclaration for BackgroundPosition<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[name(repeat)]
 pub enum BackgroundRepeat {
+    #[tag("repeat")]
     Repeat,
+    #[tag("no-repeat")]
     NoRepeat,
+    #[tag("repeat-x")]
     RepeatX,
+    #[tag("repeat-y")]
     RepeatY,
+    #[tag("repeat-round")]
     RepeatRound,
+    #[tag("repeat-space")]
     RepeatSpace,
-}
-
-fn repeat(input: &str) -> IResult<&str, BackgroundRepeat> {
-    alt((
-        map(tag("repeat"), |_| BackgroundRepeat::Repeat),
-        map(tag("no-repeat"), |_| BackgroundRepeat::NoRepeat),
-        map(tag("repeat-x"), |_| BackgroundRepeat::RepeatX),
-        map(tag("repeat-y"), |_| BackgroundRepeat::RepeatY),
-        map(tag("repeat-round"), |_| BackgroundRepeat::RepeatRound),
-        map(tag("repeat-space"), |_| BackgroundRepeat::RepeatSpace),
-    ))(input)
 }
 
 impl IntoDeclaration for BackgroundRepeat {
@@ -226,12 +199,10 @@ impl IntoDeclaration for BackgroundRepeat {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[name(size)]
+#[config(backgrounds.get_size)]
 pub struct BackgroundSize<'a>(pub &'a str);
-
-fn size<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundSize<'a>> {
-    map(hashmap_value(config.backgrounds.get_size()), BackgroundSize)(input)
-}
 
 impl<'a> IntoDeclaration for BackgroundSize<'a> {
     fn to_decl(self) -> Decl {
@@ -239,15 +210,10 @@ impl<'a> IntoDeclaration for BackgroundSize<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[name(image)]
+#[config(backgrounds.get_image)]
 pub struct BackgroundImage<'a>(pub &'a str);
-
-fn image<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BackgroundImage<'a>> {
-    map(
-        hashmap_value(config.backgrounds.get_image()),
-        BackgroundImage,
-    )(input)
-}
 
 impl<'a> IntoDeclaration for BackgroundImage<'a> {
     fn to_decl(self) -> Decl {
@@ -255,24 +221,16 @@ impl<'a> IntoDeclaration for BackgroundImage<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableEnumParser)]
+#[name(gradient_color_stops)]
+#[config(backgrounds.get_gradient_color_stops)]
 pub enum GradientColorStops<'a> {
+    #[tag("from")]
     From(&'a str),
+    #[tag("to")]
     To(&'a str),
+    #[tag("via")]
     Via(&'a str),
-}
-
-fn gradient_color_stops<'a>(
-    input: &'a str,
-    config: &'a Config,
-) -> IResult<&'a str, GradientColorStops<'a>> {
-    let g = |keyword| keyword_value(keyword, config.backgrounds.get_gradient_color_stops());
-
-    alt((
-        map(g("from"), GradientColorStops::From),
-        map(g("to"), GradientColorStops::To),
-        map(g("via"), GradientColorStops::Via),
-    ))(input)
 }
 
 impl<'a> IntoDeclaration for GradientColorStops<'a> {
@@ -280,7 +238,12 @@ impl<'a> IntoDeclaration for GradientColorStops<'a> {
         match self {
             Self::From(g) => Decl::Vec(vec![
                 format!("--tw-gradient-from: {}", g),
-                format!("--tw-gradient-to: {}", g),
+                format!(
+                    "--tw-gradient-to: rgb({}) / 0",
+                    hex_color(g)
+                        .map(|(_, color)| color)
+                        .unwrap_or("0 0 0".to_string())
+                ),
                 "--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)".into(),
             ]),
             Self::To(g) => Decl::String(format!("--tw-gradient-to: {}", g)),

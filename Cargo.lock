@@ -156,15 +156,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "get_derive"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.15",
-]
-
-[[package]]
 name = "globset"
 version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -339,6 +330,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "macro_derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.15",
+]
+
+[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -448,11 +448,11 @@ dependencies = [
 name = "railwind"
 version = "0.1.5"
 dependencies = [
- "get_derive",
  "hex",
  "indexmap",
  "lazy_static",
  "line-col",
+ "macro_derive",
  "nom",
  "regex",
  "ron",

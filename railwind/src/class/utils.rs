@@ -19,21 +19,28 @@ pub fn negative_keyword_dash<'a>(keyword: &'a str) -> impl FnMut(&'a str) -> IRe
     delimited(tag("-"), tag(keyword), tag("-"))
 }
 
-pub fn hashmap_value<'a>(
-    hashmap: &'a HashMap<&'static str, &'static str>,
+pub fn arbitrary_hashmap_value<'a>(
+    hashmap: impl Fn() -> &'a HashMap<&'static str, &'static str>,
 ) -> impl FnMut(&'a str) -> IResult<&str, &str> {
-    alt((arbitrary, map_opt(is_not(" "), |v| hashmap.get(v).copied())))
+    alt((
+        arbitrary,
+        map_opt(is_not(" "), move |v| hashmap().get(v).copied()),
+    ))
 }
 
 pub fn keyword_value<'a>(
     keyword: &'a str,
-    hashmap: &'a HashMap<&'static str, &'static str>,
+    hashmap: impl Fn() -> &'a HashMap<&'static str, &'static str>,
 ) -> impl FnMut(&'a str) -> IResult<&str, &str> {
     preceded(
         terminated(tag(keyword), tag("-")),
-        alt((arbitrary, map_opt(is_not(" "), |v| hashmap.get(v).copied()))),
+        alt((
+            arbitrary,
+            map_opt(is_not(" "), move |v| hashmap().get(v).copied()),
+        )),
     )
 }
+
 pub fn neg_keyword_value<'a>(
     keyword: &'a str,
     hashmap: &'a HashMap<&'static str, &'static str>,

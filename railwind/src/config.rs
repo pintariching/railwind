@@ -1,7 +1,7 @@
 use std::cell::OnceCell;
 use std::collections::HashMap;
 
-use get_derive::GetOnceCell;
+use macro_derive::GetOnceCell;
 
 pub struct Config {
     pub backgrounds: BackgroundsConfig,

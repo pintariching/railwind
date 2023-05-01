@@ -1,5 +1,5 @@
 [workspace]
-members = ["railwind", "railwind_cli", "get_derive"]
+members = ["railwind", "railwind_cli", "macro_derive"]
 
 [profile.small]
 inherits = 'release'
