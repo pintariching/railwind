@@ -91,6 +91,9 @@ pub struct BordersConfig {
     #[config_path("config/outline_width.ron")]
     outline_width: OnceCell<HashMap<&'static str, &'static str>>,
 
+    #[config_path("config/colors.ron")]
+    outline_color: OnceCell<HashMap<&'static str, &'static str>>,
+
     #[config_path("config/border_width.ron")]
     outline_offset: OnceCell<HashMap<&'static str, &'static str>>,
 
@@ -116,6 +119,7 @@ impl BordersConfig {
             divide_width: OnceCell::new(),
             divide_color: OnceCell::new(),
             outline_width: OnceCell::new(),
+            outline_color: OnceCell::new(),
             outline_offset: OnceCell::new(),
             ring_width: OnceCell::new(),
             right_color: OnceCell::new(),

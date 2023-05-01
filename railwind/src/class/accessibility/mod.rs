@@ -1,3 +1,4 @@
+use macro_derive::EnumParser;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::combinator::map;
@@ -22,17 +23,13 @@ impl IntoDeclaration for Accessibility {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[name(screen_readers)]
 pub enum ScreenReaders {
+    #[tag("sr-only")]
     SrOnly,
+    #[tag("not-sr-only")]
     NotSrOnly,
-}
-
-fn screen_readers(input: &str) -> IResult<&str, ScreenReaders> {
-    alt((
-        map(tag("sr-only"), |_| ScreenReaders::SrOnly),
-        map(tag("not-sr-only"), |_| ScreenReaders::NotSrOnly),
-    ))(input)
 }
 
 impl IntoDeclaration for ScreenReaders {

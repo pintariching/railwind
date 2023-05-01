@@ -14,3 +14,19 @@ where
     }
     panic!("macro requires '{name}' attribute")
 }
+
+pub fn get_attr_opt<T>(attrs: &Vec<Attribute>, name: &str) -> Option<T>
+where
+    T: Parse,
+{
+    for attr in attrs {
+        if attr.path().is_ident(name) {
+            let name: T = attr.parse_args().expect(&format!(
+                "failed to parse attribute {name} to the required type"
+            ));
+            return Some(name);
+        }
+    }
+
+    None
+}

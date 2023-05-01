@@ -1,18 +1,14 @@
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    combinator::map,
-    sequence::{preceded, terminated},
-    IResult,
-};
+use macro_derive::{ConfigurableParser, EnumParser, IntoDeclaration};
+use nom::branch::alt;
+use nom::bytes::complete::tag;
+use nom::combinator::map;
+use nom::sequence::preceded;
+use nom::IResult;
 
+use crate::class::colors::hex_color;
+use crate::class::utils::{arbitrary_hashmap_value, keyword_dash, keyword_value};
+use crate::class::{Decl, IntoDeclaration};
 use crate::config::Config;
-
-use super::{
-    colors::hex_color,
-    utils::{arbitrary_hashmap_value, keyword_dash, keyword_value},
-    Decl, IntoDeclaration,
-};
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Borders<'a> {
@@ -244,40 +240,22 @@ impl<'a> IntoDeclaration for BorderColor<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, EnumParser, IntoDeclaration)]
+#[name(border_style)]
+#[decl("border-style")]
 pub enum BorderStyle {
+    #[tag("solid")]
     Solid,
+    #[tag("dashed")]
     Dashed,
+    #[tag("dotted")]
     Dotted,
+    #[tag("double")]
     Double,
+    #[tag("hidden")]
     Hidden,
+    #[tag("none")]
     None,
-}
-
-fn style(input: &str) -> IResult<&str, BorderStyle> {
-    alt((
-        map(tag("solid"), |_| BorderStyle::Solid),
-        map(tag("dashed"), |_| BorderStyle::Dashed),
-        map(tag("dotted"), |_| BorderStyle::Dotted),
-        map(tag("double"), |_| BorderStyle::Double),
-        map(tag("hidden"), |_| BorderStyle::Hidden),
-        map(tag("none"), |_| BorderStyle::None),
-    ))(input)
-}
-
-impl IntoDeclaration for BorderStyle {
-    fn to_decl(self) -> Decl {
-        let val = match self {
-            Self::Solid => "solid",
-            Self::Dashed => "dashed",
-            Self::Dotted => "dotted",
-            Self::Double => "double",
-            Self::Hidden => "hidden",
-            Self::None => "none",
-        };
-
-        Decl::String(format!("border-style: {}", val))
-    }
 }
 
 #[derive(Debug, PartialEq, Hash)]
@@ -330,45 +308,78 @@ impl<'a> IntoDeclaration for DivideWidth<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
+#[name(divide_color)]
+#[config(borders.get_divide_color)]
+#[decl("border-color")]
 pub struct DivideColor<'a>(pub &'a str);
 
-fn divide_color<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, DivideColor<'a>> {
-    let color = || config.borders.get_divide_color();
-    map(arbitrary_hashmap_value(color), DivideColor)(input)
+#[derive(Debug, PartialEq, Hash, EnumParser, IntoDeclaration)]
+#[name(divide_style)]
+#[decl("border-style")]
+pub enum DivideStyle {
+    #[tag("solid")]
+    Solid,
+    #[tag("dashed")]
+    Dashed,
+    #[tag("dotted")]
+    Dotted,
+    #[tag("double")]
+    Double,
+    #[tag("none")]
+    None,
 }
 
-impl<'a> IntoDeclaration for DivideColor<'a> {
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
+#[name(outline_width)]
+#[config(borders.get_outline_width)]
+#[decl("outline-width")]
+pub struct OutlineWidth<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
+#[name(outline_color)]
+#[config(borders.get_outline_color)]
+#[decl("outline-color")]
+pub struct OutlineColor<'a>(pub &'a str);
+
+#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[name(outline_style)]
+pub enum OutlineStyle {
+    #[tag("none")]
+    None,
+    #[tag("outline")]
+    Solid,
+    #[tag("dashed")]
+    Dashed,
+    #[tag("dotted")]
+    Dotted,
+    #[tag("double")]
+    Double,
+}
+
+impl IntoDeclaration for OutlineStyle {
     fn to_decl(self) -> Decl {
-        Decl::String(format!("border-color: {}", self.0))
+        let val = match self {
+            Self::None => {
+                return Decl::Vec(vec![
+                    "outline: 2px solid transparent".into(),
+                    "outline-offset: 2px".into(),
+                ])
+            }
+            Self::Solid => "solid",
+            Self::Dashed => "dashed",
+            Self::Dotted => "dotted",
+            Self::Double => "double",
+        };
+
+        Decl::String(format!("border-style: {}", val))
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
-pub enum DivideStyle {
-    Solid,
-    Dashed,
-    Dotted,
-    Double,
-    None,
-}
-
-#[derive(Debug, PartialEq, Hash)]
-pub struct OutlineWidth<'a>(pub &'a str);
-
-#[derive(Debug, PartialEq, Hash)]
-pub struct OutlineColor<'a>(pub &'a str);
-
-#[derive(Debug, PartialEq, Hash)]
-pub enum OutlineStyle {
-    None,
-    Solid,
-    Dashed,
-    Dotted,
-    Double,
-}
-
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
+#[name(outline_offset)]
+#[config(borders.get_outline_offset)]
+#[decl("outline-offset")]
 pub struct OutlineOffset<'a>(pub &'a str);
 
 #[derive(Debug, PartialEq, Hash)]

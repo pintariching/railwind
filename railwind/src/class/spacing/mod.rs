@@ -1,3 +1,4 @@
+use macro_derive::ConfigurableEnumParser;
 use nom::branch::alt;
 use nom::IResult;
 use nom::{bytes::complete::tag, combinator::map};
@@ -32,29 +33,24 @@ impl<'a> IntoDeclaration for Spacing<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash)]
+#[derive(Debug, PartialEq, Hash, ConfigurableEnumParser)]
+#[name(padding)]
+#[config(spacing.get_padding)]
 pub enum Padding<'a> {
+    #[tag("p")]
     All(&'a str),
+    #[tag("pt")]
     Top(&'a str),
+    #[tag("pr")]
     Right(&'a str),
+    #[tag("pb")]
     Bottom(&'a str),
+    #[tag("pl")]
     Left(&'a str),
+    #[tag("px")]
     X(&'a str),
+    #[tag("py")]
     Y(&'a str),
-}
-
-fn padding<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Padding<'a>> {
-    let padding = || config.spacing.get_padding();
-
-    alt((
-        map(keyword_value("p", padding), Padding::All),
-        map(keyword_value("pt", padding), Padding::Top),
-        map(keyword_value("pr", padding), Padding::Right),
-        map(keyword_value("pb", padding), Padding::Bottom),
-        map(keyword_value("pl", padding), Padding::Left),
-        map(keyword_value("px", padding), Padding::X),
-        map(keyword_value("py", padding), Padding::Y),
-    ))(input)
 }
 
 impl<'a> IntoDeclaration for Padding<'a> {

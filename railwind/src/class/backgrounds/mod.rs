@@ -1,14 +1,13 @@
-use macro_derive::{ConfigurableEnumParser, ConfigurableParser, EnumParser};
+use macro_derive::{ConfigurableEnumParser, ConfigurableParser, EnumParser, IntoDeclaration};
 use nom::branch::alt;
 use nom::combinator::map;
 use nom::sequence::preceded;
 use nom::IResult;
 
+use crate::class::colors::hex_color;
 use crate::class::utils::keyword_dash;
 use crate::class::{Decl, IntoDeclaration};
 use crate::config::Config;
-
-use super::colors::hex_color;
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Backgrounds<'a> {
@@ -61,8 +60,9 @@ impl<'a> IntoDeclaration for Backgrounds<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[derive(Debug, PartialEq, Hash, EnumParser, IntoDeclaration)]
 #[name(attachment)]
+#[decl("background-attachment")]
 pub enum BackgroundAttachment {
     #[tag("fixed")]
     Fixed,
@@ -70,18 +70,6 @@ pub enum BackgroundAttachment {
     Local,
     #[tag("scroll")]
     Scroll,
-}
-
-impl IntoDeclaration for BackgroundAttachment {
-    fn to_decl(self) -> Decl {
-        let val = match self {
-            Self::Fixed => "fixed",
-            Self::Local => "local",
-            Self::Scroll => "scroll",
-        };
-
-        Decl::String(format!("background-attachment: {}", val))
-    }
 }
 
 #[derive(Debug, PartialEq, Hash, EnumParser)]
@@ -133,42 +121,30 @@ impl<'a> IntoDeclaration for BackgroundColor<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[derive(Debug, PartialEq, Hash, EnumParser, IntoDeclaration)]
 #[name(origin)]
+#[decl("background-origin")]
 pub enum BackgroundOrigin {
     #[tag("border")]
+    #[decl("border-box")]
     Border,
     #[tag("padding")]
+    #[decl("padding-box")]
     Padding,
     #[tag("content")]
+    #[decl("content-box")]
     Content,
 }
 
-impl IntoDeclaration for BackgroundOrigin {
-    fn to_decl(self) -> Decl {
-        let val = match self {
-            Self::Border => "border-box",
-            Self::Padding => "padding-box",
-            Self::Content => "content-box",
-        };
-
-        Decl::String(format!("background-origin: {}", val))
-    }
-}
-
-#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
 #[name(position)]
 #[config(backgrounds.get_position)]
+#[decl("background-position")]
 pub struct BackgroundPosition<'a>(pub &'a str);
 
-impl<'a> IntoDeclaration for BackgroundPosition<'a> {
-    fn to_decl(self) -> Decl {
-        Decl::String(format!("background-position: {}", self.0))
-    }
-}
-
-#[derive(Debug, PartialEq, Hash, EnumParser)]
+#[derive(Debug, PartialEq, Hash, EnumParser, IntoDeclaration)]
 #[name(repeat)]
+#[decl("background-repeat")]
 pub enum BackgroundRepeat {
     #[tag("repeat")]
     Repeat,
@@ -179,47 +155,24 @@ pub enum BackgroundRepeat {
     #[tag("repeat-y")]
     RepeatY,
     #[tag("repeat-round")]
+    #[decl("round")]
     RepeatRound,
     #[tag("repeat-space")]
+    #[decl("space")]
     RepeatSpace,
 }
 
-impl IntoDeclaration for BackgroundRepeat {
-    fn to_decl(self) -> Decl {
-        let val = match self {
-            Self::Repeat => "repeat",
-            Self::NoRepeat => "no-repeat",
-            Self::RepeatX => "repeat-x",
-            Self::RepeatY => "repeat-y",
-            Self::RepeatRound => "round",
-            Self::RepeatSpace => "space",
-        };
-
-        Decl::String(format!("background-repeat: {}", val))
-    }
-}
-
-#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
 #[name(size)]
 #[config(backgrounds.get_size)]
+#[decl("background-size")]
 pub struct BackgroundSize<'a>(pub &'a str);
 
-impl<'a> IntoDeclaration for BackgroundSize<'a> {
-    fn to_decl(self) -> Decl {
-        Decl::String(format!("background-size: {}", self.0))
-    }
-}
-
-#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser, IntoDeclaration)]
 #[name(image)]
 #[config(backgrounds.get_image)]
+#[decl("background-image")]
 pub struct BackgroundImage<'a>(pub &'a str);
-
-impl<'a> IntoDeclaration for BackgroundImage<'a> {
-    fn to_decl(self) -> Decl {
-        Decl::String(format!("background-image: {}", self.0))
-    }
-}
 
 #[derive(Debug, PartialEq, Hash, ConfigurableEnumParser)]
 #[name(gradient_color_stops)]

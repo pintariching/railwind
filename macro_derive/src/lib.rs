@@ -1,8 +1,10 @@
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;
-use syn::{parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Lit};
-use utils::get_attr;
+use syn::{
+    parse_macro_input, Attribute, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Lit,
+};
+use utils::{get_attr, get_attr_opt};
 
 mod utils;
 
@@ -141,4 +143,50 @@ pub fn derive_configurable_enum_parser_fn(input: TokenStream) -> TokenStream {
             ))(input)
         }
     })
+}
+
+#[proc_macro_derive(IntoDeclaration, attributes(decl))]
+pub fn derive_into_declaration(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let decl_name = get_attr::<Lit>(&input.attrs, "decl");
+
+    match &input.data {
+        Data::Struct(_) => {
+            let out_type = &input.ident;
+
+            TokenStream::from(quote! {
+                impl<'a> crate::class::IntoDeclaration for #out_type<'a> {
+                    fn to_decl(self) -> crate::class::Decl {
+                        crate::class::Decl::String(format!("{}: {}", #decl_name, self.0))
+                    }
+                }
+            })
+        }
+        Data::Enum(DataEnum { variants, .. }) => {
+            let out_type = &input.ident;
+            let variant_name = variants.iter().map(|v| &v.ident);
+            let variant_decl = variants.iter().map(|v| {
+                if let Some(attr) = get_attr_opt::<Lit>(&v.attrs, "decl") {
+                    attr
+                } else {
+                    get_attr::<Lit>(&v.attrs, "tag")
+                }
+            });
+
+            TokenStream::from(quote! {
+                impl crate::class::IntoDeclaration for #out_type {
+                    fn to_decl(self) -> crate::class::Decl {
+                        let val = match self {
+                            #(
+                                Self::#variant_name => #variant_decl,
+                            )*
+                        };
+
+                        crate::class::Decl::String(format!("{}: {}", #decl_name, val))
+                    }
+                }
+            })
+        }
+        _ => panic!("expected enum or struct"),
+    }
 }
