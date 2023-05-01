@@ -132,10 +132,10 @@ pub fn derive_configurable_enum_parser_fn(input: TokenStream) -> TokenStream {
                             nom::sequence::terminated(nom::bytes::complete::tag(#variant_tag), nom::bytes::complete::tag("-")),
                             nom::branch::alt((
                                 nom::sequence::delimited(nom::bytes::complete::tag("["), nom::bytes::complete::is_not("]"), nom::bytes::complete::tag("]")),
-                                nom::combinator::map_opt(nom::bytes::complete::is_not(" "), |v| config.#config().get(v).copied()),
+                                nom::combinator::map_opt(nom::bytes::complete::is_not(" "), |v| config.#config().get(v).copied())
                             )),
                         ),
-                        |_| #out_type::#variant_name
+                        |s| #out_type::#variant_name(s)
                     ),
                 )*
             ))(input)
