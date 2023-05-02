@@ -6,7 +6,7 @@ use nom::sequence::preceded;
 use nom::IResult;
 
 use crate::class::colors::hex_color;
-use crate::class::utils::{arbitrary_hashmap_value, keyword_dash, keyword_value};
+use crate::class::utils::{arbitrary_hashmap_value, keyword_value};
 use crate::class::{Decl, IntoDeclaration};
 use crate::config::Config;
 
@@ -32,14 +32,14 @@ pub enum Borders<'a> {
 pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borders<'a>> {
     alt((
         preceded(
-            keyword_dash("rounded"),
+            tag("rounded-"),
             map(|i| border_radius(i, config), Borders::BorderRadius),
         ),
         map(tag("rounded"), |_| {
             Borders::BorderRadius(BorderRadius::Around(""))
         }),
         preceded(
-            keyword_dash("border"),
+            tag("border-"),
             alt((
                 map(|i| border_width(i, config), Borders::BorderWidth),
                 map(|i| border_color(i, config), Borders::BorderColor),
@@ -50,7 +50,7 @@ pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borde
             Borders::BorderWidth(BorderWidth::Around(""))
         }),
         preceded(
-            keyword_dash("divide"),
+            tag("divide-"),
             alt((
                 map(|i| divide_width(i, config), Borders::DivideWidth),
                 map(|i| divide_color(i, config), Borders::DivideColor),
@@ -58,7 +58,7 @@ pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borde
             )),
         ),
         preceded(
-            keyword_dash("outline"),
+            tag("outline-"),
             alt((
                 map(|i| outline_width(i, config), Borders::OutlineWidth),
                 map(|i| outline_color(i, config), Borders::OutlineColor),
@@ -70,12 +70,12 @@ pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borde
             Borders::OutlineStyle(OutlineStyle::Solid)
         }),
         preceded(
-            keyword_dash("ring"),
+            tag("ring-"),
             alt((
                 map(|i| ring_width(i, config), Borders::RingWidth),
                 map(|i| ring_color(i, config), Borders::RingColor),
                 preceded(
-                    keyword_dash("offset"),
+                    tag("offset-"),
                     alt((
                         map(|i| ring_offset_width(i, config), Borders::RingOffsetWidth),
                         map(|i| ring_offset_color(i, config), Borders::RingOffsetColor),

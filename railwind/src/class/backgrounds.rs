@@ -1,11 +1,11 @@
 use macro_derive::{ConfigurableEnumParser, ConfigurableParser, EnumParser, IntoDeclaration};
 use nom::branch::alt;
+use nom::bytes::complete::tag;
 use nom::combinator::map;
 use nom::sequence::preceded;
 use nom::IResult;
 
 use crate::class::colors::hex_color;
-use crate::class::utils::keyword_dash;
 use crate::class::{Decl, IntoDeclaration};
 use crate::config::Config;
 
@@ -25,7 +25,7 @@ pub enum Backgrounds<'a> {
 pub fn backgrounds<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Backgrounds<'a>> {
     alt((
         preceded(
-            keyword_dash("bg"),
+            tag("bg-"),
             alt((
                 map(attachment, Backgrounds::BackgroundAttachment),
                 map(clip, Backgrounds::BackgroundClip),
@@ -218,7 +218,7 @@ mod tests {
     #[test]
     fn test_attachment() {
         assert_eq!(
-            backgrounds("bg-fixed", &Config::new()),
+            backgrounds("bg-fixed", &Config::default()),
             Ok((
                 "",
                 Backgrounds::BackgroundAttachment(BackgroundAttachment::Fixed)
@@ -229,7 +229,7 @@ mod tests {
     #[test]
     fn test_clip() {
         assert_eq!(
-            backgrounds("bg-content", &Config::new()),
+            backgrounds("bg-content", &Config::default()),
             Ok(("", Backgrounds::BackgroundClip(BackgroundClip::Content)))
         );
     }
@@ -237,14 +237,14 @@ mod tests {
     #[test]
     fn test_color() {
         assert_eq!(
-            backgrounds("bg-red-500", &Config::new()),
+            backgrounds("bg-red-500", &Config::default()),
             Ok(("", Backgrounds::BackgroundColor(BackgroundColor("#ef4444"))))
         );
     }
 
     #[test]
     fn test_config() {
-        let mut c = Config::new();
+        let mut c = Config::default();
 
         c.backgrounds.get_mut_color().insert("yellow", "#yellow");
 

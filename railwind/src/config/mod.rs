@@ -3,23 +3,15 @@ use std::collections::HashMap;
 
 use macro_derive::GetOnceCell;
 
+#[derive(Default)]
 pub struct Config {
     pub backgrounds: BackgroundsConfig,
     pub spacing: SpacingConfig,
     pub borders: BordersConfig,
+    pub effects: EffectsConfig,
 }
 
-impl Config {
-    pub fn new() -> Self {
-        Self {
-            backgrounds: BackgroundsConfig::new(),
-            spacing: SpacingConfig::new(),
-            borders: BordersConfig::new(),
-        }
-    }
-}
-
-#[derive(GetOnceCell)]
+#[derive(GetOnceCell, Default)]
 pub struct BackgroundsConfig {
     #[config_path("colors.ron")]
     color: OnceCell<HashMap<&'static str, &'static str>>,
@@ -37,19 +29,7 @@ pub struct BackgroundsConfig {
     gradient_color_stops: OnceCell<HashMap<&'static str, &'static str>>,
 }
 
-impl BackgroundsConfig {
-    pub fn new() -> Self {
-        Self {
-            color: OnceCell::new(),
-            position: OnceCell::new(),
-            size: OnceCell::new(),
-            image: OnceCell::new(),
-            gradient_color_stops: OnceCell::new(),
-        }
-    }
-}
-
-#[derive(GetOnceCell)]
+#[derive(GetOnceCell, Default)]
 pub struct SpacingConfig {
     #[config_path("padding.ron")]
     padding: OnceCell<HashMap<&'static str, &'static str>>,
@@ -61,17 +41,7 @@ pub struct SpacingConfig {
     space_between: OnceCell<HashMap<&'static str, &'static str>>,
 }
 
-impl SpacingConfig {
-    pub fn new() -> Self {
-        Self {
-            padding: OnceCell::new(),
-            margin: OnceCell::new(),
-            space_between: OnceCell::new(),
-        }
-    }
-}
-
-#[derive(GetOnceCell)]
+#[derive(GetOnceCell, Default)]
 pub struct BordersConfig {
     #[config_path("border_radius.ron")]
     border_radius: OnceCell<HashMap<&'static str, &'static str>>,
@@ -110,21 +80,14 @@ pub struct BordersConfig {
     ring_offset_color: OnceCell<HashMap<&'static str, &'static str>>,
 }
 
-impl BordersConfig {
-    pub fn new() -> Self {
-        Self {
-            border_radius: OnceCell::new(),
-            border_width: OnceCell::new(),
-            border_color: OnceCell::new(),
-            divide_width: OnceCell::new(),
-            divide_color: OnceCell::new(),
-            outline_width: OnceCell::new(),
-            outline_color: OnceCell::new(),
-            outline_offset: OnceCell::new(),
-            ring_width: OnceCell::new(),
-            ring_color: OnceCell::new(),
-            ring_offset_width: OnceCell::new(),
-            ring_offset_color: OnceCell::new(),
-        }
-    }
+#[derive(GetOnceCell, Default)]
+pub struct EffectsConfig {
+    #[config_path("box_shadow.ron")]
+    box_shadow: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("colors.ron")]
+    box_shadow_color: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("opacity.ron")]
+    opacity: OnceCell<HashMap<&'static str, &'static str>>,
 }

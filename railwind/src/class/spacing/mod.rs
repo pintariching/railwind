@@ -169,11 +169,11 @@ mod tests {
     #[test]
     fn test_padding() {
         assert_eq!(
-            padding("p-5", &Config::new()),
+            padding("p-5", &Config::default()),
             Ok(("", Padding::All("1.25rem")))
         );
         assert_eq!(
-            padding("p-[3.251rem]", &Config::new()),
+            padding("p-[3.251rem]", &Config::default()),
             Ok(("", Padding::All("3.251rem")))
         );
     }
@@ -181,19 +181,19 @@ mod tests {
     #[test]
     fn test_margin() {
         assert_eq!(
-            margin("m-5", &Config::new()),
+            margin("m-5", &Config::default()),
             Ok(("", Margin::All("1.25rem".to_string())))
         );
         assert_eq!(
-            margin("-m-5", &Config::new()),
+            margin("-m-5", &Config::default()),
             Ok(("", Margin::All("-1.25rem".to_string())))
         );
         assert_eq!(
-            margin("m-[3.14px]", &Config::new()),
+            margin("m-[3.14px]", &Config::default()),
             Ok(("", Margin::All("3.14px".to_string())))
         );
         assert_eq!(
-            margin("-m-[3.14px]", &Config::new()),
+            margin("-m-[3.14px]", &Config::default()),
             Ok(("", Margin::All("-3.14px".to_string())))
         );
     }
@@ -201,27 +201,27 @@ mod tests {
     #[test]
     fn test_space_between() {
         assert_eq!(
-            space_between("space-x-5", &Config::new()),
+            space_between("space-x-5", &Config::default()),
             Ok(("", SpaceBetween::X("1.25rem".to_string())))
         );
         assert_eq!(
-            space_between("-space-x-5", &Config::new()),
+            space_between("-space-x-5", &Config::default()),
             Ok(("", SpaceBetween::X("-1.25rem".to_string())))
         );
         assert_eq!(
-            space_between("space-x-[42rem]", &Config::new()),
+            space_between("space-x-[42rem]", &Config::default()),
             Ok(("", SpaceBetween::X("42rem".to_string())))
         );
         assert_eq!(
-            space_between("space-x-[-42rem]", &Config::new()),
+            space_between("space-x-[-42rem]", &Config::default()),
             Ok(("", SpaceBetween::X("-42rem".to_string())))
         );
         assert_eq!(
-            space_between("space-x-reverse", &Config::new()),
+            space_between("space-x-reverse", &Config::default()),
             Ok(("", SpaceBetween::ReverseX))
         );
         assert_eq!(
-            space_between("space-y-reverse", &Config::new()),
+            space_between("space-y-reverse", &Config::default()),
             Ok(("", SpaceBetween::ReverseY))
         );
     }
