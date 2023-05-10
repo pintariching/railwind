@@ -101,7 +101,7 @@ pub enum BorderRadius<'a> {
 }
 
 fn border_radius<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BorderRadius<'a>> {
-    let radius = || config.borders.get_border_radius();
+    let radius = config.borders.get_border_radius();
 
     alt((
         map(keyword_value("t", radius), BorderRadius::Top),
@@ -156,7 +156,7 @@ pub enum BorderWidth<'a> {
 }
 
 fn border_width<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BorderWidth<'a>> {
-    let width = || config.borders.get_border_width();
+    let width = config.borders.get_border_width();
 
     alt((
         map(keyword_value("x", width), BorderWidth::X),
@@ -201,7 +201,7 @@ pub enum BorderColor<'a> {
 }
 
 fn border_color<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, BorderColor<'a>> {
-    let color = || config.borders.get_border_color();
+    let color = config.borders.get_border_color();
 
     alt((
         map(keyword_value("x", color), BorderColor::X),
@@ -308,7 +308,7 @@ pub enum DivideWidth<'a> {
 }
 
 fn divide_width<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, DivideWidth<'a>> {
-    let width = || config.borders.get_divide_width();
+    let width = config.borders.get_divide_width();
 
     alt((
         map(keyword_value("x", width), DivideWidth::X),
@@ -431,7 +431,7 @@ pub enum RingWidth<'a> {
 }
 
 fn ring_width<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, RingWidth<'a>> {
-    let w = || config.borders.get_ring_width();
+    let w = config.borders.get_ring_width();
 
     alt((
         map(arbitrary_hashmap_value(w), RingWidth::Value),

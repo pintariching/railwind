@@ -9,6 +9,7 @@ pub struct Config {
     pub spacing: SpacingConfig,
     pub borders: BordersConfig,
     pub effects: EffectsConfig,
+    pub filters: FiltersConfig,
 }
 
 #[derive(GetOnceCell, Default)]
@@ -90,4 +91,37 @@ pub struct EffectsConfig {
 
     #[config_path("effects/opacity.ron")]
     opacity: OnceCell<HashMap<&'static str, &'static str>>,
+}
+
+#[derive(GetOnceCell, Default)]
+pub struct FiltersConfig {
+    #[config_path("filters/blur.ron")]
+    blur: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/brightness.ron")]
+    brightness: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/contrast.ron")]
+    contrast: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/drop_shadow.ron")]
+    drop_shadow: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/grayscale.ron")]
+    grayscale: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/hue_rotate.ron")]
+    hue_rotate: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/invert.ron")]
+    invert: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/saturate.ron")]
+    saturate: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/sepia.ron")]
+    sepia: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("filters/opacity.ron")]
+    backdrop_opacity: OnceCell<HashMap<&'static str, &'static str>>,
 }

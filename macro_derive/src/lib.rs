@@ -95,7 +95,7 @@ pub fn derive_enum_parser_fn(input: TokenStream) -> TokenStream {
     })
 }
 
-#[proc_macro_derive(ConfigurableParser, attributes(name, config))]
+#[proc_macro_derive(ConfigurableParser, attributes(name, keyword, config))]
 pub fn derive_configurable_parser_fn(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
@@ -108,12 +108,76 @@ pub fn derive_configurable_parser_fn(input: TokenStream) -> TokenStream {
             nom::combinator::map(
                 nom::branch::alt((
                     nom::sequence::delimited(nom::bytes::complete::tag("["), nom::bytes::complete::is_not("]"), nom::bytes::complete::tag("]")),
-                    nom::combinator::map_opt(nom::bytes::complete::is_not(" "), move |v| config.#config().get(v).copied()),
+                    nom::combinator::map_opt(nom::bytes::complete::is_not(" "), |v| config.#config().get(v).copied()),
                 )),
                 #out_type,
             )(input)
         }
     })
+}
+
+#[proc_macro_derive(
+    KeywordConfigurableParser,
+    attributes(name, keyword, config, empty_args)
+)]
+pub fn derive_keyword_configurable_parser_fn(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    let parser_name = get_attr::<Ident>(&input.attrs, "name");
+    let config = get_attr::<Expr>(&input.attrs, "config");
+    let keyword = get_attr::<Lit>(&input.attrs, "keyword");
+    let empty_args = get_attr::<Lit>(&input.attrs, "empty_args");
+
+    let empty_args = match empty_args {
+        Lit::Bool(b) => b.value,
+        _ => panic!("expected a bool"),
+    };
+
+    let out_type = &input.ident;
+
+    if empty_args {
+        TokenStream::from(quote! {
+            fn #parser_name<'a>(input: &'a str, config: &'a crate::config::Config) -> nom::IResult<&'a str, #out_type<'a>> {
+                nom::branch::alt((
+                    nom::sequence::preceded(
+                        nom::sequence::preceded(
+                            nom::bytes::complete::tag(#keyword),
+                            nom::bytes::complete::tag("-")
+                        ),
+                        nom::combinator::map(
+                            nom::branch::alt((
+                                nom::sequence::delimited(nom::bytes::complete::tag("["), nom::bytes::complete::is_not("]"), nom::bytes::complete::tag("]")),
+                                nom::combinator::map_opt(nom::bytes::complete::is_not(" "), |v| config.#config().get(v).copied()),
+                            )),
+                            #out_type,
+                        )
+                    ),
+                    nom::combinator::map_opt(
+                        nom::bytes::complete::tag(#keyword),
+                        |_| config.#config().get("").map(|v| #out_type(v))
+                    ),
+                ))(input)
+            }
+        })
+    } else {
+        TokenStream::from(quote! {
+            fn #parser_name<'a>(input: &'a str, config: &'a crate::config::Config) -> nom::IResult<&'a str, #out_type<'a>> {
+                nom::sequence::preceded(
+                    nom::sequence::preceded(
+                        nom::bytes::complete::tag(#keyword),
+                        nom::bytes::complete::tag("-")
+                    ),
+                    nom::combinator::map(
+                        nom::branch::alt((
+                            nom::sequence::delimited(nom::bytes::complete::tag("["), nom::bytes::complete::is_not("]"), nom::bytes::complete::tag("]")),
+                            nom::combinator::map_opt(nom::bytes::complete::is_not(" "), |v| config.#config().get(v).copied()),
+                        )),
+                        #out_type,
+                    )
+                )(input)
+            }
+        })
+    }
 }
 
 #[proc_macro_derive(ConfigurableEnumParser, attributes(tag, name, config))]

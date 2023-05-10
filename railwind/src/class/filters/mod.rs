@@ -1,36 +1,19 @@
-mod types;
-
-use types::*;
+use macro_derive::KeywordConfigurableParser;
+use nom::branch::alt;
+use nom::bytes::complete::tag;
+use nom::combinator::map;
+use nom::sequence::preceded;
+use nom::IResult;
 
 use crate::class::Decl;
-use crate::utils::{get_args, get_class_name};
-use crate::warning::WarningType;
 
-use lazy_static::lazy_static;
-use std::collections::HashMap;
+use crate::class::utils::neg_keyword_value;
+use crate::class::IntoDeclaration;
+use crate::config::Config;
 
-lazy_static! {
-    pub static ref BLUR: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("blur.ron")).unwrap();
-    pub static ref BRIGHTNESS: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("brightness.ron")).unwrap();
-    pub static ref CONTRAST: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("contrast.ron")).unwrap();
-    pub static ref DROP_SHADOW: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("drop_shadow.ron")).unwrap();
-    pub static ref GRAYSCALE: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("grayscale.ron")).unwrap();
-    pub static ref HUE_ROTATE: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("hue_rotate.ron")).unwrap();
-    pub static ref INVERT: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("invert.ron")).unwrap();
-    pub static ref SATURATE: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("saturate.ron")).unwrap();
-    pub static ref SEPIA: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("sepia.ron")).unwrap();
-    pub static ref OPACITY: HashMap<&'static str, &'static str> =
-        ron::from_str(include_str!("opacity.ron")).unwrap();
-}
+const FILTER_STYLE: &str = "filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)";
+const WEBKIT_BACKDROP_FILTER_STYLE: &str = "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)";
+const BACKDROP_FILTER_STYLE: &str = "        backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)";
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Filter<'a> {
@@ -39,7 +22,7 @@ pub enum Filter<'a> {
     Contrast(Contrast<'a>),
     DropShadow(DropShadow<'a>),
     Grayscale(Grayscale<'a>),
-    HueRotate(HueRotate<'a>),
+    HueRotate(HueRotate),
     Invert(Invert<'a>),
     Saturate(Saturate<'a>),
     Sepia(Sepia<'a>),
@@ -47,171 +30,354 @@ pub enum Filter<'a> {
     BackdropBrightness(BackdropBrightness<'a>),
     BackdropContrast(BackdropContrast<'a>),
     BackdropGrayscale(BackdropGrayscale<'a>),
-    BackdropHueRotate(BackdropHueRotate<'a>),
+    BackdropHueRotate(BackdropHueRotate),
     BackdropInvert(BackdropInvert<'a>),
     BackdropOpacity(BackdropOpacity<'a>),
     BackdropSaturate(BackdropSaturate<'a>),
     BackdropSepia(BackdropSepia<'a>),
 }
 
-impl<'a> Filter<'a> {
-    pub fn new(value: &'a str) -> Result<Option<Self>, WarningType> {
-        let class_name = get_class_name(value);
+pub fn filter<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Filter<'a>> {
+    alt((
+        map(|i| blur(i, config), Filter::Blur),
+        map(|i| brightness(i, config), Filter::Brightness),
+        map(|i| contrast(i, config), Filter::Contrast),
+        map(|i| drop_shadow(i, config), Filter::DropShadow),
+        map(|i| grayscale(i, config), Filter::Grayscale),
+        map(|i| hue_rotate(i, config), Filter::HueRotate),
+        map(|i| invert(i, config), Filter::Invert),
+        map(|i| saturate(i, config), Filter::Saturate),
+        map(|i| sepia(i, config), Filter::Sepia),
+        map(|i| backdrop_opacity(i, config), Filter::BackdropOpacity),
+        preceded(
+            tag("backdrop-"),
+            alt((
+                map(
+                    |i| blur(i, config),
+                    |b| Filter::BackdropBlur(BackdropBlur(b.0)),
+                ),
+                map(
+                    |i| brightness(i, config),
+                    |b| Filter::BackdropBrightness(BackdropBrightness(b.0)),
+                ),
+                map(
+                    |i| contrast(i, config),
+                    |b| Filter::BackdropContrast(BackdropContrast(b.0)),
+                ),
+                map(
+                    |i| grayscale(i, config),
+                    |b| Filter::BackdropGrayscale(BackdropGrayscale(b.0)),
+                ),
+                map(
+                    |i| hue_rotate(i, config),
+                    |b| Filter::BackdropHueRotate(BackdropHueRotate(b.0)),
+                ),
+                map(
+                    |i| invert(i, config),
+                    |b| Filter::BackdropInvert(BackdropInvert(b.0)),
+                ),
+                map(
+                    |i| saturate(i, config),
+                    |b| Filter::BackdropSaturate(BackdropSaturate(b.0)),
+                ),
+                map(
+                    |i| sepia(i, config),
+                    |b| Filter::BackdropSepia(BackdropSepia(b.0)),
+                ),
+            )),
+        ),
+    ))(input)
+}
 
-        let filter = match class_name {
-            "blur" => {
-                if let Ok(args) = get_args(value) {
-                    Self::Blur(Blur(args))
-                } else {
-                    Self::Blur(Blur(""))
-                }
-            }
-            "brightness" => Self::Brightness(Brightness(get_args(value)?)),
-            "contrast" => Self::Contrast(Contrast(get_args(value)?)),
-            "drop" => match get_class_name(get_args(value)?) {
-                "shadow" => {
-                    if let Ok(args) = get_args(get_args(value)?) {
-                        Self::DropShadow(DropShadow(args))
-                    } else {
-                        Self::DropShadow(DropShadow(""))
-                    }
-                }
-                v => {
-                    return Err(WarningType::InvalidArg(
-                        v.into(),
-                        "Drop Shadow".into(),
-                        vec!["shadow"],
-                    ))
-                }
-            },
-            "grayscale" => {
-                if let Ok(args) = get_args(value) {
-                    Self::Grayscale(Grayscale(args))
-                } else {
-                    Self::Grayscale(Grayscale(""))
-                }
-            }
-            "hue" | "-hue" => match get_class_name(get_args(value)?) {
-                "rotate" => {
-                    Self::HueRotate(HueRotate::new(class_name, get_args(get_args(value)?)?))
-                }
-                v => {
-                    return Err(WarningType::InvalidArg(
-                        v.into(),
-                        "Hue Rotate".into(),
-                        vec!["rotate"],
-                    ))
-                }
-            },
-            "invert" => {
-                if let Ok(args) = get_args(value) {
-                    Self::Invert(Invert(args))
-                } else {
-                    Self::Invert(Invert(""))
-                }
-            }
-            "saturate" => Self::Saturate(Saturate(get_args(value)?)),
-            "sepia" => {
-                if let Ok(args) = get_args(value) {
-                    Self::Sepia(Sepia(args))
-                } else {
-                    Self::Sepia(Sepia(""))
-                }
-            }
-            "backdrop" | "-backdrop" => {
-                let args = get_args(value)?;
-                let sub_class_name = get_class_name(args);
-                match sub_class_name {
-                    "blur" => {
-                        if let Ok(args) = get_args(get_args(value)?) {
-                            Self::BackdropBlur(BackdropBlur(args))
-                        } else {
-                            Self::BackdropBlur(BackdropBlur(""))
-                        }
-                    }
-                    "brightness" => Self::BackdropBrightness(BackdropBrightness(get_args(args)?)),
-                    "contrast" => Self::BackdropContrast(BackdropContrast(get_args(args)?)),
-                    "grayscale" => {
-                        if let Ok(args) = get_args(args) {
-                            Self::BackdropGrayscale(BackdropGrayscale(args))
-                        } else {
-                            Self::BackdropGrayscale(BackdropGrayscale(""))
-                        }
-                    }
-                    "hue" => match get_class_name(get_args(get_args(value)?)?) {
-                        "rotate" => Self::BackdropHueRotate(BackdropHueRotate::new(
-                            class_name,
-                            get_args(get_args(args)?)?,
-                        )),
-                        v => {
-                            return Err(WarningType::InvalidArg(
-                                v.into(),
-                                "Backdrop Hue Rotate".into(),
-                                vec!["rotate"],
-                            ))
-                        }
-                    },
-                    "invert" => {
-                        if let Ok(args) = get_args(args) {
-                            Self::BackdropInvert(BackdropInvert(args))
-                        } else {
-                            Self::BackdropInvert(BackdropInvert(""))
-                        }
-                    }
-                    "opacity" => Self::BackdropOpacity(BackdropOpacity(get_args(args)?)),
-                    "saturate" => Self::BackdropSaturate(BackdropSaturate(get_args(args)?)),
-                    "sepia" => {
-                        if let Ok(args) = get_args(args) {
-                            Self::BackdropSepia(BackdropSepia(args))
-                        } else {
-                            Self::BackdropSepia(BackdropSepia(""))
-                        }
-                    }
-                    v => {
-                        return Err(WarningType::InvalidArg(
-                            v.into(),
-                            "Backdrop".into(),
-                            vec![
-                                "blur",
-                                "brightness",
-                                "contrast",
-                                "grayscale",
-                                "hue",
-                                "invert",
-                                "opacity",
-                                "saturate",
-                                "sepia",
-                            ],
-                        ))
-                    }
-                }
-            }
-            _ => return Ok(None),
-        };
-
-        Ok(Some(filter))
-    }
-
-    pub fn to_decl(self) -> Result<Decl, WarningType> {
+impl<'a> IntoDeclaration for Filter<'a> {
+    fn to_decl(self) -> Decl {
         match self {
-            Self::Blur(s) => s.to_decl(),
-            Self::Brightness(s) => s.to_decl(),
-            Self::Contrast(s) => s.to_decl(),
-            Self::DropShadow(s) => s.to_decl(),
-            Self::Grayscale(s) => s.to_decl(),
-            Self::HueRotate(s) => s.to_decl(),
-            Self::Invert(s) => s.to_decl(),
-            Self::Saturate(s) => s.to_decl(),
-            Self::Sepia(s) => s.to_decl(),
-            Self::BackdropBlur(s) => s.to_decl(),
-            Self::BackdropBrightness(s) => s.to_decl(),
-            Self::BackdropContrast(s) => s.to_decl(),
-            Self::BackdropGrayscale(s) => s.to_decl(),
-            Self::BackdropHueRotate(s) => s.to_decl(),
-            Self::BackdropInvert(s) => s.to_decl(),
-            Self::BackdropOpacity(s) => s.to_decl(),
-            Self::BackdropSaturate(s) => s.to_decl(),
-            Self::BackdropSepia(s) => s.to_decl(),
+            Filter::Blur(f) => f.to_decl(),
+            Filter::Brightness(f) => f.to_decl(),
+            Filter::Contrast(f) => f.to_decl(),
+            Filter::DropShadow(f) => f.to_decl(),
+            Filter::Grayscale(f) => f.to_decl(),
+            Filter::HueRotate(f) => f.to_decl(),
+            Filter::Invert(f) => f.to_decl(),
+            Filter::Saturate(f) => f.to_decl(),
+            Filter::Sepia(f) => f.to_decl(),
+            Filter::BackdropBlur(f) => f.to_decl(),
+            Filter::BackdropBrightness(f) => f.to_decl(),
+            Filter::BackdropContrast(f) => f.to_decl(),
+            Filter::BackdropGrayscale(f) => f.to_decl(),
+            Filter::BackdropHueRotate(f) => f.to_decl(),
+            Filter::BackdropInvert(f) => f.to_decl(),
+            Filter::BackdropOpacity(f) => f.to_decl(),
+            Filter::BackdropSaturate(f) => f.to_decl(),
+            Filter::BackdropSepia(f) => f.to_decl(),
         }
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(blur)]
+#[keyword("blur")]
+#[empty_args(true)]
+#[config(filters.get_blur)]
+pub struct Blur<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for Blur<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-blur: blur({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(brightness)]
+#[keyword("brightness")]
+#[empty_args(false)]
+#[config(filters.get_brightness)]
+pub struct Brightness<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for Brightness<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-brightness: brightness({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(contrast)]
+#[keyword("contrast")]
+#[empty_args(false)]
+#[config(filters.get_contrast)]
+pub struct Contrast<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for Contrast<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-contrast: contrast({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(drop_shadow)]
+#[keyword("drop-shadow")]
+#[empty_args(true)]
+#[config(filters.get_drop_shadow)]
+pub struct DropShadow<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for DropShadow<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-drop-shadow: drop-shadow({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(grayscale)]
+#[keyword("grayscale")]
+#[empty_args(true)]
+#[config(filters.get_grayscale)]
+pub struct Grayscale<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for Grayscale<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-grayscale: grayscale({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct HueRotate(pub String);
+
+fn hue_rotate<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, HueRotate> {
+    map(
+        neg_keyword_value("hue-rotate", config.filters.get_hue_rotate()),
+        HueRotate,
+    )(input)
+}
+
+impl IntoDeclaration for HueRotate {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-hue-rotate: hue-rotate({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(invert)]
+#[keyword("invert")]
+#[empty_args(true)]
+#[config(filters.get_invert)]
+pub struct Invert<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for Invert<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-invert: invert({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(saturate)]
+#[keyword("saturate")]
+#[empty_args(false)]
+#[config(filters.get_saturate)]
+pub struct Saturate<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for Saturate<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-saturate: saturate({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(sepia)]
+#[keyword("sepia")]
+#[empty_args(true)]
+#[config(filters.get_sepia)]
+pub struct Sepia<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for Sepia<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-sepia: sepia({})", self.0),
+            FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropBlur<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropBlur<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-blur: blur({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropBrightness<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropBrightness<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-brightness: brightness({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropContrast<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropContrast<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-contrast: contrast({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropGrayscale<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropGrayscale<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-grayscale: grayscale({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropHueRotate(pub String);
+
+impl<'a> IntoDeclaration for BackdropHueRotate {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-hue-rotate: hue-rotate({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropInvert<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropInvert<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-invert: invert({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[name(backdrop_opacity)]
+#[keyword("backdrop-opacity")]
+#[empty_args(false)]
+#[config(filters.get_backdrop_opacity)]
+pub struct BackdropOpacity<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropOpacity<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-opacity: opacity({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropSaturate<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropSaturate<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-saturate: saturate({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
+    }
+}
+
+#[derive(Debug, PartialEq, Hash)]
+pub struct BackdropSepia<'a>(pub &'a str);
+
+impl<'a> IntoDeclaration for BackdropSepia<'a> {
+    fn to_decl(self) -> Decl {
+        Decl::Vec(vec![
+            format!("--tw-backdrop-sepia: sepia({})", self.0),
+            WEBKIT_BACKDROP_FILTER_STYLE.into(),
+            BACKDROP_FILTER_STYLE.into(),
+        ])
     }
 }
