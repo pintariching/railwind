@@ -16,13 +16,13 @@ pub struct BackgroundsConfig {
     #[config_path("colors.ron")]
     color: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("background_position.ron")]
+    #[config_path("backgrounds/background_position.ron")]
     position: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("background_size.ron")]
+    #[config_path("backgrounds/background_size.ron")]
     size: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("background_image.ron")]
+    #[config_path("backgrounds/background_image.ron")]
     image: OnceCell<HashMap<&'static str, &'static str>>,
 
     #[config_path("colors.ron")]
@@ -31,49 +31,49 @@ pub struct BackgroundsConfig {
 
 #[derive(GetOnceCell, Default)]
 pub struct SpacingConfig {
-    #[config_path("padding.ron")]
+    #[config_path("spacing/padding.ron")]
     padding: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("margin.ron")]
+    #[config_path("spacing/margin.ron")]
     margin: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("space_between.ron")]
+    #[config_path("spacing/space_between.ron")]
     space_between: OnceCell<HashMap<&'static str, &'static str>>,
 }
 
 #[derive(GetOnceCell, Default)]
 pub struct BordersConfig {
-    #[config_path("border_radius.ron")]
+    #[config_path("borders/border_radius.ron")]
     border_radius: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("border_width.ron")]
+    #[config_path("borders/border_width.ron")]
     border_width: OnceCell<HashMap<&'static str, &'static str>>,
 
     #[config_path("colors.ron")]
     border_color: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("divide_width.ron")]
+    #[config_path("borders/divide_width.ron")]
     divide_width: OnceCell<HashMap<&'static str, &'static str>>,
 
     #[config_path("colors.ron")]
     divide_color: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("outline_width.ron")]
+    #[config_path("borders/outline_width.ron")]
     outline_width: OnceCell<HashMap<&'static str, &'static str>>,
 
     #[config_path("colors.ron")]
     outline_color: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("border_width.ron")]
+    #[config_path("borders/border_width.ron")]
     outline_offset: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("ring_width.ron")]
+    #[config_path("borders/ring_width.ron")]
     ring_width: OnceCell<HashMap<&'static str, &'static str>>,
 
     #[config_path("colors.ron")]
     ring_color: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("outline_width.ron")]
+    #[config_path("borders/outline_width.ron")]
     ring_offset_width: OnceCell<HashMap<&'static str, &'static str>>,
 
     #[config_path("colors.ron")]
@@ -82,12 +82,12 @@ pub struct BordersConfig {
 
 #[derive(GetOnceCell, Default)]
 pub struct EffectsConfig {
-    #[config_path("box_shadow.ron")]
+    #[config_path("effects/box_shadow.ron")]
     box_shadow: OnceCell<HashMap<&'static str, &'static str>>,
 
     #[config_path("colors.ron")]
     box_shadow_color: OnceCell<HashMap<&'static str, &'static str>>,
 
-    #[config_path("opacity.ron")]
+    #[config_path("effects/opacity.ron")]
     opacity: OnceCell<HashMap<&'static str, &'static str>>,
 }

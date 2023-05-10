@@ -1,9 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;
-use syn::{
-    parse_macro_input, Attribute, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Lit,
-};
+use syn::{parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Lit};
 use utils::{get_attr, get_attr_opt};
 
 mod utils;
