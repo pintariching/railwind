@@ -1,4 +1,4 @@
-use macro_derive::KeywordConfigurableParser;
+use macro_derive::ConfigurableParser;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::combinator::map;
@@ -39,50 +39,89 @@ pub enum Filter<'a> {
 
 pub fn filter<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Filter<'a>> {
     alt((
-        map(|i| blur(i, config), Filter::Blur),
-        map(|i| brightness(i, config), Filter::Brightness),
-        map(|i| contrast(i, config), Filter::Contrast),
-        map(|i| drop_shadow(i, config), Filter::DropShadow),
-        map(|i| grayscale(i, config), Filter::Grayscale),
+        preceded(tag("blur"), map(|i| blur(i, config), Filter::Blur)),
+        preceded(
+            tag("brightness"),
+            map(|i| brightness(i, config), Filter::Brightness),
+        ),
+        preceded(
+            tag("contrast"),
+            map(|i| contrast(i, config), Filter::Contrast),
+        ),
+        preceded(
+            tag("drop-shadow"),
+            map(|i| drop_shadow(i, config), Filter::DropShadow),
+        ),
+        preceded(
+            tag("grayscale"),
+            map(|i| grayscale(i, config), Filter::Grayscale),
+        ),
         map(|i| hue_rotate(i, config), Filter::HueRotate),
-        map(|i| invert(i, config), Filter::Invert),
-        map(|i| saturate(i, config), Filter::Saturate),
-        map(|i| sepia(i, config), Filter::Sepia),
-        map(|i| backdrop_opacity(i, config), Filter::BackdropOpacity),
+        preceded(tag("invert"), map(|i| invert(i, config), Filter::Invert)),
+        preceded(
+            tag("saturate"),
+            map(|i| saturate(i, config), Filter::Saturate),
+        ),
+        preceded(tag("sepia"), map(|i| sepia(i, config), Filter::Sepia)),
         preceded(
             tag("backdrop-"),
             alt((
-                map(
-                    |i| blur(i, config),
-                    |b| Filter::BackdropBlur(BackdropBlur(b.0)),
+                preceded(
+                    tag("blur"),
+                    map(
+                        |i| blur(i, config),
+                        |b| Filter::BackdropBlur(BackdropBlur(b.0)),
+                    ),
                 ),
-                map(
-                    |i| brightness(i, config),
-                    |b| Filter::BackdropBrightness(BackdropBrightness(b.0)),
+                preceded(
+                    tag("brightness"),
+                    map(
+                        |i| brightness(i, config),
+                        |b| Filter::BackdropBrightness(BackdropBrightness(b.0)),
+                    ),
                 ),
-                map(
-                    |i| contrast(i, config),
-                    |b| Filter::BackdropContrast(BackdropContrast(b.0)),
+                preceded(
+                    tag("contrast"),
+                    map(
+                        |i| contrast(i, config),
+                        |b| Filter::BackdropContrast(BackdropContrast(b.0)),
+                    ),
                 ),
-                map(
-                    |i| grayscale(i, config),
-                    |b| Filter::BackdropGrayscale(BackdropGrayscale(b.0)),
+                preceded(
+                    tag("grayscale"),
+                    map(
+                        |i| grayscale(i, config),
+                        |b| Filter::BackdropGrayscale(BackdropGrayscale(b.0)),
+                    ),
                 ),
                 map(
                     |i| hue_rotate(i, config),
                     |b| Filter::BackdropHueRotate(BackdropHueRotate(b.0)),
                 ),
-                map(
-                    |i| invert(i, config),
-                    |b| Filter::BackdropInvert(BackdropInvert(b.0)),
+                preceded(
+                    tag("invert"),
+                    map(
+                        |i| invert(i, config),
+                        |b| Filter::BackdropInvert(BackdropInvert(b.0)),
+                    ),
                 ),
-                map(
-                    |i| saturate(i, config),
-                    |b| Filter::BackdropSaturate(BackdropSaturate(b.0)),
+                preceded(
+                    tag("opacity"),
+                    map(|i| backdrop_opacity(i, config), Filter::BackdropOpacity),
                 ),
-                map(
-                    |i| sepia(i, config),
-                    |b| Filter::BackdropSepia(BackdropSepia(b.0)),
+                preceded(
+                    tag("saturate"),
+                    map(
+                        |i| saturate(i, config),
+                        |b| Filter::BackdropSaturate(BackdropSaturate(b.0)),
+                    ),
+                ),
+                preceded(
+                    tag("sepia"),
+                    map(
+                        |i| sepia(i, config),
+                        |b| Filter::BackdropSepia(BackdropSepia(b.0)),
+                    ),
                 ),
             )),
         ),
@@ -114,10 +153,8 @@ impl<'a> IntoDeclaration for Filter<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(blur)]
-#[keyword("blur")]
-#[empty_args(true)]
 #[config(filters.get_blur)]
 pub struct Blur<'a>(pub &'a str);
 
@@ -130,10 +167,8 @@ impl<'a> IntoDeclaration for Blur<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(brightness)]
-#[keyword("brightness")]
-#[empty_args(false)]
 #[config(filters.get_brightness)]
 pub struct Brightness<'a>(pub &'a str);
 
@@ -146,10 +181,8 @@ impl<'a> IntoDeclaration for Brightness<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(contrast)]
-#[keyword("contrast")]
-#[empty_args(false)]
 #[config(filters.get_contrast)]
 pub struct Contrast<'a>(pub &'a str);
 
@@ -162,10 +195,8 @@ impl<'a> IntoDeclaration for Contrast<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(drop_shadow)]
-#[keyword("drop-shadow")]
-#[empty_args(true)]
 #[config(filters.get_drop_shadow)]
 pub struct DropShadow<'a>(pub &'a str);
 
@@ -178,10 +209,8 @@ impl<'a> IntoDeclaration for DropShadow<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(grayscale)]
-#[keyword("grayscale")]
-#[empty_args(true)]
 #[config(filters.get_grayscale)]
 pub struct Grayscale<'a>(pub &'a str);
 
@@ -213,10 +242,8 @@ impl IntoDeclaration for HueRotate {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(invert)]
-#[keyword("invert")]
-#[empty_args(true)]
 #[config(filters.get_invert)]
 pub struct Invert<'a>(pub &'a str);
 
@@ -229,10 +256,8 @@ impl<'a> IntoDeclaration for Invert<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(saturate)]
-#[keyword("saturate")]
-#[empty_args(false)]
 #[config(filters.get_saturate)]
 pub struct Saturate<'a>(pub &'a str);
 
@@ -245,10 +270,8 @@ impl<'a> IntoDeclaration for Saturate<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(sepia)]
-#[keyword("sepia")]
-#[empty_args(true)]
 #[config(filters.get_sepia)]
 pub struct Sepia<'a>(pub &'a str);
 
@@ -339,10 +362,8 @@ impl<'a> IntoDeclaration for BackdropInvert<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, KeywordConfigurableParser)]
+#[derive(Debug, PartialEq, Hash, ConfigurableParser)]
 #[name(backdrop_opacity)]
-#[keyword("backdrop-opacity")]
-#[empty_args(false)]
 #[config(filters.get_backdrop_opacity)]
 pub struct BackdropOpacity<'a>(pub &'a str);
 

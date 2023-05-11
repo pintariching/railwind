@@ -1,7 +1,7 @@
 use macro_derive::{ConfigurableParser, EnumParser, IntoDeclaration};
 use nom::branch::alt;
 use nom::bytes::complete::tag;
-use nom::combinator::map;
+use nom::combinator::{map, map_opt, value};
 use nom::sequence::preceded;
 use nom::IResult;
 
@@ -32,23 +32,17 @@ pub enum Borders<'a> {
 pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borders<'a>> {
     alt((
         preceded(
-            tag("rounded-"),
+            tag("rounded"),
             map(|i| border_radius(i, config), Borders::BorderRadius),
         ),
-        map(tag("rounded"), |_| {
-            Borders::BorderRadius(BorderRadius::Around(""))
-        }),
         preceded(
-            tag("border-"),
+            tag("border"),
             alt((
                 map(|i| border_width(i, config), Borders::BorderWidth),
                 map(|i| border_color(i, config), Borders::BorderColor),
                 map(border_style, Borders::BorderStyle),
             )),
         ),
-        map(tag("border"), |_| {
-            Borders::BorderWidth(BorderWidth::Around(""))
-        }),
         preceded(
             tag("divide-"),
             alt((
@@ -70,10 +64,10 @@ pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borde
             Borders::OutlineStyle(OutlineStyle::Solid)
         }),
         preceded(
-            tag("ring-"),
+            tag("ring"),
             alt((
                 map(|i| ring_width(i, config), Borders::RingWidth),
-                map(|i| ring_color(i, config), Borders::RingColor),
+                preceded(tag("-"), map(|i| ring_color(i, config), Borders::RingColor)),
                 preceded(
                     tag("offset-"),
                     alt((
@@ -83,7 +77,6 @@ pub fn borders<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Borde
                 ),
             )),
         ),
-        map(tag("ring"), |_| Borders::RingWidth(RingWidth::Value(""))),
     ))(input)
 }
 
@@ -104,15 +97,21 @@ fn border_radius<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Bor
     let radius = config.borders.get_border_radius();
 
     alt((
-        map(keyword_value("t", radius), BorderRadius::Top),
-        map(keyword_value("r", radius), BorderRadius::Right),
-        map(keyword_value("b", radius), BorderRadius::Right),
-        map(keyword_value("l", radius), BorderRadius::Right),
-        map(keyword_value("tl", radius), BorderRadius::Right),
-        map(keyword_value("tr", radius), BorderRadius::Right),
-        map(keyword_value("br", radius), BorderRadius::Right),
-        map(keyword_value("bl", radius), BorderRadius::Right),
-        map(arbitrary_hashmap_value(radius), BorderRadius::Around),
+        preceded(
+            tag("-"),
+            alt((
+                map(keyword_value("t", radius), BorderRadius::Top),
+                map(keyword_value("r", radius), BorderRadius::Right),
+                map(keyword_value("b", radius), BorderRadius::Right),
+                map(keyword_value("l", radius), BorderRadius::Right),
+                map(keyword_value("tl", radius), BorderRadius::Right),
+                map(keyword_value("tr", radius), BorderRadius::Right),
+                map(keyword_value("br", radius), BorderRadius::Right),
+                map(keyword_value("bl", radius), BorderRadius::Right),
+                map(arbitrary_hashmap_value(radius), BorderRadius::Around),
+            )),
+        ),
+        map_opt(tag(""), |_| radius.get("").map(|b| BorderRadius::Around(b))),
     ))(input)
 }
 
@@ -159,13 +158,19 @@ fn border_width<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Bord
     let width = config.borders.get_border_width();
 
     alt((
-        map(keyword_value("x", width), BorderWidth::X),
-        map(keyword_value("y", width), BorderWidth::Y),
-        map(keyword_value("t", width), BorderWidth::Top),
-        map(keyword_value("r", width), BorderWidth::Right),
-        map(keyword_value("b", width), BorderWidth::Bottom),
-        map(keyword_value("l", width), BorderWidth::Left),
-        map(arbitrary_hashmap_value(width), BorderWidth::Around),
+        preceded(
+            tag("-"),
+            alt((
+                map(keyword_value("x", width), BorderWidth::X),
+                map(keyword_value("y", width), BorderWidth::Y),
+                map(keyword_value("t", width), BorderWidth::Top),
+                map(keyword_value("r", width), BorderWidth::Right),
+                map(keyword_value("b", width), BorderWidth::Bottom),
+                map(keyword_value("l", width), BorderWidth::Left),
+                map(arbitrary_hashmap_value(width), BorderWidth::Around),
+            )),
+        ),
+        map_opt(tag(""), |_| width.get("").map(|w| BorderWidth::Around(w))),
     ))(input)
 }
 
@@ -431,11 +436,17 @@ pub enum RingWidth<'a> {
 }
 
 fn ring_width<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, RingWidth<'a>> {
-    let w = config.borders.get_ring_width();
+    let width = config.borders.get_ring_width();
 
     alt((
-        map(arbitrary_hashmap_value(w), RingWidth::Value),
-        map(tag("inset"), |_| RingWidth::Inset),
+        preceded(
+            tag("-"),
+            alt((
+                map(arbitrary_hashmap_value(width), RingWidth::Value),
+                map(tag("inset"), |_| RingWidth::Inset),
+            )),
+        ),
+        map_opt(tag(""), |_| width.get("").map(|w| RingWidth::Value(w))),
     ))(input)
 }
 

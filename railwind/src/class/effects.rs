@@ -1,11 +1,13 @@
 use macro_derive::{ConfigurableParser, EnumParser, IntoDeclaration};
-use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::combinator::map;
 use nom::sequence::preceded;
 use nom::IResult;
+use nom::{branch::alt, combinator::map_opt};
 
 use crate::config::Config;
+
+use super::utils::{arbitrary_hashmap_value, keyword_value};
 
 #[derive(Debug, PartialEq, Hash)]
 pub enum Effects<'a> {
@@ -19,13 +21,12 @@ pub enum Effects<'a> {
 pub fn effects<'a>(input: &'a str, config: &'a Config) -> IResult<&'a str, Effects<'a>> {
     alt((
         preceded(
-            tag("shadow-"),
+            tag("shadow"),
             alt((
                 map(|i| box_shadow(i, config), Effects::BoxShadow),
                 map(|i| box_shadow_color(i, config), Effects::BoxShadowColor),
             )),
         ),
-        map(tag("shadow"), |_| Effects::BoxShadow(BoxShadow(""))),
         preceded(
             tag("opacity-"),
             map(|i| opacity(i, config), Effects::Opacity),
