@@ -3,6 +3,8 @@ use std::collections::HashMap;
 
 use macro_derive::GetOnceCell;
 
+mod layout;
+
 #[derive(Default)]
 pub struct Config {
     pub backgrounds: BackgroundsConfig,
@@ -10,6 +12,7 @@ pub struct Config {
     pub borders: BordersConfig,
     pub effects: EffectsConfig,
     pub filters: FiltersConfig,
+    pub flexbox_grid: FlexboxGridConfig,
 }
 
 #[derive(GetOnceCell, Default)]
@@ -124,4 +127,61 @@ pub struct FiltersConfig {
 
     #[config_path("filters/opacity.ron")]
     backdrop_opacity: OnceCell<HashMap<&'static str, &'static str>>,
+}
+
+#[derive(GetOnceCell, Default)]
+pub struct FlexboxGridConfig {
+    #[config_path("flexbox_grid/basis.ron")]
+    basis: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/flex.ron")]
+    flex: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grow.ron")]
+    grow: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/shrink.ron")]
+    shrink: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/order.ron")]
+    order: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_template_columns.ron")]
+    grid_template_columns: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_column_span.ron")]
+    grid_column_span: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_column_start_end.ron")]
+    grid_column_start: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_column_start_end.ron")]
+    grid_column_end: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_template_rows.ron")]
+    grid_template_rows: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_row_span.ron")]
+    grid_row_span: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_row_start_end.ron")]
+    grid_row_start: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_row_start_end.ron")]
+    grid_row_end: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_auto_columns.ron")]
+    grid_auto_columns: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/grid_auto_rows.ron")]
+    grid_auto_rows: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/gap.ron")]
+    gap: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/gap.ron")]
+    gap_x: OnceCell<HashMap<&'static str, &'static str>>,
+
+    #[config_path("flexbox_grid/gap.ron")]
+    gap_y: OnceCell<HashMap<&'static str, &'static str>>,
 }
